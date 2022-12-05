@@ -7,6 +7,6 @@ import java.util.UUID
 case class InspirationalQuote(
   serialId: UUID,
   quote: Quote,
-  author: Option[String],
+  author: Option[AuthorDetail],
   genre: Set[String],
 )

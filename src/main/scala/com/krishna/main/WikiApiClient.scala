@@ -9,7 +9,7 @@ object WikiApiClient extends ZIOAppDefault:
 
   val program: ZIO[WebClient, Throwable, Unit] =
     for
-      res <- WebClient.getAuthorDetail("Friedrich Nietzsche")
+      res <- WebClient.getAuthorDetail("")
       _ <- Console.printLine(res)
     yield ()
 
