@@ -22,15 +22,15 @@ object MainApp extends ZIOAppDefault:
         .cached,
     )
 
-  override val run =
+  override val run: ZIO[Any, IOException, ExitCode] =
 
     val splintOnQuote: ZPipeline[Any, Nothing, String, InspirationalQuote] = ZPipeline.map { line =>
       val splitValue = line.split(";")
       InspirationalQuote(
-      serialId = UUID.randomUUID(),
-      quote = Quote(splitValue(0)),
-      author = Option(splitValue(1)).filter(_.nonEmpty),
-      genre = splitValue(2).split(",").map(_.trim).toSet
+        serialId = UUID.randomUUID(),
+        quote = Quote(splitValue(0)),
+        author = Option(splitValue(1)).filter(_.nonEmpty),
+        genre = splitValue(2).split(",").map(_.trim).toSet,
       )
     }
 
@@ -42,8 +42,8 @@ object MainApp extends ZIOAppDefault:
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines >>> splintOnQuote)
       .run(collectQuotes)
 
-    for {
+    for
       _ <- ZIO.logInfo("Running ZIO inspirational quote project!!")
       bar <- sourceCsvFile
       _ <- ZIO.logInfo(s"Debugging: ${bar.drop(1).take(2)}")
-    } yield ExitCode.success
+    yield ExitCode.success

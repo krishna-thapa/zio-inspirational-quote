@@ -5,13 +5,12 @@ import zio.*
 
 import java.net.URLEncoder
 
-object WikiApiClient extends ZIOAppDefault {
+object WikiApiClient extends ZIOAppDefault:
 
-  val program = for {
-    res <- WebClient.getAuthorDetail("Friedrich Nietzsche")
-    _ <- Console.printLine(res)
-  } yield ()
+  val program: ZIO[WebClient, Throwable, Unit] =
+    for
+      res <- WebClient.getAuthorDetail("Friedrich Nietzsche")
+      _ <- Console.printLine(res)
+    yield ()
 
-  override val run = program.provide(WikiHttpService.layer)
-
-}
+  override val run: ZIO[Any, Throwable, Unit] = program.provide(WikiHttpService.layer)
