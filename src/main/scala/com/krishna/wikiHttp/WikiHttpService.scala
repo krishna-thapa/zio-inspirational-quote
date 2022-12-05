@@ -1,5 +1,6 @@
 package com.krishna.wikiHttp
 
+import com.krishna.config.EnvironmentConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 import com.krishna.wikiHttp.WikiHttpApi.*
@@ -21,9 +22,9 @@ case class WikiHttpService() extends WebClient:
 
     program.provide(ChannelFactory.auto ++ EventLoopGroup.auto())
 
-  override def getAuthorDetail(author: String): ZIO[WebClient, Throwable, AuthorDetail] =
+  override def getAuthorDetail(
+    author: String): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
     getAuthorDetailFromUrl(author)
 
 object WikiHttpService:
   val layer: ULayer[WikiHttpService] = ZLayer.succeed(WikiHttpService())
-

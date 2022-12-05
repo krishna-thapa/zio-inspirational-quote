@@ -9,11 +9,12 @@ case class WikiMockService() extends WebClient:
     url: String,
     params: Seq[(String, String)],
     headers: Seq[(String, String)]): ZIO[Any, Throwable, JsonBody] =
-
-    ZIO.logInfo("foo") *> ZIO.succeed(JsonBody("ggg"))
+    ZIO.succeed(JsonBody("mock JSON Body"))
 
   override def getAuthorDetail(author: String): ZIO[WebClient, Throwable, AuthorDetail] =
-    getWebClientResponse("url", Nil, Nil) *> ZIO.logInfo("bar") *> ZIO.succeed(AuthorDetail(title = ""))
+    getWebClientResponse("mock url", Nil, Nil) *>
+      ZIO.logInfo(s"Mocking Wiki API call for the author: $author") *>
+      ZIO.succeed(AuthorDetail(title = "", relatedInfo = None))
 
 object WikiMockService:
   val layer: ULayer[WikiMockService] = ZLayer.succeed(WikiMockService())

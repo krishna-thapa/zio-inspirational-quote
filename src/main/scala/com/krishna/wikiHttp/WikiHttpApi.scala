@@ -1,5 +1,6 @@
 package com.krishna.wikiHttp
 
+import com.krishna.config.EnvironmentConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 import zio.json.*
@@ -29,17 +30,20 @@ object WikiHttpApi:
 
   given JsonDecoder[Entity] = DeriveJsonDecoder.gen[Entity]
 
-  private val toAuthorDetail: (String, String) => AuthorDetail =
-    (author: String, jsonData: String) =>
+  private val toAuthorDetail: (Array[String], String) => AuthorDetail =
+    (authorWithInfo: Array[String], jsonData: String) =>
+      val title: String = authorWithInfo.head.trim
+      val relatedInfo: Option[String] = Option(authorWithInfo.tail.mkString(", ").trim).filter(_.nonEmpty)
       jsonData.fromJson[Entity].toOption match
         case Some(result) =>
           AuthorDetail(
-            title = author,
+            title,
+            relatedInfo,
             alias = result.query.pages.flatMap(_.terms.alias),
             description = result.query.pages.flatMap(_.terms.description),
             imagerUrl = result.query.pages.map(_.thumbnail.source).head,
           )
-        case None => AuthorDetail(title = author)
+        case None => AuthorDetail(title, relatedInfo)
 
   private val capitalizeAuthor = (author: String) =>
     author.split(" ").map(_.trim.capitalize).mkString(" ")
@@ -53,12 +57,14 @@ object WikiHttpApi:
       .map(encodeAuthor)
       .head
 
-  def getAuthorDetailFromUrl(author: String): ZIO[WebClient, Throwable, AuthorDetail] =
-    // TODO: Get it from the config file
-    val encodedAuthor: String = filterAuthor(author)
-    val url: String =
-      s"https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageimages%7Cpageterms&piprop=thumbnail&pithumbsize=500&titles=$encodedAuthor"
+  def getAuthorDetailFromUrl(
+    author: String): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
+    val splitAuthorWithInfo: Array[String] = author.split(",")
+    val encodedAuthor: String = filterAuthor(splitAuthorWithInfo.head)
     for
-      jsonContent <- WebClient.getWebClientResponse(url)
-      authorDetail = toAuthorDetail(author, jsonContent.value)
+      environmentConfig <- ZIO.service[EnvironmentConfig]
+      jsonContent <- WebClient.getWebClientResponse(
+        environmentConfig.wiki.apiUrl.concat(encodedAuthor)
+      )
+      authorDetail = toAuthorDetail(splitAuthorWithInfo, jsonContent.value)
     yield authorDetail

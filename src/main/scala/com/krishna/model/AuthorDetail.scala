@@ -2,6 +2,7 @@ package com.krishna.model
 
 case class AuthorDetail(
   title: String,
+  relatedInfo: Option[String],
   alias: Seq[String] = Seq.empty,
   description: Seq[String] = Seq.empty,
   imagerUrl: Option[String] = None,
