@@ -15,7 +15,6 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio" % zioVersion,
       "dev.zio" %% "zio-streams" % zioVersion,
-
       "dev.zio" %% "zio-json" % "0.3.0",
 
       // https://zio.github.io/zio-http/
@@ -25,3 +24,7 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-logging" % zioLogger,
     ),
   )
+
+scalacOptions ++= Seq(
+  "-Yretain-trees", // To use the default parameters for the ZIO JSON for Scala 3
+)
