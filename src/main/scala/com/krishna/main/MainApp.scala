@@ -28,7 +28,7 @@ object MainApp extends ZIOAppDefault:
 
   val program: ZIO[WebClient with EnvironmentConfig, Throwable, ExitCode] =
     for
-      _ <- ZIO.logInfo("Running ZIO inspirational quote project!!")
+      _      <- ZIO.logInfo("Running ZIO inspirational quote project!!")
       quotes <- ReadQuoteCsv.getQuotesFromCsv
       bar = quotes.filter(_.author.exists(_.imagerUrl.isEmpty))
       _ <- ZIO.logInfo(s"Debugging: ${quotes.drop(1).take(2)}")

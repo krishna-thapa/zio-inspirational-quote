@@ -33,7 +33,7 @@ object WikiHttpApi:
 
   private val toAuthorDetail: (Array[String], String) => AuthorDetail =
     (authorWithInfo: Array[String], jsonData: String) =>
-      val title: String = authorWithInfo.head.trim
+      val title: String               = authorWithInfo.head.trim
       val relatedInfo: Option[String] =
         Option(authorWithInfo.tail.mkString(", ").trim).filter(_.nonEmpty)
       jsonData.fromJson[Entity].toOption match
@@ -45,7 +45,7 @@ object WikiHttpApi:
             description = result.query.pages.flatMap(_.terms.description),
             imagerUrl = result.query.pages.map(_.thumbnail.source).head
           )
-        case None => AuthorDetail(title, relatedInfo)
+        case None         => AuthorDetail(title, relatedInfo)
 
   private val capitalizeAuthor = (author: String) =>
     author.split(" ").map(_.trim.capitalize).mkString(" ")
@@ -62,10 +62,10 @@ object WikiHttpApi:
   def getAuthorDetailFromUrl(
     author: String): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
     val splitAuthorWithInfo: Array[String] = author.split(",")
-    val encodedAuthor: String = filterAuthor(splitAuthorWithInfo.head)
+    val encodedAuthor: String              = filterAuthor(splitAuthorWithInfo.head)
     for
       environmentConfig <- ZIO.service[EnvironmentConfig]
-      jsonContent <- WebClient.getWebClientResponse(
+      jsonContent       <- WebClient.getWebClientResponse(
         environmentConfig.wiki.apiUrl.concat(encodedAuthor)
       )
       authorDetail = toAuthorDetail(splitAuthorWithInfo, jsonContent.value)

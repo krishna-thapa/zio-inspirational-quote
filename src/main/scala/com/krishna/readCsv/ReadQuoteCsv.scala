@@ -32,7 +32,7 @@ object ReadQuoteCsv:
     : ZIO[WebClient with EnvironmentConfig, Throwable, Chunk[InspirationalQuote]] =
     for
       environmentConfig <- ZIO.service[EnvironmentConfig]
-      result <- ZStream
+      result            <- ZStream
         .fromResource(environmentConfig.csvPath)
         .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
         .mapZIOPar(environmentConfig.batchSize)(toInspirationQuote)
