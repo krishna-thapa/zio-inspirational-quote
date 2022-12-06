@@ -2,16 +2,14 @@ val zioVersion = "2.0.4"
 val zioLogger = "2.1.5"
 val zioJson = "0.3.0"
 
+// give the user a nice default project!
+ThisBuild / organization := "com.krishna"
+ThisBuild / version := "0.0.1"
+ThisBuild / description := ""
+
 lazy val root = (project in file("."))
+  .settings(BuildHelper.stdSettings)
   .settings(
-    inThisBuild(
-      List(
-        organization := "com.krishna",
-        version := "0.0.1",
-        scalaVersion := "3.2.1",
-        description := "",
-      )
-    ),
     name := "zio-inspirational-quote",
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio" % zioVersion,
@@ -38,6 +36,7 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
   "dev.zio" %% "zio-config-magnolia" % zioConfig,
 )
 
-scalacOptions ++= Seq(
-  "-Yretain-trees" // To use the default parameters for the ZIO JSON for Scala 3
-)
+addCommandAlias("fmt", "scalafmt; Test / scalafmt; sFix;")
+addCommandAlias("fmtCheck", "scalafmtCheck; Test / scalafmtCheck; sFixCheck")
+addCommandAlias("sFix", "scalafix OrganizeImports; Test / scalafix OrganizeImports")
+addCommandAlias("sFixCheck", "scalafix --check OrganizeImports; Test / scalafix --check OrganizeImports")

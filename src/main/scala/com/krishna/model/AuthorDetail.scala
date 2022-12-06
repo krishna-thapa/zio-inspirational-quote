@@ -5,7 +5,7 @@ case class AuthorDetail(
   relatedInfo: Option[String],
   alias: Seq[String] = Seq.empty,
   description: Seq[String] = Seq.empty,
-  imagerUrl: Option[String] = None,
+  imagerUrl: Option[String] = None
 )
 
 object AuthorDetail:

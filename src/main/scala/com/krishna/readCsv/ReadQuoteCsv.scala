@@ -1,14 +1,15 @@
 package com.krishna.readCsv
 
+import java.io.IOException
+import java.util.UUID
+
+import zio.stream.{ ZPipeline, ZSink, ZStream }
+import zio.{ Chunk, ZIO }
+
 import com.krishna.config.EnvironmentConfig
 import com.krishna.model.Quotes.Quote
 import com.krishna.model.{ AuthorDetail, InspirationalQuote }
 import com.krishna.wikiHttp.WebClient
-import zio.stream.{ ZPipeline, ZSink, ZStream }
-import zio.{ Chunk, ZIO }
-
-import java.io.IOException
-import java.util.UUID
 
 object ReadQuoteCsv:
 
@@ -20,7 +21,7 @@ object ReadQuoteCsv:
       serialId = UUID.randomUUID(),
       quote = Quote(splitValue(0)),
       author = Option(authorDetails).filterNot(AuthorDetail.isEmpty),
-      genre = splitValue(2).split(",").map(_.trim).toSet,
+      genre = splitValue(2).split(",").map(_.trim).toSet
     )
 
   private val collectQuotes

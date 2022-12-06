@@ -1,8 +1,9 @@
 package com.krishna.wikiHttp
 
+import zio.{ ULayer, ZIO, ZLayer }
+
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
-import zio.{ ULayer, ZIO, ZLayer }
 
 case class WikiMockService() extends WebClient:
   override def getWebClientResponse(

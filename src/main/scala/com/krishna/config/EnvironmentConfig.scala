@@ -9,7 +9,7 @@ case class WikiConfig(apiUrl: String)
 case class EnvironmentConfig(
   csvPath: String,
   wiki: WikiConfig,
-  batchSize: Int,
+  batchSize: Int
 )
 
 object EnvironmentConfig:

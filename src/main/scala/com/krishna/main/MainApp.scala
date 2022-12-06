@@ -1,14 +1,15 @@
 package com.krishna.main
 
+import java.io.IOException
+import java.util.UUID
+
+import zio.logging.{ LogFilter, LogFormat, console }
+import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
+
 import com.krishna.config.EnvironmentConfig
 import com.krishna.model.InspirationalQuote
 import com.krishna.readCsv.ReadQuoteCsv
 import com.krishna.wikiHttp.{ WebClient, WikiHttpService }
-import zio.logging.{ LogFilter, LogFormat, console }
-import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
-
-import java.io.IOException
-import java.util.UUID
 
 object MainApp extends ZIOAppDefault:
 
@@ -18,9 +19,9 @@ object MainApp extends ZIOAppDefault:
       LogFilter
         .logLevelByName(
           LogLevel.Info,
-          "io.netty" -> LogLevel.Warning,
+          "io.netty" -> LogLevel.Warning
         )
-        .cached,
+        .cached
     )
 
   // Catch IOException && CharacterCodingException && Throwable

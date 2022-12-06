@@ -1,12 +1,13 @@
 package com.krishna.wikiHttp
 
-import com.krishna.config.EnvironmentConfig
-import com.krishna.model.AuthorDetail
-import com.krishna.wikiHttp.JsonRes.JsonBody
+import java.net.URLEncoder
+
 import zio.json.*
 import zio.{ ZIO, ZLayer }
 
-import java.net.URLEncoder
+import com.krishna.config.EnvironmentConfig
+import com.krishna.model.AuthorDetail
+import com.krishna.wikiHttp.JsonRes.JsonBody
 
 object WikiHttpApi:
 
@@ -33,7 +34,8 @@ object WikiHttpApi:
   private val toAuthorDetail: (Array[String], String) => AuthorDetail =
     (authorWithInfo: Array[String], jsonData: String) =>
       val title: String = authorWithInfo.head.trim
-      val relatedInfo: Option[String] = Option(authorWithInfo.tail.mkString(", ").trim).filter(_.nonEmpty)
+      val relatedInfo: Option[String] =
+        Option(authorWithInfo.tail.mkString(", ").trim).filter(_.nonEmpty)
       jsonData.fromJson[Entity].toOption match
         case Some(result) =>
           AuthorDetail(
@@ -41,7 +43,7 @@ object WikiHttpApi:
             relatedInfo,
             alias = result.query.pages.flatMap(_.terms.alias),
             description = result.query.pages.flatMap(_.terms.description),
-            imagerUrl = result.query.pages.map(_.thumbnail.source).head,
+            imagerUrl = result.query.pages.map(_.thumbnail.source).head
           )
         case None => AuthorDetail(title, relatedInfo)
 
