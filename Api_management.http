@@ -1,0 +1,7 @@
+// Home page request
+GET http://localhost:9000/
+
+// Request to ping to check the HTTP response
+###
+GET http://localhost:9000/migrate
+Authorization: Basic admin:admin

@@ -2,11 +2,13 @@ package com.krishna.model
 
 import java.util.UUID
 
-import com.krishna.model.Quotes.*
+import zio.json.{ DeriveJsonEncoder, JsonEncoder }
 
 case class InspirationalQuote(
   serialId: UUID,
   quote: Quote,
   author: Option[AuthorDetail],
-  genre: Set[String]
-)
+  genre: Set[String])
+
+object InspirationalQuote:
+  given JsonEncoder[InspirationalQuote] = DeriveJsonEncoder.gen

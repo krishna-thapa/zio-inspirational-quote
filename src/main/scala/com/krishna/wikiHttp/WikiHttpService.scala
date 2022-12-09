@@ -13,7 +13,8 @@ case class WikiHttpService() extends WebClient:
   override def getWebClientResponse(
     url: String,
     params: Seq[(String, String)],
-    headers: Seq[(String, String)]): ZIO[Any, Throwable, JsonBody] =
+    headers: Seq[(String, String)]
+  ): ZIO[Any, Throwable, JsonBody] =
     val program
       : ZIO[zhttp.service.EventLoopGroup & zhttp.service.ChannelFactory, Throwable, JsonBody] =
       for
@@ -24,7 +25,8 @@ case class WikiHttpService() extends WebClient:
     program.provide(ChannelFactory.auto ++ EventLoopGroup.auto())
 
   override def getAuthorDetail(
-    author: String): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
+    author: String
+  ): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
     getAuthorDetailFromUrl(author)
 
 object WikiHttpService:

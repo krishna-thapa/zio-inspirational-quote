@@ -7,13 +7,14 @@ import zio.stream.{ ZPipeline, ZSink, ZStream }
 import zio.{ Chunk, ZIO }
 
 import com.krishna.config.EnvironmentConfig
-import com.krishna.model.Quotes.Quote
-import com.krishna.model.{ AuthorDetail, InspirationalQuote }
+import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
 
 object ReadQuoteCsv:
 
-  private def toInspirationQuote(line: String): ZIO[WebClient & EnvironmentConfig, Throwable, InspirationalQuote] =
+  private def toInspirationQuote(
+    line: String
+  ): ZIO[WebClient & EnvironmentConfig, Throwable, InspirationalQuote] =
     val splitValue: Array[String] = line.split(";")
     for authorDetails <- WebClient.getAuthorDetail(splitValue(1))
     yield InspirationalQuote(
@@ -36,4 +37,5 @@ object ReadQuoteCsv:
         .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
         .mapZIOPar(environmentConfig.batchSize)(toInspirationQuote)
         .run(collectQuotes)
+        .tapError(ex => ZIO.logError(s"Error while $ex"))
     yield result

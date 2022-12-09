@@ -9,7 +9,8 @@ case class WikiMockService() extends WebClient:
   override def getWebClientResponse(
     url: String,
     params: Seq[(String, String)],
-    headers: Seq[(String, String)]): ZIO[Any, Throwable, JsonBody] =
+    headers: Seq[(String, String)]
+  ): ZIO[Any, Throwable, JsonBody] =
     ZIO.succeed(JsonBody("mock JSON Body"))
 
   override def getAuthorDetail(author: String): ZIO[WebClient, Throwable, AuthorDetail] =

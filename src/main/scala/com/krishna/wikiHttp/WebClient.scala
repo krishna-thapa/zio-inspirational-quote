@@ -25,9 +25,11 @@ object WebClient:
   def getWebClientResponse(
     url: String,
     params: Seq[(String, String)] = Nil,
-    headers: Seq[(String, String)] = Nil): ZIO[WebClient, Throwable, JsonBody] =
+    headers: Seq[(String, String)] = Nil
+  ): ZIO[WebClient, Throwable, JsonBody] =
     ZIO.serviceWithZIO[WebClient](_.getWebClientResponse(url, params, headers))
 
   def getAuthorDetail(
-    author: String): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
+    author: String
+  ): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
     ZIO.serviceWithZIO[WebClient](_.getAuthorDetail(author))

@@ -36,6 +36,9 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
   "dev.zio" %% "zio-config-magnolia" % zioConfig,
 )
 
+addCommandAlias("api", "~reStart;")
+addCommandAlias("status", "reStatus;")
+
 addCommandAlias("fmt", "scalafmt; Test / scalafmt; sFix;")
 addCommandAlias("fmtCheck", "scalafmtCheck; Test / scalafmtCheck; sFixCheck")
 addCommandAlias("sFix", "scalafix OrganizeImports; Test / scalafix OrganizeImports")

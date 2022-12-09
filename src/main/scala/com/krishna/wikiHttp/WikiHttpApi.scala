@@ -43,7 +43,7 @@ object WikiHttpApi:
             relatedInfo,
             alias = result.query.pages.flatMap(_.terms.alias),
             description = result.query.pages.flatMap(_.terms.description),
-            imagerUrl = result.query.pages.map(_.thumbnail.source).head
+            imageUrl = result.query.pages.map(_.thumbnail.source).head
           )
         case None         => AuthorDetail(title, relatedInfo)
 
@@ -60,7 +60,8 @@ object WikiHttpApi:
       .head
 
   def getAuthorDetailFromUrl(
-    author: String): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
+    author: String
+  ): ZIO[WebClient with EnvironmentConfig, Throwable, AuthorDetail] =
     val splitAuthorWithInfo: Array[String] = author.split(",")
     val encodedAuthor: String              = filterAuthor(splitAuthorWithInfo.head)
     for
