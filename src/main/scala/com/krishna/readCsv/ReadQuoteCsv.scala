@@ -13,8 +13,7 @@ import com.krishna.wikiHttp.WebClient
 
 object ReadQuoteCsv:
 
-  private def toInspirationQuote(
-    line: String): ZIO[WebClient with EnvironmentConfig, Throwable, InspirationalQuote] =
+  private def toInspirationQuote(line: String): ZIO[WebClient & EnvironmentConfig, Throwable, InspirationalQuote] =
     val splitValue: Array[String] = line.split(";")
     for authorDetails <- WebClient.getAuthorDetail(splitValue(1))
     yield InspirationalQuote(

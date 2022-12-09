@@ -30,9 +30,20 @@ object MainApp extends ZIOAppDefault:
     for
       _      <- ZIO.logInfo("Running ZIO inspirational quote project!!")
       quotes <- ReadQuoteCsv.getQuotesFromCsv
-      bar = quotes.filter(_.author.exists(_.imagerUrl.isEmpty))
-      _ <- ZIO.logInfo(s"Debugging: ${quotes.drop(1).take(2)}")
+      // bar = quotes.filter(_.author.exists(_.imagerUrl.isEmpty))
+      _      <- ZIO.logInfo(s"Debugging: ${quotes.drop(1).take(2)}")
+      _      <- ZIO.logInfo("Finished running ZIO application for the inspirational quote project!")
     yield ExitCode.success
 
+  // =========================================
+  def logAndFail(errorMsg: String, exception: Throwable): ZIO[Any, Throwable, Unit] =
+    ZIO.logError(errorMsg) *> ZIO.fail(exception)
+
+  def errorHandler(exception: Throwable, service: String): ZIO[Any, Throwable, Unit] = ???
+
   override val run: ZIO[Any, Throwable, ExitCode] =
-    program.provide(WikiHttpService.layer, EnvironmentConfig.layer)
+    program
+      .provide(WikiHttpService.layer, EnvironmentConfig.layer)
+      .catchAll { throwable =>
+        ZIO.succeed(throwable.printStackTrace()).map(_ => ExitCode.failure)
+      }
