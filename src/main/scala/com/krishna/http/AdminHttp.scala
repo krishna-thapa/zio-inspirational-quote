@@ -1,18 +1,23 @@
 package com.krishna.http
 
 import zhttp.http.*
-import zio.ZIO
 import zio.json.EncoderOps
+import zio.{ Chunk, ZIO }
 
 import com.krishna.config.EnvironmentConfig
+import com.krishna.model.InspirationalQuote
 import com.krishna.readCsv.ReadQuoteCsv
 import com.krishna.wikiHttp.WebClient
 
 object AdminHttp:
+
+  val convertToJson: Chunk[InspirationalQuote] => Response = (quotes: Chunk[InspirationalQuote]) =>
+    Response.json(quotes.toJson)
+
   def apply(): Http[WebClient with EnvironmentConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       // GET /migrate
       case Method.GET -> !! / "migrate" =>
         ZIO.logInfo("Retrieving all the quotes.....") *>
-          ReadQuoteCsv.getQuotesFromCsv.map(quotes => Response.json(quotes.toJson))
+          ReadQuoteCsv.getQuotesFromCsv.map(convertToJson)
     } @@ Middleware.basicAuth("admin", "admin")

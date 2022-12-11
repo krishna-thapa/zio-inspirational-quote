@@ -7,3 +7,11 @@ addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.10.4")
 
 // https://github.com/spray/sbt-revolver
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
+
+// https://www.baeldung.com/scala/sbt-dependency-tree
+// sbt dependencyBrowseGraph
+// sbt dependencyBrowseTree
+addDependencyTreePlugin
+
+// https://github.com/Philippus/sbt-dotenv
+addSbtPlugin("nl.gn0s1s" % "sbt-dotenv" % "3.0.0")

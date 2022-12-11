@@ -38,4 +38,5 @@ object ReadQuoteCsv:
         .mapZIOPar(environmentConfig.batchSize)(toInspirationQuote)
         .run(collectQuotes)
         .tapError(ex => ZIO.logError(s"Error while $ex"))
+      _ <- ZIO.logInfo(s"Finishing retrieving total quote records of size: ${result.size}.")
     yield result
