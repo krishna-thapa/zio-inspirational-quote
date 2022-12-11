@@ -49,7 +49,7 @@ object MainApp extends ZIOAppDefault:
       case ex: IOException => logAndFail("Failed while reading the CSV file!", ex)
       case ex              => logAndFail("Generic fail", ex)
 
-  override val run: ZIO[Any, Throwable, ExitCode] =
+  override val run: ZIO[Environment & (ZIOAppArgs & Scope), Any, Any] =
     program
       .provide(WikiHttpService.layer, EnvironmentConfig.layer)
       .catchAll(errorHandler)
