@@ -24,7 +24,7 @@ lazy val root = (project in file("."))
 
       // https://zio.github.io/zio-logging/
       "dev.zio" %% "zio-logging" % zioLogger,
-    ) ++ zioConfigDependencies,
+    ) ++ zioConfigDependencies ++ zioQuillDependencies,
   )
 
 // https://zio.dev/zio-config/
@@ -33,6 +33,12 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
   "dev.zio" %% "zio-config" % zioConfig,
   "dev.zio" %% "zio-config-typesafe" % zioConfig,
   "dev.zio" %% "zio-config-magnolia" % zioConfig,
+)
+
+// https://zio.dev/zio-quill/
+val zioQuillDependencies: Seq[ModuleID] = Seq(
+  //"org.postgresql" % "postgresql" % "42.5.1",
+  "io.getquill" %% "quill-jdbc-zio" % "4.6.0"
 )
 
 // ============= SBT Aliases ============================
