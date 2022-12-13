@@ -2,14 +2,18 @@ package com.krishna.model
 
 import zio.json.{ DeriveJsonEncoder, JsonEncoder }
 
-case class AuthorDetail(
-  title: String,
+final case class AuthorDetail(
+  title: AuthorDetail.Title,
   relatedInfo: Option[String],
   alias: Seq[String] = Seq.empty,
   description: Seq[String] = Seq.empty,
-  imageUrl: Option[String] = None)
+  imageUrl: Option[String] = None
+)
 
 object AuthorDetail:
+
+  type Title = String
+
   given JsonEncoder[AuthorDetail] = DeriveJsonEncoder.gen
 
   def isEmpty(author: AuthorDetail): Boolean =

@@ -6,6 +6,7 @@ import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 
 case class WikiMockService() extends WebClient:
+
   override def getWebClientResponse(
     url: String,
     params: Seq[(String, String)],

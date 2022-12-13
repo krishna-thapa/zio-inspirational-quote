@@ -3,12 +3,13 @@ package com.krishna.main
 import java.io.IOException
 import java.util.UUID
 
-import zhttp.http._
+import zhttp.http.*
 import zhttp.service.Server
 import zio.logging.{ LogFilter, LogFormat, console }
 import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
 import com.krishna.config.EnvironmentConfig
+import com.krishna.database.DatabaseMigrator
 import com.krishna.http.{ AdminHttp, HomePage }
 import com.krishna.model.InspirationalQuote
 import com.krishna.readCsv.ReadQuoteCsv
@@ -36,7 +37,7 @@ object MainApp extends ZIOAppDefault:
     for
       _ <- ZIO.logInfo("Running ZIO inspirational quote API project!!")
       _ <- ZIO.logInfo(s"Starting server on http://localhost:$port")
-      _ <- Server.start(port, combinedHttp)
+      _ <- DatabaseMigrator.migrate <*> Server.start(port, combinedHttp)
     yield ()
 
   // =========================================

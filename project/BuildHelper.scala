@@ -1,6 +1,6 @@
-import sbt.Keys._
-import sbt.{ Def, _ }
-import scalafix.sbt.ScalafixPlugin.autoImport._
+import sbt.Keys.*
+import sbt.{ Def, * }
+import scalafix.sbt.ScalafixPlugin.autoImport.*
 
 object BuildHelper {
   val ScalaVersion = "3.2.1"
@@ -10,11 +10,11 @@ object BuildHelper {
   )
 
   def stdSettings
-    : Seq[Def.Setting[_ >: Boolean with String with Task[Seq[String]] with Seq[sbt.ModuleID]]] =
+    : Seq[Def.Setting[? >: Boolean with String with Task[Seq[String]] with Seq[sbt.ModuleID]]] =
     Seq(
-      ThisBuild / fork := true,
-      ThisBuild / scalaVersion := ScalaVersion,
-      ThisBuild / scalacOptions := commonSettings,
+      ThisBuild / fork              := true,
+      ThisBuild / scalaVersion      := ScalaVersion,
+      ThisBuild / scalacOptions     := commonSettings,
       ThisBuild / semanticdbEnabled := true,
       ThisBuild / semanticdbVersion := scalafixSemanticdb.revision,
       ThisBuild / scalafixDependencies ++=

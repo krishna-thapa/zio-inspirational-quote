@@ -1,7 +1,10 @@
 package com.krishna.readCsv
 
 import java.io.IOException
+import java.time.LocalDate
 import java.util.UUID
+
+import scala.Option.unless
 
 import zio.stream.{ ZPipeline, ZSink, ZStream }
 import zio.{ Chunk, ZIO }
@@ -15,13 +18,21 @@ object ReadQuoteCsv:
   private def toInspirationQuote(
     line: String
   ): ZIO[WebClient & EnvironmentConfig, Throwable, InspirationalQuote] =
+    final case class MissingQuote(message: String) extends Throwable(message)
+
     val splitValue: Array[String] = line.split(";")
-    for authorDetails <- WebClient.getAuthorDetail(splitValue(1))
+    val quote: String             = splitValue(0)
+    for
+      quote         <- ZIO
+        .fromOption(unless(quote.isEmpty)(quote))
+        .orElseFail(MissingQuote(s"Quote is missing from CSV file."))
+      authorDetails <- WebClient.getAuthorDetail(splitValue(1))
     yield InspirationalQuote(
       serialId = UUID.randomUUID(),
-      quote = Quote(splitValue(0)),
+      quote = Quote(quote),
       author = Option(authorDetails).filterNot(AuthorDetail.isEmpty),
-      genre = splitValue(2).split(",").map(_.trim).toSet
+      genre = splitValue(2).split(",").map(_.trim).toSet,
+      storedDate = LocalDate.now()
     )
 
   private val collectQuotes

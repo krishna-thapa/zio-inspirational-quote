@@ -8,6 +8,7 @@ import zhttp.http.*
   *   - Does not use the environment
   */
 object HomePage:
+
   def apply(): Http[Any, Nothing, Request, Response] =
     Http.collect[Request] {
       // GET /greet?name=:name
