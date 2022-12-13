@@ -20,6 +20,7 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-json" % zioJson,
 
       // https://zio.github.io/zio-http/
+      // TODO: This will become "zio-http"
       "io.d11" %% "zhttp" % "2.0.0-RC11",
 
       // https://zio.github.io/zio-logging/
