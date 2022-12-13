@@ -5,6 +5,7 @@ import java.util.UUID
 
 import zhttp.http.*
 import zhttp.service.Server
+import zio.logging.backend.SLF4J
 import zio.logging.{ LogFilter, LogFormat, console }
 import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
@@ -18,15 +19,7 @@ import com.krishna.wikiHttp.{ WebClient, WikiHttpService }
 object MainApp extends ZIOAppDefault:
 
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
-    Runtime.removeDefaultLoggers >>> console(
-      LogFormat.colored,
-      LogFilter
-        .logLevelByName(
-          LogLevel.Info,
-          "io.netty" -> LogLevel.Warning
-        )
-        .cached
-    )
+    Runtime.removeDefaultLoggers >>> SLF4J.slf4j
 
   val port: Int = 9000
 

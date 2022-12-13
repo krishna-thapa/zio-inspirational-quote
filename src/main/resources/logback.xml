@@ -1,0 +1,38 @@
+<configuration>
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>${application.home:-.}/logs/application.log</file>
+    <encoder>
+      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Only use for the local console logging -->
+    <encoder>
+      <pattern>%cyan(%d{HH:mm:ss.SSS}) %green([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="ASYNCFILE" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="FILE"/>
+  </appender>
+
+  <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="STDOUT"/>
+  </appender>
+
+  <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
+  <!-- logger name="com.krishna.db.QuotesPostgresDriver" level="OFF"/ -->
+
+  <!-- To print all the debug coming from hikari Postgres container -->
+  <!--  <logger name="com.zaxxer.hikari" level="debug" additivity="false">-->
+  <!--    <appender-ref ref="STDOUT"/>-->
+  <!--  </logger>-->
+
+  <root level="INFO">
+    <appender-ref ref="ASYNCFILE"/>
+    <appender-ref ref="ASYNCSTDOUT"/>
+  </root>
+
+</configuration>
