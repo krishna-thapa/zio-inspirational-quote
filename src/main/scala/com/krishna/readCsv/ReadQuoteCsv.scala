@@ -9,7 +9,7 @@ import scala.Option.unless
 import zio.stream.{ ZPipeline, ZSink, ZStream }
 import zio.{ Chunk, ZIO }
 
-import com.krishna.config.{ EnvironmentConfig, QuoteConfig }
+import com.krishna.configuration.*
 import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
 
@@ -17,7 +17,7 @@ object ReadQuoteCsv:
 
   private def toInspirationQuote(
     line: String
-  ): ZIO[WebClient & QuoteConfig, Throwable, InspirationalQuote] =
+  ): ZIO[WebClient with WikiConfig, Throwable, InspirationalQuote] =
     final case class MissingQuote(message: String) extends Throwable(message)
 
     val splitValue: Array[String] = line.split(";")
@@ -39,9 +39,10 @@ object ReadQuoteCsv:
     : ZSink[Any, Nothing, InspirationalQuote, Nothing, Chunk[InspirationalQuote]] =
     ZSink.collectAll
 
-  def getQuotesFromCsv: ZIO[WebClient with QuoteConfig, Throwable, Chunk[InspirationalQuote]] =
+  def getQuotesFromCsv
+    : ZIO[WebClient with QuoteAndWikiConfig, Throwable, Chunk[InspirationalQuote]] =
     for
-      quoteConfig <- ZIO.service[QuoteConfig]
+      quoteConfig <- com.krishna.configuration.quoteConfig
       result      <- ZStream
         .fromResource(quoteConfig.csvPath)
         .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)

@@ -5,7 +5,7 @@ import java.net.URLEncoder
 import zio.json.*
 import zio.{ ZIO, ZLayer }
 
-import com.krishna.config.QuoteConfig
+import com.krishna.configuration.WikiConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 
@@ -61,13 +61,13 @@ object WikiHttpApi:
 
   def getAuthorDetailFromUrl(
     author: String
-  ): ZIO[WebClient with QuoteConfig, Throwable, AuthorDetail] =
+  ): ZIO[WebClient with WikiConfig, Throwable, AuthorDetail] =
     val splitAuthorWithInfo: Array[String] = author.split(",")
     val encodedAuthor: String              = filterAuthor(splitAuthorWithInfo.head)
     for
-      quoteConfig <- ZIO.service[QuoteConfig]
+      wikiConfig  <- com.krishna.configuration.wikiConfig
       jsonContent <- WebClient.getWebClientResponse(
-        quoteConfig.wiki.apiUrl.concat(encodedAuthor)
+        wikiConfig.apiUrl.concat(encodedAuthor)
       )
       authorDetail = toAuthorDetail(splitAuthorWithInfo, jsonContent.value)
     yield authorDetail

@@ -1,4 +1,5 @@
 -- Use of Repeatable Migrations from Flyway Database migration
+-- TODO: Remove the Repeatable migration and use the Version migration
 
 -- Drop table before reapplying sql scripts
 DROP TABLE IF EXISTS inspirational_quotes CASCADE;

@@ -9,7 +9,7 @@ import zio.logging.backend.SLF4J
 import zio.logging.{ LogFilter, LogFormat, console }
 import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
-import com.krishna.config.QuoteConfig
+import com.krishna.configuration.*
 import com.krishna.database.DatabaseMigrator
 import com.krishna.http.{ AdminHttp, HomePage }
 import com.krishna.model.InspirationalQuote
@@ -23,10 +23,10 @@ object MainApp extends ZIOAppDefault:
 
   val port: Int = 9000
 
-  val combinedHttp: Http[WebClient & QuoteConfig, Throwable, Request, Response] =
+  val combinedHttp: Http[WebClient & QuoteAndWikiConfig, Throwable, Request, Response] =
     HomePage() ++ AdminHttp()
 
-  val program: ZIO[WebClient & QuoteConfig, Throwable, Unit] =
+  val program: ZIO[WebClient & QuoteAndWikiConfig, Throwable, Unit] =
     for
       _ <- ZIO.logInfo("Running ZIO inspirational quote API project!!")
       _ <- ZIO.logInfo(s"Starting server on http://localhost:$port")
@@ -42,9 +42,12 @@ object MainApp extends ZIOAppDefault:
     exception match
       case ex: IOException => logAndFail("Failed while reading the CSV file!", ex)
       case ex              => logAndFail("Generic fail", ex)
+  // ===========================================
+
+  val appEnvironment = Configuration.layer >+> WikiHttpService.layer
 
   override val run: ZIO[Environment & (ZIOAppArgs & Scope), Any, Any] =
     program
-      .provide(WikiHttpService.layer, QuoteConfig.layer)
+      .provide(appEnvironment)
       .catchAll(errorHandler)
       .map(_ => ExitCode.success)

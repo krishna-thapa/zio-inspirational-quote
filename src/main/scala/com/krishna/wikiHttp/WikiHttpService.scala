@@ -3,7 +3,7 @@ package com.krishna.wikiHttp
 import zhttp.service.{ ChannelFactory, Client, EventLoopGroup }
 import zio.{ ULayer, ZIO, ZLayer }
 
-import com.krishna.config.QuoteConfig
+import com.krishna.configuration.WikiConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 import com.krishna.wikiHttp.WikiHttpApi.*
@@ -26,7 +26,7 @@ case class WikiHttpService() extends WebClient:
 
   override def getAuthorDetail(
     author: String
-  ): ZIO[WebClient with QuoteConfig, Throwable, AuthorDetail] =
+  ): ZIO[WebClient with WikiConfig, Throwable, AuthorDetail] =
     getAuthorDetailFromUrl(author)
 
 object WikiHttpService:

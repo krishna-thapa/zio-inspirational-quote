@@ -67,6 +67,7 @@ onLoadMessage := {
   def item(text: String): String    = s"${GREEN}> ${CYAN}$text${RESET}"
   def subItem(text: String): String = s"  ${YELLOW}> ${CYAN}$text${RESET}"
 
+   // @formatter:off
   s"""|
       |${header(" _______ ___       ___  _   _  ___ _____ ___ ")}
       |${header("|_  /_ _/ _ \\ ___ / _ \\| | | |/ _ \\_   _| __|")}
@@ -74,9 +75,7 @@ onLoadMessage := {
       |${header("/___|___\\___/     \\__\\_\\\\___/ \\___/ |_| |___|")}
       |
       |Useful sbt tasks:
-      |${item(
-       "api"
-     )}: Run the Scala project that will restart automatically if there is a new change.
+      |${item("api")}: Run the Scala project that will restart automatically if there is a new change.
       |${item("status")}: See the sbt status of the project.
       |${item("fmt")}: Prepares source files using scalafix and scalafmt.
       |${item("sFix")}: Fixes sources files using scalafix.
@@ -85,4 +84,5 @@ onLoadMessage := {
       |
       |${subItem("GitHub account: https://github.com/krishna-thapa/zio-inspirational-quote")}
       """.stripMargin
+  // @formatter:on 
 }
