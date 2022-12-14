@@ -2,21 +2,19 @@ package com.krishna.config
 
 import zio.*
 import zio.config.*
-import zio.config.magnolia.descriptor
+import zio.config.magnolia.{Descriptor, descriptor}
 import zio.config.typesafe.TypesafeConfigSource
 
-case class WikiConfig(apiUrl: String)
-case class EnvironmentConfig(csvPath: String, wiki: WikiConfig, batchSize: Int)
+trait EnvironmentConfig:
+  val configPath: String
 
-object EnvironmentConfig:
-
-  val layer: ZLayer[Any, ReadError[String], EnvironmentConfig] =
+  def getEnvironmentConfig[T: Tag](using Descriptor[T]): ZLayer[Any, ReadError[String], T] =
     ZLayer {
       read {
-        descriptor[EnvironmentConfig].from(
+        descriptor[T].from(
           TypesafeConfigSource
             .fromResourcePath
-            .at(PropertyTreePath.$("QuoteConfig"))
+            .at(PropertyTreePath.$(configPath))
         )
       }
     }

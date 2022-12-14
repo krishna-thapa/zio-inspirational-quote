@@ -9,7 +9,7 @@ import scala.Option.unless
 import zio.stream.{ ZPipeline, ZSink, ZStream }
 import zio.{ Chunk, ZIO }
 
-import com.krishna.config.EnvironmentConfig
+import com.krishna.config.{ EnvironmentConfig, QuoteConfig }
 import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
 
@@ -17,7 +17,7 @@ object ReadQuoteCsv:
 
   private def toInspirationQuote(
     line: String
-  ): ZIO[WebClient & EnvironmentConfig, Throwable, InspirationalQuote] =
+  ): ZIO[WebClient & QuoteConfig, Throwable, InspirationalQuote] =
     final case class MissingQuote(message: String) extends Throwable(message)
 
     val splitValue: Array[String] = line.split(";")
@@ -39,14 +39,13 @@ object ReadQuoteCsv:
     : ZSink[Any, Nothing, InspirationalQuote, Nothing, Chunk[InspirationalQuote]] =
     ZSink.collectAll
 
-  def getQuotesFromCsv
-    : ZIO[WebClient with EnvironmentConfig, Throwable, Chunk[InspirationalQuote]] =
+  def getQuotesFromCsv: ZIO[WebClient with QuoteConfig, Throwable, Chunk[InspirationalQuote]] =
     for
-      environmentConfig <- ZIO.service[EnvironmentConfig]
-      result            <- ZStream
-        .fromResource(environmentConfig.csvPath)
+      quoteConfig <- ZIO.service[QuoteConfig]
+      result      <- ZStream
+        .fromResource(quoteConfig.csvPath)
         .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
-        .mapZIOPar(environmentConfig.batchSize)(toInspirationQuote)
+        .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
         .run(collectQuotes)
         .tapError(ex => ZIO.logError(s"Error while $ex"))
       _ <- ZIO.logInfo(s"Finishing retrieving total quote records of size: ${result.size}.")
