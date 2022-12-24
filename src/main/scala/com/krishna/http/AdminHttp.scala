@@ -4,7 +4,7 @@ import zhttp.http.*
 import zio.json.EncoderOps
 import zio.{ Chunk, ZIO }
 
-import com.krishna.configuration.*
+import com.krishna.config.*
 import com.krishna.model.InspirationalQuote
 import com.krishna.readCsv.ReadQuoteCsv
 import com.krishna.wikiHttp.WebClient

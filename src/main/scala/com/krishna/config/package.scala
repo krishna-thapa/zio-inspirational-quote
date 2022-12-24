@@ -5,7 +5,7 @@ import zio.config.*
 import zio.config.magnolia.{ Descriptor, descriptor }
 import zio.config.typesafe.TypesafeConfigSource
 
-package object configuration:
+package object config:
 
   type QuoteAndWikiConfig = WikiConfig with QuoteConfig
   type Configuration      = WikiConfig with QuoteConfig with DatabaseConfig
@@ -23,15 +23,20 @@ package object configuration:
     connectionTimeout: Int
   )
 
+  object DatabaseConfig:
+    def validateConfig(dbConfig: DatabaseConfig): Boolean =
+      dbConfig.serverName.nonEmpty && dbConfig.user.nonEmpty &&
+      dbConfig.password.nonEmpty && dbConfig.databaseName.nonEmpty
+
   val wikiConfig: URIO[WikiConfig, WikiConfig]             = ZIO.service[WikiConfig]
   val quoteConfig: URIO[QuoteConfig, QuoteConfig]          = ZIO.service[QuoteConfig]
   val databaseConfig: URIO[DatabaseConfig, DatabaseConfig] = ZIO.service[DatabaseConfig]
 
   object Configuration:
 
-    def getEnvironmentConfig[T: Tag](
+    private def getEnvironmentConfig[T: Tag](
       configPath: String
-    )(using Descriptor[T]): ZLayer[Any, ReadError[String], T] =
+    )(using Descriptor[T]): Layer[ReadError[String], T] =
       ZLayer {
         read {
           descriptor[T].from(

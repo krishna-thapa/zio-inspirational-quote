@@ -9,7 +9,7 @@ import scala.Option.unless
 import zio.stream.{ ZPipeline, ZSink, ZStream }
 import zio.{ Chunk, ZIO }
 
-import com.krishna.configuration.*
+import com.krishna.config.*
 import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
 
@@ -42,7 +42,7 @@ object ReadQuoteCsv:
   def getQuotesFromCsv
     : ZIO[WebClient with QuoteAndWikiConfig, Throwable, Chunk[InspirationalQuote]] =
     for
-      quoteConfig <- com.krishna.configuration.quoteConfig
+      quoteConfig <- com.krishna.config.quoteConfig
       result      <- ZStream
         .fromResource(quoteConfig.csvPath)
         .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)

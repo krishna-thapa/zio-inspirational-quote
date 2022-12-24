@@ -23,6 +23,11 @@ CREATE USER admin WITH PASSWORD 'admin';
 ALTER USER admin WITH SUPERUSER;
 ```
 
+**To kill the existing Postgres Container in Ubuntu**
+```
+sudo lsof -i :5432
+sudo kill <pid>
+```
 ### Access to PgAdmin:
 - URL: http://localhost:5050
 - Username: `admin@admin.com`

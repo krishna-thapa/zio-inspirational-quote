@@ -22,7 +22,7 @@
     <appender-ref ref="STDOUT"/>
   </appender>
 
-  <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
+  <!-- We can manage configuration ourselves -->
   <!-- logger name="com.krishna.db.QuotesPostgresDriver" level="OFF"/ -->
 
   <!-- To print all the debug coming from hikari Postgres container -->

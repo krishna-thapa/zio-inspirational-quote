@@ -1,6 +1,6 @@
-val zioVersion = "2.0.4"
+val zioVersion = "2.0.5"
 val zioLogger  = "2.1.5"
-val zioJson    = "0.3.0"
+val zioJson    = "0.4.2"
 
 ThisBuild / organization := "com.krishna"
 ThisBuild / version      := "0.0.1"
@@ -31,7 +31,7 @@ lazy val root = (project in file("."))
   )
 
 // https://zio.dev/zio-config/
-val zioConfig = "3.0.2"
+val zioConfig = "3.0.6"
 
 val zioConfigDependencies: Seq[ModuleID] = Seq(
   "dev.zio" %% "zio-config"          % zioConfig,

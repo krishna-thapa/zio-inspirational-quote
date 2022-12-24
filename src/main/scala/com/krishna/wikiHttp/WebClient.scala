@@ -2,7 +2,7 @@ package com.krishna.wikiHttp
 
 import zio.ZIO
 
-import com.krishna.configuration.WikiConfig
+import com.krishna.config.WikiConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 

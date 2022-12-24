@@ -1,35 +1,33 @@
 package com.krishna.database
 
+import com.krishna.config.DatabaseConfig
 import org.flywaydb.core.Flyway
-import zio.ZIO
+import zio.*
 
 object DatabaseMigrator:
 
-  val getConfigValue = (envVariable: String) =>
-    for
-      configValueOpt <- zio.System.env(envVariable).orDie
-      configValue    <- ZIO
-        .fromOption(configValueOpt)
-        .orElseFail(new RuntimeException(s"Missing the \"$envVariable\" environment variable."))
-    yield configValue
+  private val validateDbConfig = (dbConfig: DatabaseConfig) =>
+    if DatabaseConfig.validateConfig(dbConfig) then ZIO.succeed(dbConfig)
+    else ZIO.fail(new RuntimeException(s"Missing the Database configuration environment variables."))
 
-  def migrate: ZIO[Any, Throwable, Unit] =
+  def migrate: ZIO[DatabaseConfig, Throwable, Unit] =
     for
-      _          <- ZIO.logInfo("Running flyway Database migration!!")
-      hostDb     <- getConfigValue("POSTGRES_SERVER")
-      portDb     <- getConfigValue("POSTGRES_PORT")
-      database   <- getConfigValue("POSTGRES_DB")
-      userDb     <- getConfigValue("POSTGRES_USER")
-      passwordDb <- getConfigValue("POSTGRES_PASSWORD")
-      flyway     <- ZIO.attempt(
+      _           <- ZIO.logInfo("Running flyway Database migration!!")
+      getDbConfig <- com.krishna.config.databaseConfig
+      dbConfig    <- validateDbConfig(getDbConfig)
+      flyway      <- ZIO.attempt(
         Flyway
           .configure()
           .validateMigrationNaming(true)
           .baselineOnMigrate(true)
-          .dataSource(s"jdbc:postgresql://$hostDb:$portDb/$database", userDb, passwordDb)
+          .dataSource(
+            s"jdbc:postgresql://${dbConfig.serverName}:${dbConfig.portNumber}/${dbConfig.databaseName}",
+            dbConfig.user,
+            dbConfig.password
+          )
           .load()
       )
-      _          <- ZIO.attempt {
+      _           <- ZIO.attempt {
         // flyway.clean()
         flyway.migrate()
       }
