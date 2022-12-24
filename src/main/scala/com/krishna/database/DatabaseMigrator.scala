@@ -8,7 +8,8 @@ object DatabaseMigrator:
 
   private val validateDbConfig = (dbConfig: DatabaseConfig) =>
     if DatabaseConfig.validateConfig(dbConfig) then ZIO.succeed(dbConfig)
-    else ZIO.fail(new RuntimeException(s"Missing the Database configuration environment variables."))
+    else
+      ZIO.fail(new RuntimeException(s"Missing the Database configuration environment variables."))
 
   def migrate: ZIO[DatabaseConfig, Throwable, Unit] =
     for
@@ -31,4 +32,5 @@ object DatabaseMigrator:
         // flyway.clean()
         flyway.migrate()
       }
+      _           <- ZIO.logInfo("Successfully ran flyway Database migration!!")
     yield ()
