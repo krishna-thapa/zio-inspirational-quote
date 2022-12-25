@@ -27,7 +27,7 @@ lazy val root = (project in file("."))
       "ch.qos.logback" % "logback-classic"   % "1.4.5",
       "dev.zio"       %% "zio-logging"       % zioLogger,
       "dev.zio"       %% "zio-logging-slf4j" % zioLogger
-    ) ++ zioConfigDependencies ++ doobieDbDependencies
+    ) ++ zioConfigDependencies ++ flywayMigrationDependencies ++ zioJdbcDependencies
   )
 
 // https://zio.dev/zio-config/
@@ -39,10 +39,17 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
   "dev.zio" %% "zio-config-magnolia" % zioConfig
 )
 
-// https://zio.dev/zio-quill/
-val doobieDbDependencies: Seq[ModuleID] = Seq(
+// https://flywaydb.org/
+val flywayMigrationDependencies: Seq[ModuleID] = Seq(
   "org.flywaydb"   % "flyway-core" % "9.10.0",
   "org.postgresql" % "postgresql"  % "42.5.1"
+)
+
+// TODO: Using local snapshot, need to be updated once ZIO team release new version for Scala 3
+val zioJdbc = "0.0.0+119-07026605+20221225-2025-SNAPSHOT"
+
+val zioJdbcDependencies: Seq[ModuleID] = Seq(
+  "dev.zio" %% "zio-jdbc" % zioJdbc
 )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

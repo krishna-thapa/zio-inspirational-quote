@@ -11,13 +11,17 @@ import com.krishna.wikiHttp.WebClient
 
 object AdminHttp:
 
-  val convertToJson: Chunk[InspirationalQuote] => Response = (quotes: Chunk[InspirationalQuote]) =>
+  private val convertToJson: Chunk[InspirationalQuote] => Response = (quotes: Chunk[InspirationalQuote]) =>
     Response.json(quotes.toJson)
 
   def apply(): Http[WebClient with QuoteAndWikiConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       // GET /migrate
-      case Method.GET -> !! / "migrate" =>
+      case Method.GET -> !! / "csv-quotes" / rows =>
+        val getRows: Option[Int] = rows.toIntOption
+        ZIO.logInfo(s"Retrieving total $rows quotes from the CSV file data!") *>
+          ReadQuoteCsv.getQuotesFromCsv(rows = getRows).map(convertToJson)
+      case Method.GET -> !! / "migrate" / "quotes" =>
         ZIO.logInfo("Retrieving all the quotes.....") *>
-          ReadQuoteCsv.getQuotesFromCsv.map(convertToJson)
+          ReadQuoteCsv.getQuotesFromCsv(isMigrateAll = true).map(convertToJson)
     } @@ Middleware.basicAuth("admin", "admin")
