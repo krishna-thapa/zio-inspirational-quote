@@ -42,10 +42,23 @@ object ReadQuoteCsv:
     : ZSink[Any, Nothing, InspirationalQuote, Nothing, Chunk[InspirationalQuote]] =
     ZSink.collectAll
 
-  private val csvStream = (csvPath: String) =>
+  private val csvStream: String => ZStream[Any, IOException, String] = csvPath =>
     ZStream
       .fromResource(csvPath)
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
+
+  private val validateRows: (Option[RuntimeFlags], Boolean) => ZIO[Any, Nothing, RuntimeFlags] =
+    (rows, isMigrateAll) =>
+      if !isMigrateAll then
+        ZIO
+          .fromOption(rows)
+          .orElse(
+            ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO
+              .succeed(
+                20
+              )
+          )
+      else ZIO.succeed(0)
 
   def getQuotesFromCsv(
     rows: Option[Int] = None,
@@ -53,17 +66,7 @@ object ReadQuoteCsv:
   ): ZIO[QuoteConfig, Throwable, Chunk[InspirationalQuote]] =
     for
       quoteConfig <- com.krishna.config.quoteConfig
-      getRows     <-
-        if !isMigrateAll then
-          ZIO
-            .fromOption(rows)
-            .orElse(
-              ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO
-                .succeed(
-                  20
-                )
-            )
-        else ZIO.succeed(0)
+      getRows     <- validateRows(rows, isMigrateAll)
       getCsvStream =
         if isMigrateAll then csvStream(quoteConfig.csvPath)
         else csvStream(quoteConfig.csvPath).take(getRows)
