@@ -53,13 +53,17 @@ object ReadQuoteCsv:
   ): ZIO[QuoteConfig, Throwable, Chunk[InspirationalQuote]] =
     for
       quoteConfig <- com.krishna.config.quoteConfig
-      getRows     <- ZIO
-        .fromOption(rows)
-        .orElse(
-          ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO.succeed(
-            20
-          )
-        )
+      getRows     <-
+        if !isMigrateAll then
+          ZIO
+            .fromOption(rows)
+            .orElse(
+              ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO
+                .succeed(
+                  20
+                )
+            )
+        else ZIO.succeed(0)
       getCsvStream =
         if isMigrateAll then csvStream(quoteConfig.csvPath)
         else csvStream(quoteConfig.csvPath).take(getRows)
