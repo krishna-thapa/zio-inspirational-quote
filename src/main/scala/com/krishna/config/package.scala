@@ -29,9 +29,22 @@ package object config:
 
   object DatabaseConfig:
 
-    def validateConfig(dbConfig: DatabaseConfig): Boolean =
-      dbConfig.serverName.nonEmpty && dbConfig.user.nonEmpty &&
-      dbConfig.password.nonEmpty && dbConfig.databaseName.nonEmpty
+    def validateTable(dbConfig: DatabaseConfig): ZIO[Any, RuntimeException, String] =
+      if dbConfig.tables.quotesTable.nonEmpty && dbConfig.tables.authorTable.nonEmpty then
+        ZIO.succeed(dbConfig.tables.quotesTable)
+      else
+        ZIO.fail(
+          new RuntimeException(
+            s"Missing the Database configuration environment variables for table names."
+          )
+        )
+
+    def validateConfig(dbConfig: DatabaseConfig): ZIO[Any, RuntimeException, DatabaseConfig] =
+      val isValidate: Boolean = dbConfig.serverName.nonEmpty && dbConfig.user.nonEmpty &&
+        dbConfig.password.nonEmpty && dbConfig.databaseName.nonEmpty
+      if isValidate then ZIO.succeed(dbConfig)
+      else
+        ZIO.fail(new RuntimeException(s"Missing the Database configuration environment variables."))
 
   val wikiConfig: URIO[WikiConfig, WikiConfig]             = ZIO.service[WikiConfig]
   val quoteConfig: URIO[QuoteConfig, QuoteConfig]          = ZIO.service[QuoteConfig]

@@ -1,22 +1,16 @@
 package com.krishna.database
 
+import com.krishna.config.DatabaseConfig
 import org.flywaydb.core.Flyway
 import zio.*
 
-import com.krishna.config.DatabaseConfig
-
 object DatabaseMigrator:
-
-  private val validateDbConfig = (dbConfig: DatabaseConfig) =>
-    if DatabaseConfig.validateConfig(dbConfig) then ZIO.succeed(dbConfig)
-    else
-      ZIO.fail(new RuntimeException(s"Missing the Database configuration environment variables."))
 
   def migrate: ZIO[DatabaseConfig, Throwable, Unit] =
     for
       _           <- ZIO.logInfo("Running flyway Database migration!!")
       getDbConfig <- com.krishna.config.databaseConfig
-      dbConfig    <- validateDbConfig(getDbConfig)
+      dbConfig    <- DatabaseConfig.validateConfig(getDbConfig)
       flyway      <- ZIO.attempt(
         Flyway
           .configure()

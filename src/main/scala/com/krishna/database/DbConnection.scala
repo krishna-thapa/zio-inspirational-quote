@@ -13,13 +13,18 @@ object DbConnection:
 
   // Create a connection pool with Postgres Database client
   val dbConnectionPool
-    : URIO[DatabaseConfig, ZLayer[ZConnectionPoolConfig, Throwable, ZConnectionPool]] =
+    : ZIO[DatabaseConfig, Throwable, ZLayer[ZConnectionPoolConfig, Throwable, ZConnectionPool]] =
     for
-      _        <- ZIO.logInfo("Getting Database connection pool!")
-      dbConfig <- com.krishna.config.databaseConfig
+      _           <- ZIO.logInfo("Getting Database connection pool!")
+      getDbConfig <- com.krishna.config.databaseConfig
+      dbConfig    <- DatabaseConfig.validateConfig(getDbConfig)
       properties = Map(
         "user"     -> dbConfig.user,
         "password" -> dbConfig.password
       )
-    yield
-      ZConnectionPool.postgres(dbConfig.serverName, dbConfig.portNumber, dbConfig.databaseName, properties)
+    yield ZConnectionPool.postgres(
+      dbConfig.serverName,
+      dbConfig.portNumber,
+      dbConfig.databaseName,
+      properties
+    )

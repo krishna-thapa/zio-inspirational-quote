@@ -93,7 +93,7 @@ object CsvQuoteService:
         .tapError(ex => ZIO.logError(s"Error while $ex"))
       _ <- ZIO.logInfo(s"Finishing retrieving total quote records of size: ${result.size}.")
     yield result
-  
+
   /** Pipeline to insert a quote to Database Postgres
     */
   def insertQuoteToDb(
@@ -124,6 +124,6 @@ object CsvQuoteService:
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
         .mapZIO(insertQuoteToDb)
         .run(collectQuotesQuotes)
-      // .catchAll(ErrorHandle.catchException("migrateQuotesToDb", _))
+        .tapError(ErrorHandle.matchException("migrateQuotesToDb", _))
       _ <- ZIO.logInfo(s"Successfully migrated total quotes $result from CSV data to Postgres Database.")
     yield result

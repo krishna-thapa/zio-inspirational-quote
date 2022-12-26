@@ -27,4 +27,4 @@ object AdminHttp:
           CsvQuoteService
             .migrateQuotesToDb()
             .map(result => Response.text(s"Success on migrating total $result quotes to database."))
-    } @@ Middleware.basicAuth("admin", "admin")
+    } @@ (Middleware.basicAuth("admin", "admin") ++ VerboseLog.log)
