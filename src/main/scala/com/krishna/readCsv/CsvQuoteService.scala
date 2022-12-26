@@ -1,6 +1,7 @@
 package com.krishna.readCsv
 
 import com.krishna.config.*
+import com.krishna.database.JdbcQueries
 import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
 import zio.*
@@ -11,7 +12,7 @@ import java.time.LocalDate
 import java.util.UUID
 import scala.Option.unless
 
-object ReadQuoteCsv:
+object CsvQuoteService:
 
   private def toInspirationQuote(
     line: String
@@ -38,8 +39,7 @@ object ReadQuoteCsv:
       storedDate = LocalDate.now()
     )
 
-  private val collectQuotes
-    : ZSink[Any, Nothing, InspirationalQuote, Nothing, Chunk[InspirationalQuote]] =
+  val collectQuotes: ZSink[Any, Nothing, InspirationalQuote, Nothing, Chunk[InspirationalQuote]] =
     ZSink.collectAll
 
   private val csvStream: String => ZStream[Any, IOException, String] = csvPath =>
@@ -47,32 +47,56 @@ object ReadQuoteCsv:
       .fromResource(csvPath)
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
 
-  private val validateRows: (Option[RuntimeFlags], Boolean) => ZIO[Any, Nothing, RuntimeFlags] =
-    (rows, isMigrateAll) =>
-      if !isMigrateAll then
-        ZIO
-          .fromOption(rows)
-          .orElse(
-            ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO
-              .succeed(
-                20
-              )
+  private val validateRows: Option[Int] => UIO[RuntimeFlags] = rows =>
+    ZIO
+      .fromOption(rows)
+      .orElse(
+        ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO
+          .succeed(
+            20
           )
-      else ZIO.succeed(0)
+      )
 
   def getQuotesFromCsv(
-    rows: Option[Int] = None,
-    isMigrateAll: Boolean = false
+    rows: Option[Int] = None
   ): ZIO[QuoteConfig, Throwable, Chunk[InspirationalQuote]] =
     for
       quoteConfig <- com.krishna.config.quoteConfig
-      getRows     <- validateRows(rows, isMigrateAll)
-      getCsvStream =
-        if isMigrateAll then csvStream(quoteConfig.csvPath)
-        else csvStream(quoteConfig.csvPath).take(getRows)
-      result <- getCsvStream
+      getRows     <- validateRows(rows)
+      result      <- csvStream(quoteConfig.csvPath)
+        .take(getRows)
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
         .run(collectQuotes)
         .tapError(ex => ZIO.logError(s"Error while $ex"))
-      _      <- ZIO.logInfo(s"Finishing retrieving total quote records of size: ${result.size}.")
+      _ <- ZIO.logInfo(s"Finishing retrieving total quote records of size: ${result.size}.")
+    yield result
+
+  type DbInsertResult =
+    ZIO[Any, RuntimeException, ZIO[zio.jdbc.ZConnectionPool, Throwable, zio.jdbc.UpdateResult]]
+
+  type DbInsertResponse =
+    ZIO[Any, RuntimeException, ZIO[zio.jdbc.ZConnectionPool, Throwable, Long]]
+
+  val uploadToDatabase: ZPipeline[Any, Nothing, InspirationalQuote, DbInsertResult] =
+    ZPipeline.map(q => JdbcQueries.insertQuote(q))
+
+  val collectDbResponse: ZSink[zio.jdbc.ZConnectionPool, Throwable, DbInsertResult, Nothing, Unit] =
+    ZSink.foreach { (res: DbInsertResult) =>
+      for
+        bla <- res
+        foo <- bla
+        _ <- ZIO.logInfo(s"updating ---")
+      yield ()
+    }
+
+  def migrateQuotesToDb() =
+    for
+      quoteConfig <- com.krishna.config.quoteConfig
+      result      <- csvStream(quoteConfig.csvPath)
+        .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
+        .via(uploadToDatabase)
+        .run(collectDbResponse)
+        .catchAll(ex => ZIO.logError("Failed") *> ZIO.fail(ex))
+      // .tapError(ex => ZIO.logError(s"Error while $ex"))
+      _           <- ZIO.logInfo(s"Error.")
     yield result
