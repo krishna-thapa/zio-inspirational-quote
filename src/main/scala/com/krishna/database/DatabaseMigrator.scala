@@ -1,8 +1,9 @@
 package com.krishna.database
 
-import com.krishna.config.DatabaseConfig
 import org.flywaydb.core.Flyway
 import zio.*
+
+import com.krishna.config.DatabaseConfig
 
 object DatabaseMigrator:
 

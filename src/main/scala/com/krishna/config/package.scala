@@ -8,22 +8,27 @@ import zio.config.typesafe.TypesafeConfigSource
 package object config:
 
   type QuoteAndWikiConfig = WikiConfig with QuoteConfig
+  type QuoteAndDbConfig   = QuoteConfig with DatabaseConfig
   type Configuration      = WikiConfig with QuoteConfig with DatabaseConfig
 
   final case class WikiConfig(apiUrl: String)
   final case class QuoteConfig(csvPath: String, batchSize: Int)
+
+  final case class Tables(quotesTable: String, authorTable: String)
 
   final case class DatabaseConfig(
     dataSourceClassName: String,
     user: String,
     password: String,
     databaseName: String,
+    tables: Tables,
     portNumber: Int,
     serverName: String,
     connectionTimeout: Int
   )
 
   object DatabaseConfig:
+
     def validateConfig(dbConfig: DatabaseConfig): Boolean =
       dbConfig.serverName.nonEmpty && dbConfig.user.nonEmpty &&
       dbConfig.password.nonEmpty && dbConfig.databaseName.nonEmpty
@@ -47,9 +52,10 @@ package object config:
         }
       }
 
-    val dbLayer: Layer[ReadError[String], DatabaseConfig] = getEnvironmentConfig[DatabaseConfig]("DatabaseConfig")
-    
+    val databaseLayer: Layer[ReadError[String], DatabaseConfig] =
+      getEnvironmentConfig[DatabaseConfig]("DatabaseConfig")
+
     val layer: Layer[ReadError[String], Configuration] =
       getEnvironmentConfig[WikiConfig]("WikiConfig") ++
         getEnvironmentConfig[QuoteConfig]("QuoteConfig") ++
-        getEnvironmentConfig[DatabaseConfig]("DatabaseConfig")
+        databaseLayer

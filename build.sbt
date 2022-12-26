@@ -41,7 +41,7 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
 
 // https://flywaydb.org/
 val flywayMigrationDependencies: Seq[ModuleID] = Seq(
-  "org.flywaydb"   % "flyway-core" % "9.10.0",
+  "org.flywaydb"   % "flyway-core" % "9.10.1",
   "org.postgresql" % "postgresql"  % "42.5.1"
 )
 
