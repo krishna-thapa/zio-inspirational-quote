@@ -8,6 +8,7 @@
 
 - https://en.wikipedia.org/w/api.php?action=help&modules=query%2Ballimages
 - https://en.wikipedia.org/w/api.php?action=help&modules=query
+- https://forestry.io/blog/full-text-searching-with-postgres/#indexing
 
 ## Connect to Docker
 ### Connect to the postgres server running in docker container:

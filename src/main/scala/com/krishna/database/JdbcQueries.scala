@@ -10,7 +10,16 @@ object JdbcQueries:
 
   // Inserting from tuples:
   private val insertQuoteSql: (String, InspirationalQuote) => SqlFragment = (table, quote) =>
-    sql"insert into $table (serial_id, quote, stored_date) values(gen_random_uuid (), 'Don', '2017-04-30')"
+//    val quoteValues = (quote.quote.quote, quote.author, quote.relatedInfo, quote.storedDate.toString)
+//    val bar         = Sql
+//      .insertInto(table)("quote", "author", "relatedInfo", "stored_date")
+//      .values(quoteValues)
+    // TODO: Wait until the ZIO JDBC is released and has more supports for types like Array, UUID, Date and JSON
+    val str: String = s"insert into inspirational_quotes (quote, stored_date) values('I was eating rice and soup.', ${quote.storedDate.toString})"
+    val foo         =
+      sql"$str"
+    println(s"------------- ${foo.toString}")
+    foo
 
   def insertQuote(
     quote: InspirationalQuote

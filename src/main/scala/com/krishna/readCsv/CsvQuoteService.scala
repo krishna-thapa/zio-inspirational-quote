@@ -1,20 +1,18 @@
 package com.krishna.readCsv
 
+import com.krishna.config.*
+import com.krishna.database.{DbConnection, JdbcQueries}
+import com.krishna.errorHandle.ErrorHandle
+import com.krishna.model.{AuthorDetail, InspirationalQuote, Quote}
+import com.krishna.wikiHttp.WebClient
+import zio.*
+import zio.jdbc.ZConnectionPool
+import zio.stream.{ZPipeline, ZSink, ZStream}
+
 import java.io.IOException
 import java.time.LocalDate
 import java.util.UUID
-
 import scala.Option.unless
-
-import zio.*
-import zio.jdbc.ZConnectionPool
-import zio.stream.{ ZPipeline, ZSink, ZStream }
-
-import com.krishna.config.*
-import com.krishna.database.{ DbConnection, JdbcQueries }
-import com.krishna.errorHandle.ErrorHandle
-import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
-import com.krishna.wikiHttp.WebClient
 
 object CsvQuoteService:
 
@@ -60,6 +58,7 @@ object CsvQuoteService:
     ZStream
       .fromResource(csvPath)
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
+    // .drop()
 
   /** Validate the number of rows that the user wants to get from the CSV file It will be from the
     * record 0 and the default value is 20
@@ -103,9 +102,8 @@ object CsvQuoteService:
       jdbcInsertCall <- JdbcQueries.insertQuote(quote)
       result         <- jdbcInsertCall
       _              <-
-        if result.rowsUpdated == 1 then
-          ZIO.logInfo(s"Success insert quote with id: ${quote.serialId}")
-        else ZIO.logError(s"Failure insert quote with id: ${quote.serialId}")
+        if result.rowsUpdated == 1 then ZIO.logInfo(s"Success insert quote")
+        else ZIO.logError(s"Failure insert quote with quote: ${quote.quote.quote}")
     yield ()
 
   /** Collect all total Quotes count that is migrated to Database
@@ -113,10 +111,10 @@ object CsvQuoteService:
   val collectQuotesQuotes: ZSink[Any, Nothing, Any, Nothing, Long] =
     ZSink.count
 
-  /**
-   * Reads the quotes from the CSV file and store to the Postgres Database
-   * @return Total amount of records stored in the Database
-   */
+  /** Reads the quotes from the CSV file and store to the Postgres Database
+    * @return
+    *   Total amount of records stored in the Database
+    */
   def migrateQuotesToDb(): ZIO[ZConnectionPool with QuoteAndDbConfig, Throwable, Long] =
     for
       quoteConfig <- com.krishna.config.quoteConfig
@@ -125,5 +123,7 @@ object CsvQuoteService:
         .mapZIO(insertQuoteToDb)
         .run(collectQuotesQuotes)
         .tapError(ErrorHandle.matchException("migrateQuotesToDb", _))
-      _ <- ZIO.logInfo(s"Successfully migrated total quotes $result from CSV data to Postgres Database.")
+      _           <- ZIO.logInfo(
+        s"Successfully migrated total quotes $result from CSV data to Postgres Database."
+      )
     yield result
