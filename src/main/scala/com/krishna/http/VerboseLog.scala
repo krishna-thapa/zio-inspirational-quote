@@ -5,9 +5,8 @@ import zio.*
 
 object VerboseLog:
 
-  /**
-   * Generic method to Console print the request and response on each HTTP API call
-   */
+  /** Generic method to Console print the request and response on each HTTP API call
+    */
   def log[R, E >: Throwable]: Middleware[R, E, Request, Response, Request, Response] =
     new Middleware[R, E, Request, Response, Request, Response]:
 

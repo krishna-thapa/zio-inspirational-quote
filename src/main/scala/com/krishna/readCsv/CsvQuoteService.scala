@@ -7,11 +7,11 @@ import java.util.UUID
 import scala.Option.unless
 
 import zio.*
-import zio.jdbc.ZConnectionPool
 import zio.stream.{ ZPipeline, ZSink, ZStream }
 
 import com.krishna.config.*
-import com.krishna.database.{ DbConnection, JdbcQueries }
+import com.krishna.database.DbConnection
+import com.krishna.database.quotes.Persistence
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
@@ -98,26 +98,26 @@ object CsvQuoteService:
     */
   def insertQuoteToDb(
     quote: InspirationalQuote
-  ): ZIO[ZConnectionPool with DatabaseConfig, Throwable, Unit] =
+  ): ZIO[Persistence with DatabaseConfig with Scope, Throwable, Unit] =
     for
-      jdbcInsertCall <- JdbcQueries.insertQuote(quote)
-      result         <- jdbcInsertCall
-      _              <-
-        if result.rowsUpdated == 1 then
-          ZIO.logInfo(s"Success insert quote with id: ${quote.serialId}")
+      dbPersistenceCall <- Persistence.migrateQuote(quote)
+      result            <- dbPersistenceCall
+      _                 <-
+        if result == 1 then ZIO.logInfo(s"Success insert quote with id: ${quote.serialId}")
         else ZIO.logError(s"Failure insert quote with id: ${quote.serialId}")
     yield ()
 
   /** Collect all total Quotes count that is migrated to Database
     */
+
   val collectQuotesQuotes: ZSink[Any, Nothing, Any, Nothing, Long] =
     ZSink.count
 
-  /**
-   * Reads the quotes from the CSV file and store to the Postgres Database
-   * @return Total amount of records stored in the Database
-   */
-  def migrateQuotesToDb(): ZIO[ZConnectionPool with QuoteAndDbConfig, Throwable, Long] =
+  /** Reads the quotes from the CSV file and store to the Postgres Database
+    * @return
+    *   Total amount of records stored in the Database
+    */
+  def migrateQuotesToDb(): ZIO[Persistence with QuoteAndDbConfig with Scope, Throwable, Long] =
     for
       quoteConfig <- com.krishna.config.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
@@ -125,5 +125,7 @@ object CsvQuoteService:
         .mapZIO(insertQuoteToDb)
         .run(collectQuotesQuotes)
         .tapError(ErrorHandle.matchException("migrateQuotesToDb", _))
-      _ <- ZIO.logInfo(s"Successfully migrated total quotes $result from CSV data to Postgres Database.")
+      _           <- ZIO.logInfo(
+        s"Successfully migrated total quotes $result from CSV data to Postgres Database."
+      )
     yield result

@@ -8,6 +8,7 @@
 
 - https://en.wikipedia.org/w/api.php?action=help&modules=query%2Ballimages
 - https://en.wikipedia.org/w/api.php?action=help&modules=query
+- https://forestry.io/blog/full-text-searching-with-postgres/#indexing
 
 ## Connect to Docker
 ### Connect to the postgres server running in docker container:
@@ -38,3 +39,8 @@ Host name/address `postgres`
 Port `5432`
 Username as POSTGRES_USER
 Password as POSTGRES_PASSWORD
+
+## Use of Doobie for the JDBC
+- [Doobie](https://tpolecat.github.io/doobie/)
+- [Use of ZIO with Doobie](https://zio.dev/guides/interop/with-cats-effect/#using-zio-with-doobie)
+- [Sample project](https://github.com/wi101/zio-examples/blob/master/src/main/scala/com/zio/examples/http4s_doobie/persistence/UserPersistenceService.scala)

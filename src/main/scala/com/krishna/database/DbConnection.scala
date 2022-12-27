@@ -1,30 +1,43 @@
 package com.krishna.database
 
+import doobie.hikari.HikariTransactor
 import zio.*
-import zio.jdbc.{ ZConnectionPool, ZConnectionPoolConfig }
-
-import com.krishna.config.DatabaseConfig
+import zio.interop.catz.*
+import com.krishna.config.{ DatabaseConfig, databaseConfig }
+import doobie.ExecutionContexts
 
 object DbConnection:
 
-  // Default with maximum connection of 32
-  val createZIOPoolConfig: ULayer[ZConnectionPoolConfig] =
-    ZLayer.succeed(ZConnectionPoolConfig.default)
+  given zioRuntime: zio.Runtime[Any] = zio.Runtime.default
+
+  // To create a Transactor, we need to create an instance of Dispatcher for zio.Task.
+  given cats.effect.std.Dispatcher[zio.Task] =
+    Unsafe.unsafely {
+      zioRuntime
+        .unsafe
+        .run(
+          cats.effect.std.Dispatcher[zio.Task].allocated
+        )
+        .getOrThrowFiberFailure()
+        ._1
+    }
 
   // Create a connection pool with Postgres Database client
-  val dbConnectionPool
-    : ZIO[DatabaseConfig, Throwable, ZLayer[ZConnectionPoolConfig, Throwable, ZConnectionPool]] =
+  lazy val transactor: ZIO[DatabaseConfig with Scope, Throwable, HikariTransactor[Task]] =
     for
       _           <- ZIO.logInfo("Getting Database connection pool!")
       getDbConfig <- com.krishna.config.databaseConfig
       dbConfig    <- DatabaseConfig.validateConfig(getDbConfig)
-      properties = Map(
-        "user"     -> dbConfig.user,
-        "password" -> dbConfig.password
-      )
-    yield ZConnectionPool.postgres(
-      dbConfig.serverName,
-      dbConfig.portNumber,
-      dbConfig.databaseName,
-      properties
-    )
+      //executor    <- ZIO.executor
+      ce          <- ExecutionContexts.fixedThreadPool[Task](32).toScopedZIO
+      xa          <- HikariTransactor
+        .newHikariTransactor[Task](
+          driverClassName = "org.postgresql.Driver",
+          url =
+            s"jdbc:postgresql://${dbConfig.serverName}:${dbConfig.portNumber}/${dbConfig.databaseName}",
+          user = dbConfig.user,
+          pass = dbConfig.password,
+          connectEC = ce
+        )
+        .allocated
+    yield xa._1

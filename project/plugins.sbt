@@ -15,3 +15,6 @@ addDependencyTreePlugin
 
 // https://github.com/Philippus/sbt-dotenv
 addSbtPlugin("nl.gn0s1s" % "sbt-dotenv" % "3.0.0")
+
+// https://github.com/rtimush/sbt-updates
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
