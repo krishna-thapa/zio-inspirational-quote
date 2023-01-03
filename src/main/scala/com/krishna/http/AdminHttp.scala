@@ -2,7 +2,8 @@ package com.krishna.http
 
 import zhttp.http.*
 import zio.json.EncoderOps
-import zio.{Chunk, Scope, ZIO}
+import zio.{ Chunk, Scope, ZIO }
+
 import com.krishna.config.*
 import com.krishna.database.quotes.Persistence
 import com.krishna.model.InspirationalQuote
@@ -14,7 +15,7 @@ object AdminHttp:
   private val convertToJson: Chunk[InspirationalQuote] => Response =
     (quotes: Chunk[InspirationalQuote]) => Response.json(quotes.toJson)
 
-  def apply(): Http[Persistence with QuoteAndDbConfig with Scope, Throwable, Request, Response] =
+  def apply(): Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       // GET /migrate
       case Method.GET -> !! / "csv-quotes" / rows  =>

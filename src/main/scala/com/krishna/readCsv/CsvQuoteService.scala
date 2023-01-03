@@ -98,7 +98,7 @@ object CsvQuoteService:
     */
   def insertQuoteToDb(
     quote: InspirationalQuote
-  ): ZIO[Persistence with DatabaseConfig with Scope, Throwable, Unit] =
+  ): ZIO[Persistence with DatabaseConfig, Throwable, Unit] =
     for
       dbPersistenceCall <- Persistence.migrateQuote(quote)
       result            <- dbPersistenceCall
@@ -117,7 +117,7 @@ object CsvQuoteService:
     * @return
     *   Total amount of records stored in the Database
     */
-  def migrateQuotesToDb(): ZIO[Persistence with QuoteAndDbConfig with Scope, Throwable, Long] =
+  def migrateQuotesToDb(): ZIO[Persistence with QuoteAndDbConfig, Throwable, Long] =
     for
       quoteConfig <- com.krishna.config.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
