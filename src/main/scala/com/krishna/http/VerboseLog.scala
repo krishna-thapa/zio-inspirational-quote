@@ -18,10 +18,12 @@ object VerboseLog:
         http
           .contramapZIO[R1, E1, Request] { req =>
             for
-              _ <-
-                ZIO.logInfo(s">>> ${req.method} ${req.path} ${req.version}")
+              _ <- ZIO.logInfo(s">>> ${req.method} ${req.path} ${req.version}")
               _ <- ZIO.foreach(req.headers.toList) { h =>
                 ZIO.logInfo(s">>> ${h._1}: ${h._2}")
+              }
+              _ <- ZIO.foreach(req.url.queryParams.toList) { q =>
+                ZIO.logInfo(s">>> Query Parameter = ${q._1}: ${q._2}")
               }
             yield req
           }

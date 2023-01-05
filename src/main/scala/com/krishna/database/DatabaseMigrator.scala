@@ -7,6 +7,14 @@ import com.krishna.config.DatabaseConfig
 
 object DatabaseMigrator:
 
+  /** Use of flyway Database migration to migrate the SQL queries. It will always migrate when the
+    * project is ran but only will apply if there are new changes.
+    * @see
+    *   <a href="https://flywaydb.org/documentation/concepts/migrations.html">More on flyway
+    *   migration</a>
+    * @return
+    *   Success or failure of the Database migration
+    */
   def migrate: ZIO[DatabaseConfig, Throwable, Unit] =
     for
       _           <- ZIO.logInfo("Running flyway Database migration!!")

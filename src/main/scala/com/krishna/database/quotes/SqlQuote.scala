@@ -43,10 +43,11 @@ object SqlQuote:
       fr"VALUES (${quote.serialId}, ${quote.quote.quote}, ${quote.author}, ${quote.relatedInfo}, ${quote.genre.toArray}, ${quote.storedDate})"
     (insertToTable ++ valuesToInsert).update
 
-  lazy val getAllQuotes: String => doobie.Query0[InspirationalQuote] = tableName =>
-    val getQuotes =
-      fr"SELECT serial_id, quote, author, related_info, genre, stored_date from " ++ Fragment
-        .const(tableName) ++ fr" ORDER BY csv_id LIMIT 10 OFFSET 0"
-    getQuotes
-      .query[(String, String, Option[String], Option[String], List[String], String)]
-      .map(InspirationalQuote.rowToQuote)
+  lazy val getAllQuotes: (String, Int, Int) => doobie.Query0[InspirationalQuote] =
+    (tableName, offset, limit) =>
+      val getQuotes =
+        fr"SELECT serial_id, quote, author, related_info, genre, stored_date from " ++ Fragment
+          .const(tableName) ++ fr" ORDER BY csv_id LIMIT $limit OFFSET $offset"
+      getQuotes
+        .query[(String, String, Option[String], Option[String], List[String], String)]
+        .map(InspirationalQuote.rowToQuote)

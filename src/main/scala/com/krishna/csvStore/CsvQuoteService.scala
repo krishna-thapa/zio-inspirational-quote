@@ -1,4 +1,4 @@
-package com.krishna.readCsv
+package com.krishna.csvStore
 
 import java.io.IOException
 import java.time.LocalDate
@@ -61,7 +61,7 @@ object CsvQuoteService:
       .fromResource(csvPath)
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
 
-  /** Validate the number of rows that the user wants to get from the CSV file It will be from the
+  /** Validate the number of rows that the user wants to get from the CSV file. It will be from the
     * record 0 and the default value is 20
     */
   val validateRows: Option[Int] => UIO[RuntimeFlags] = rows =>
@@ -119,6 +119,7 @@ object CsvQuoteService:
       result      <- csvStream(quoteConfig.csvPath)
         .drop(1) // Drop the CSV header row
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
+        // TODO Refactor this by merging logic in above map call method
         .mapZIO(insertQuoteToDb)
         .run(collectQuotesQuotes)
         .tapError(ErrorHandle.handelError("migrateQuotesToDb", _))

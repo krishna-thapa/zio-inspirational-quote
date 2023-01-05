@@ -13,7 +13,7 @@ object HomePage:
   def apply(): Http[Any, Nothing, Request, Response] =
     Http.collect[Request] {
       // GET /greet?name=:name
-      case req @ (Method.GET -> !! / "greet") if req.url.queryParams.nonEmpty =>
+      case req @ Method.GET -> !! / "greet" if req.url.queryParams.nonEmpty =>
         Response.text(s"Hello ${req.url.queryParams("name").mkString(" and ")}!")
 
       // GET /greet

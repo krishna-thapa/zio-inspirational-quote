@@ -11,3 +11,5 @@ Authorization: Basic admin:admin
 // curl -X GET -i http://localhost:9000/admin/csv-quotes/5 -u "admin:admin"
 // curl -X GET -i http://localhost:9000/admin/migrate -u "admin:admin"
 // curl -X GET -i http://localhost:9000/admin/db-quotes -u "admin:admin"
+
+// curl -X GET -i http://localhost:9000/admin/db-quotes?offset=0\&limit=10 -u "admin:admin"

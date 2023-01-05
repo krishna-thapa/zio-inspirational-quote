@@ -41,13 +41,20 @@ case class QuoteDbService() extends Persistence:
     yield response
 
   /** Retrieve all the quotes from the Postgres Database
+    * @param offset
+    *   offset value, default to 0
+    * @param limit
+    *   limit value, default to 10
     * @return
-    *   List of InspirationalQuote
+    *   list of InspirationalQuote
     */
-  def runGetAllQuotes(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+  def runGetAllQuotes(
+    offset: Int,
+    limit: Int
+  ): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
     for
       tableName <- validateDbTable
-      response  <- runQueryTxa(getAllQuotes(tableName))
+      response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
 object QuoteDbService:
