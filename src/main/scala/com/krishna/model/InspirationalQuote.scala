@@ -1,9 +1,9 @@
 package com.krishna.model
 
-import doobie.{ Read, Write }
-
 import java.time.LocalDate
 import java.util.UUID
+
+import doobie.{ Read, Write }
 import zio.json.{ DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder }
 
 case class InspirationalQuote(

@@ -1,7 +1,7 @@
 package com.krishna.http
 
-import zio.http.*
 import zio.*
+import zio.http.*
 
 object VerboseLog:
 
@@ -12,6 +12,8 @@ object VerboseLog:
 
       override def apply[R1 <: R, E1 >: E](
         http: Http[R1, E1, Request, Response]
+      )(implicit
+        trace: Trace
       ): Http[R1, E1, Request, Response] =
         http
           .contramapZIO[R1, E1, Request] { req =>

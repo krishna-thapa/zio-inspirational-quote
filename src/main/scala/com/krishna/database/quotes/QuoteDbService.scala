@@ -40,10 +40,10 @@ case class QuoteDbService() extends Persistence:
       response  <- runUpdateTxa(insertQuote(tableName, quote))
     yield response
 
-  /**
-   * Retrieve all the quotes from the Postgres Database
-   * @return List of InspirationalQuote
-   */
+  /** Retrieve all the quotes from the Postgres Database
+    * @return
+    *   List of InspirationalQuote
+    */
   def runGetAllQuotes(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
     for
       tableName <- validateDbTable

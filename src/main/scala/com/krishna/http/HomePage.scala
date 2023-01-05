@@ -1,6 +1,7 @@
 package com.krishna.http
 
-import zhttp.http.*
+import zio.http.*
+import zio.http.model.Method
 
 /** An http app that:
   *   - Accepts a `Request` and returns a `Response`

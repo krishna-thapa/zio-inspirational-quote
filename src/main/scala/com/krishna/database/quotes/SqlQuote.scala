@@ -5,6 +5,7 @@ import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
+
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.DbConnection
 import com.krishna.model.InspirationalQuote

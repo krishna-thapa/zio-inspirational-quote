@@ -71,4 +71,4 @@ package object config:
     val layer: Layer[ReadError[String], Configuration] =
       getEnvironmentConfig[WikiConfig]("WikiConfig") ++
         getEnvironmentConfig[QuoteConfig]("QuoteConfig") ++
-        databaseLayer
+        getEnvironmentConfig[DatabaseConfig]("DatabaseConfig")
