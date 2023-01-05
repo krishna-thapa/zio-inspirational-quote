@@ -16,25 +16,43 @@ import com.krishna.model.InspirationalQuote
 
 case class QuoteDbService() extends Persistence:
 
-//  lazy val transactor: ZIO[DatabaseConfig, Throwable, HikariTransactor[Task]] =
-//    DbConnection.transactor
+  def runDoobieTxa(
+    updateQuery: doobie.Update0
+  ): ZIO[DatabaseConfig, Throwable, Task[Int]] =
+    ZIO.scoped {
+      for
+        txa      <- DbConnection.transactor
+        response <- updateQuery.run.transact(txa)
+      yield ZIO.attemptBlockingIO(response)
+    }
 
-  def migrateQuote(quote: InspirationalQuote): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]] =
+  def insertQuotes(tableName: String, quote: InspirationalQuote): doobie.Update0 =
+    val insertToTable  = fr"INSERT INTO " ++
+      Fragment.const(tableName) ++
+      fr" (serial_id, quote, author, relatedInfo, genre, stored_date) "
+    val valuesToInsert =
+      fr"VALUES (${quote.serialId}, ${quote.quote.quote}, ${quote.author}, ${quote.relatedInfo}, ${quote.genre.toArray}, ${quote.storedDate})"
+    (insertToTable ++ valuesToInsert).update
 
-    // .foldM(error => zio.Task.fail(err), _ => Task.succees
-    val migrateQuery: String => doobie.Update0 = tableName =>
-      val insertToTable  = fr"INSERT INTO " ++ Fragment.const(
-        tableName
-      ) ++ fr" (serial_id, quote, author, relatedInfo, genre, stored_date) "
-      val valuesToInsert =
-        fr"VALUES (${quote.serialId}, ${quote.quote.quote}, ${quote.author}, ${quote.relatedInfo}, ${quote.genre.toArray}, ${quote.storedDate})"
-      (insertToTable ++ valuesToInsert).update
+  def truncateTable(tableName: String): doobie.Update0 =
+    (fr"TRUNCATE TABLE " ++ Fragment.const(tableName) ++ fr" CASCADE").update
+  
+  def runTruncateTable(): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]] =
+    for
+      getDbConfig <- com.krishna.config.databaseConfig
+      tableName <- DatabaseConfig.validateTable(getDbConfig)
+      query = truncateTable(tableName)
+      response <- runDoobieTxa(query)
+    yield response
+    
+  def runMigrateQuote(quote: InspirationalQuote): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]] =
 
     for
-      txa         <- DbConnection.transactor
       getDbConfig <- com.krishna.config.databaseConfig
-      tableName   <- DatabaseConfig.validateTable(getDbConfig)
-    yield migrateQuery(tableName).run.transact(txa)
+      tableName <- DatabaseConfig.validateTable(getDbConfig)
+      query = insertQuotes(tableName, quote)
+      response <- runDoobieTxa(query)
+    yield response
 
 object QuoteDbService:
 

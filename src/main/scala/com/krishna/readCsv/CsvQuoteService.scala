@@ -3,17 +3,14 @@ package com.krishna.readCsv
 import java.io.IOException
 import java.time.LocalDate
 import java.util.UUID
-
 import scala.Option.unless
-
-import zio.*
-import zio.stream.{ ZPipeline, ZSink, ZStream }
-
+import zio.{Task, *}
+import zio.stream.{ZPipeline, ZSink, ZStream}
 import com.krishna.config.*
 import com.krishna.database.DbConnection
 import com.krishna.database.quotes.Persistence
 import com.krishna.errorHandle.ErrorHandle
-import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
+import com.krishna.model.{AuthorDetail, InspirationalQuote, Quote}
 import com.krishna.wikiHttp.WebClient
 
 object CsvQuoteService:
@@ -100,7 +97,7 @@ object CsvQuoteService:
     quote: InspirationalQuote
   ): ZIO[Persistence with DatabaseConfig, Throwable, Unit] =
     for
-      dbPersistenceCall <- Persistence.migrateQuote(quote)
+      dbPersistenceCall <- Persistence.runMigrateQuote(quote)
       result            <- dbPersistenceCall
       _                 <-
         if result == 1 then ZIO.logInfo(s"Success insert quote with id: ${quote.serialId}")
@@ -119,6 +116,9 @@ object CsvQuoteService:
     */
   def migrateQuotesToDb(): ZIO[Persistence with QuoteAndDbConfig, Throwable, Long] =
     for
+      truncateRes <- Persistence.runTruncateTable()
+      res <-truncateRes
+      _ <- ZIO.logInfo(s"Success on truncating the records with response $res")
       quoteConfig <- com.krishna.config.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)

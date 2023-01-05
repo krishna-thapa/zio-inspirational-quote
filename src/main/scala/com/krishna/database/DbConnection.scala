@@ -24,13 +24,12 @@ object DbConnection:
     }
 
   // Create a connection pool with Postgres Database client
-  lazy val transactor: ZIO[DatabaseConfig, Throwable, HikariTransactor[Task]] =
+  lazy val transactor: ZIO[DatabaseConfig with Scope, Throwable, HikariTransactor[Task]] =
     for
       _           <- ZIO.logInfo("Getting Database connection pool!")
       getDbConfig <- com.krishna.config.databaseConfig
       dbConfig    <- DatabaseConfig.validateConfig(getDbConfig)
-      executor    <- ZIO.executor
-      // ce          <- ExecutionContexts.fixedThreadPool[Task](32).toScopedZIO
+      ce          <- ExecutionContexts.fixedThreadPool[Task](10).toScopedZIO
       xa          <- HikariTransactor
         .newHikariTransactor[Task](
           driverClassName = "org.postgresql.Driver",
@@ -38,7 +37,6 @@ object DbConnection:
             s"jdbc:postgresql://${dbConfig.serverName}:${dbConfig.portNumber}/${dbConfig.databaseName}",
           user = dbConfig.user,
           pass = dbConfig.password,
-          connectEC = executor.asExecutionContext
-        )
-        .allocated
-    yield xa._1
+          connectEC = ce
+        ).toScopedZIO
+    yield xa
