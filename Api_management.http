@@ -8,5 +8,6 @@ Authorization: Basic admin:admin
 
 // Curl command to be used in the terminal
 // curl -X GET -i http://localhost:9000/
-// curl -X GET -i http://localhost:9000/csv-quotes/5 -u "admin:admin"
-// curl -X GET -i http://localhost:9000/migrate/quotes -u "admin:admin"
+// curl -X GET -i http://localhost:9000/admin/csv-quotes/5 -u "admin:admin"
+// curl -X GET -i http://localhost:9000/admin/migrate -u "admin:admin"
+// curl -X GET -i http://localhost:9000/admin/db-quotes -u "admin:admin"

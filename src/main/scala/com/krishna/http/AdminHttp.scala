@@ -1,14 +1,13 @@
 package com.krishna.http
 
-import zhttp.http.*
-import zio.json.EncoderOps
-import zio.{ Chunk, Scope, ZIO }
-
 import com.krishna.config.*
-import com.krishna.database.quotes.Persistence
+import com.krishna.database.quotes.{ Persistence, QuoteDbService }
 import com.krishna.model.InspirationalQuote
 import com.krishna.readCsv.CsvQuoteService
 import com.krishna.wikiHttp.WebClient
+import zhttp.http.*
+import zio.json.EncoderOps
+import zio.{ Chunk, Scope, ZIO }
 
 object AdminHttp:
 
@@ -17,14 +16,19 @@ object AdminHttp:
 
   def apply(): Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
-      // GET /migrate
-      case Method.GET -> !! / "csv-quotes" / rows  =>
+      case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
         val getRows: Option[Int] = rows.toIntOption
         ZIO.logInfo(s"Retrieving total $rows quotes from the CSV file data!") *>
           CsvQuoteService.getQuotesFromCsv(rows = getRows).map(convertToJson)
-      case Method.GET -> !! / "migrate" / "quotes" =>
-        ZIO.logInfo("Retrieving all the quotes.....") *>
+      case Method.GET -> !! / "admin" / "migrate"           =>
+        ZIO.logInfo("Migrating quote records from CSV file to Postgres Database!") *>
           CsvQuoteService
             .migrateQuotesToDb()
             .map(result => Response.text(s"Success on migrating total $result quotes to database."))
+      case Method.GET -> !! / "admin" / "db-quotes"         =>
+        ZIO.logInfo("Retrieving all quotes Postgres Database!") *>
+          (for
+            results <- Persistence.runGetAllQuotes()
+            quotes <- results
+          yield convertToJson(Chunk.fromIterable(quotes)))
     } @@ (Middleware.basicAuth("admin", "admin") ++ VerboseLog.log)

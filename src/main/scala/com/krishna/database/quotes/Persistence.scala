@@ -10,6 +10,7 @@ trait Persistence:
 
   def runTruncateTable(): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]]
   def runMigrateQuote(quote: InspirationalQuote): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]]
+  def runGetAllQuotes(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
 
 object Persistence:
 
@@ -28,5 +29,13 @@ object Persistence:
       _.runMigrateQuote(quote).foldZIO(
         err => ErrorHandle.handelError("runMigrateQuote", err),
         _ => ZIO.logInfo(s"Success on inserting quote with uuid: ${quote.serialId}")
+      )
+    )
+
+  def runGetAllQuotes()
+    : ZIO[Persistence with DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+    ZIO.serviceWithZIO[Persistence](
+      _.runGetAllQuotes().tapError(ex =>
+        ZIO.logError(s"Error while running runGetAllQuotes, with exception:  $ex")
       )
     )

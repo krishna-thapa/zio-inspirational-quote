@@ -17,7 +17,7 @@ create TABLE IF NOT EXISTS inspirational_quotes (
   quote text NOT NULL,
   quote_tsv tsvector,
   author varchar (100),
-  relatedInfo  varchar (500),
+  related_info  varchar (500),
   genre text [],
   stored_date DATE NOT NULL
 );

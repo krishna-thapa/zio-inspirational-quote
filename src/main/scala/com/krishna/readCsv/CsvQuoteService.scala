@@ -117,7 +117,7 @@ object CsvQuoteService:
       _           <- Persistence.runTruncateTable()
       quoteConfig <- com.krishna.config.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
-        .drop(1)
+        .drop(1) // Drop the CSV header row
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
         .mapZIO(insertQuoteToDb)
         .run(collectQuotesQuotes)

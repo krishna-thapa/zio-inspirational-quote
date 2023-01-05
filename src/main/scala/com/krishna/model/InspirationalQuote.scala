@@ -1,9 +1,10 @@
 package com.krishna.model
 
+import doobie.{ Read, Write }
+
 import java.time.LocalDate
 import java.util.UUID
-
-import zio.json.{ DeriveJsonEncoder, JsonEncoder }
+import zio.json.{ DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder }
 
 case class InspirationalQuote(
   serialId: UUID,
@@ -16,3 +17,15 @@ case class InspirationalQuote(
 
 object InspirationalQuote:
   given JsonEncoder[InspirationalQuote] = DeriveJsonEncoder.gen
+
+  def rowToQuote(
+    row: (String, String, Option[String], Option[String], List[String], String)
+  ): InspirationalQuote =
+    InspirationalQuote(
+      UUID.fromString(row._1),
+      Quote(row._2),
+      row._3,
+      row._4,
+      row._5.toSet,
+      LocalDate.parse(row._6)
+    )
