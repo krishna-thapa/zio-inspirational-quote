@@ -45,7 +45,7 @@ object SqlQuote:
   lazy val getAllQuotes: String => doobie.Query0[InspirationalQuote] = tableName =>
     val getQuotes =
       fr"SELECT serial_id, quote, author, related_info, genre, stored_date from " ++ Fragment
-        .const(tableName)
+        .const(tableName) ++ fr" ORDER BY csv_id LIMIT 10 OFFSET 0"
     getQuotes
       .query[(String, String, Option[String], Option[String], List[String], String)]
       .map(InspirationalQuote.rowToQuote)

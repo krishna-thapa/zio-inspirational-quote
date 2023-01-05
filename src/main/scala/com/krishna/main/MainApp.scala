@@ -1,20 +1,18 @@
 package com.krishna.main
 
 import java.io.IOException
-
-import zhttp.http.*
-import zhttp.service.Server
 import zio.config.ReadError
 import zio.logging.backend.SLF4J
 import zio.logging.{ LogFilter, LogFormat, console }
 import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
-
 import com.krishna.config.*
 import com.krishna.database.quotes.{ Persistence, QuoteDbService }
 import com.krishna.database.{ DatabaseMigrator, DbConnection }
 import com.krishna.http.{ AdminHttp, HomePage }
 import com.krishna.model.InspirationalQuote
 import com.krishna.readCsv.CsvQuoteService
+
+import zio.http.*
 
 object MainApp extends ZIOAppDefault:
 
@@ -30,7 +28,7 @@ object MainApp extends ZIOAppDefault:
     for
       _ <- ZIO.logInfo("Running ZIO inspirational quote API project!!")
       _ <- ZIO.logInfo(s"Starting server on http://localhost:$port")
-      _ <- DatabaseMigrator.migrate <*> Server.start(port, combinedHttp)
+      _ <- DatabaseMigrator.migrate <*> Server.serve(port, combinedHttp)
     yield ()
 
   // =========================================

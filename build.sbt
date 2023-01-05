@@ -1,5 +1,5 @@
 val zioVersion = "2.0.5"
-val zioLogger  = "2.1.5"
+val zioLogger  = "2.1.7"
 val zioJson    = "0.4.2"
 
 ThisBuild / organization := "com.krishna"
@@ -20,8 +20,7 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-json" % zioJson,
 
       // https://zio.github.io/zio-http/
-      // TODO: This will become "zio-http"
-      "io.d11" %% "zhttp" % "2.0.0-RC11",
+      "dev.zio" %% "zio-http" % "0.0.3",
 
       // https://zio.github.io/zio-logging/
       "ch.qos.logback" % "logback-classic"   % "1.4.5",
@@ -41,7 +40,7 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
 
 // https://flywaydb.org/
 val flywayMigrationDependencies: Seq[ModuleID] = Seq(
-  "org.flywaydb"   % "flyway-core" % "9.10.1",
+  "org.flywaydb"   % "flyway-core" % "9.10.2",
   "org.postgresql" % "postgresql"  % "42.5.1"
 )
 
@@ -96,5 +95,5 @@ onLoadMessage := {
       |
       |${subItem("GitHub account: https://github.com/krishna-thapa/zio-inspirational-quote")}
       """.stripMargin
-  // @formatter:on 
+  // @formatter:on
 }

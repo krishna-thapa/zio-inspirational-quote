@@ -1,6 +1,6 @@
 package com.krishna.http
 
-import zhttp.http.*
+import zio.http.*
 import zio.*
 
 object VerboseLog:
