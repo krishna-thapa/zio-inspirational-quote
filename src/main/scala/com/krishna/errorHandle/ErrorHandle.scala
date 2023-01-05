@@ -13,7 +13,7 @@ object ErrorHandle:
       ZIO.fail(exception)
 
   // Catch IOException && CharacterCodingException && Throwable
-  def matchException(service: String, exception: Throwable): ZIO[Any, Throwable, Unit] =
+  def handelError(service: String, exception: Throwable): ZIO[Any, Throwable, Unit] =
     exception match
       case ex: IOException => logAndFail("Failed while reading the CSV file!", ex)
       case ex              => logAndFail(s"Fail on $service", ex)

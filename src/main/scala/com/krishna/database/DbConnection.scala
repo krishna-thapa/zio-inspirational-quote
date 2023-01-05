@@ -38,5 +38,6 @@ object DbConnection:
           user = dbConfig.user,
           pass = dbConfig.password,
           connectEC = ce
-        ).toScopedZIO
+        )
+        .toScopedZIO
     yield xa

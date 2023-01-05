@@ -3,14 +3,17 @@ package com.krishna.readCsv
 import java.io.IOException
 import java.time.LocalDate
 import java.util.UUID
+
 import scala.Option.unless
-import zio.{Task, *}
-import zio.stream.{ZPipeline, ZSink, ZStream}
+
+import zio.stream.{ ZPipeline, ZSink, ZStream }
+import zio.{ Task, * }
+
 import com.krishna.config.*
 import com.krishna.database.DbConnection
 import com.krishna.database.quotes.Persistence
 import com.krishna.errorHandle.ErrorHandle
-import com.krishna.model.{AuthorDetail, InspirationalQuote, Quote}
+import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
 
 object CsvQuoteService:
@@ -96,12 +99,7 @@ object CsvQuoteService:
   def insertQuoteToDb(
     quote: InspirationalQuote
   ): ZIO[Persistence with DatabaseConfig, Throwable, Unit] =
-    for
-      dbPersistenceCall <- Persistence.runMigrateQuote(quote)
-      result            <- dbPersistenceCall
-      _                 <-
-        if result == 1 then ZIO.logInfo(s"Success insert quote with id: ${quote.serialId}")
-        else ZIO.logError(s"Failure insert quote with id: ${quote.serialId}")
+    for _ <- Persistence.runMigrateQuote(quote)
     yield ()
 
   /** Collect all total Quotes count that is migrated to Database
@@ -116,15 +114,14 @@ object CsvQuoteService:
     */
   def migrateQuotesToDb(): ZIO[Persistence with QuoteAndDbConfig, Throwable, Long] =
     for
-      truncateRes <- Persistence.runTruncateTable()
-      res <-truncateRes
-      _ <- ZIO.logInfo(s"Success on truncating the records with response $res")
+      _           <- Persistence.runTruncateTable()
       quoteConfig <- com.krishna.config.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
+        .drop(1)
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
         .mapZIO(insertQuoteToDb)
         .run(collectQuotesQuotes)
-        .tapError(ErrorHandle.matchException("migrateQuotesToDb", _))
+        .tapError(ErrorHandle.handelError("migrateQuotesToDb", _))
       _           <- ZIO.logInfo(
         s"Successfully migrated total quotes $result from CSV data to Postgres Database."
       )
