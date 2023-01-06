@@ -1,10 +1,11 @@
 package com.krishna.database.quotes
 
 import zio.*
-
 import com.krishna.config.DatabaseConfig
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.model.InspirationalQuote
+
+import java.util.UUID
 
 trait Persistence:
 
@@ -16,7 +17,9 @@ trait Persistence:
     limit: Int
   ): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
 
-  def runRandomQuote(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
+  def runRandomQuote(rows: Int): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
+
+  def runSelectQuote(uuid: UUID): ZIO[DatabaseConfig, Throwable, Task[InspirationalQuote]]
 
 object Persistence:
 
@@ -48,10 +51,20 @@ object Persistence:
       )
     )
 
-  def runRandomQuote()
-    : ZIO[Persistence with DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+  def runRandomQuote(
+    rows: Int
+  ): ZIO[Persistence with DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
     ZIO.serviceWithZIO[Persistence](
-      _.runRandomQuote().tapError(ex =>
+      _.runRandomQuote(rows).tapError(ex =>
+        ZIO.logError(s"Error while running runRandomQuote, with exception:  $ex")
+      )
+    )
+
+  def runSelectQuote(
+    uuid: UUID
+  ): ZIO[Persistence with DatabaseConfig, Throwable, Task[InspirationalQuote]] =
+    ZIO.serviceWithZIO[Persistence](
+      _.runSelectQuote(uuid).tapError(ex =>
         ZIO.logError(s"Error while running runRandomQuote, with exception:  $ex")
       )
     )

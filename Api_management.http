@@ -15,4 +15,13 @@ Authorization: Basic admin:admin
 // curl -X GET -i http://localhost:9000/admin/db-quotes?offset=0\&limit=10 -u "admin:admin"
 
 // ===== User API endpoint
-// curl -X GET -i http://localhost:9000/quote/random -u "user:user"
+// curl -X GET -i http://localhost:9000/quote/random -u "admin:admin"
+// curl -X GET -i http://localhost:9000/quote/e0a0c231-8b93-4bc5-8615-193e551a2703 -u "admin:admin"
+
+
+// SELECT id FROM inspirational_quotes where 'dreams'=ANY(genre) order by random() limit 2;
+
+// Auto completion
+SELECT distinct a
+FROM   inspirational_quotes l, unnest(genre) a
+WHERE  lower(a) LIKE 'd%' ;

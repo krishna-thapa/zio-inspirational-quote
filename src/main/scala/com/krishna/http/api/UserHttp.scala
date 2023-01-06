@@ -18,10 +18,18 @@ object UserHttp:
 
   def apply(): Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
-      case Method.GET -> !! / "quote" / "random" =>
-        ZIO.logInfo("Getting a random quote from the Postgres database!") *>
+      case req @ Method.GET -> !! / "quote" / "random" =>
+        val rows: Int    = ConfigHttp.getQueryParameter(req, ("rows", 1))
+        val maxRows: Int = if rows >= 10 then 10 else rows
+        ZIO.logInfo(s"Getting $maxRows random quote from the Postgres database!") *>
           (for
-            results <- Persistence.runRandomQuote()
+            results <- Persistence.runRandomQuote(maxRows)
             quotes  <- results
           yield ConfigHttp.convertToJson(Chunk.fromIterable(quotes)))
+      case Method.GET -> !! / "quote" / uuid(uuid)     =>
+        ZIO.logInfo(s"Getting a quote from the Postgres database with id $uuid!") *>
+          (for
+            results <- Persistence.runSelectQuote(uuid)
+            quote   <- results
+          yield ConfigHttp.convertToJson(quote))
     } @@ VerboseLog.log

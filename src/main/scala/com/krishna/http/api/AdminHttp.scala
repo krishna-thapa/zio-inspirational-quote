@@ -12,16 +12,7 @@ import zio.http.model.{ Header, Method }
 import zio.{ Chunk, Scope, ZIO }
 
 object AdminHttp:
-
-  private val getQueryParameter: (Request, (String, Int)) => Int =
-    (request, parameterWithDefault) =>
-      request
-        .url
-        .queryParams
-        .get(parameterWithDefault._1)
-        .flatMap(_.apply(0).toIntOption)
-        .getOrElse(parameterWithDefault._2)
-
+  
   def apply(): Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
@@ -34,8 +25,8 @@ object AdminHttp:
             .migrateQuotesToDb()
             .map(result => Response.text(s"Success on migrating total $result quotes to database."))
       case req @ Method.GET -> !! / "admin" / "db-quotes"   =>
-        val offset: Int = getQueryParameter(req, ("offset", 0))
-        val limit: Int  = getQueryParameter(req, ("limit", 10))
+        val offset: Int = ConfigHttp.getQueryParameter(req, ("offset", 0))
+        val limit: Int  = ConfigHttp.getQueryParameter(req, ("limit", 10))
         ZIO.logInfo(
           s"Retrieving all quotes from Postgres Database with offset $offset and limit $limit."
         ) *>

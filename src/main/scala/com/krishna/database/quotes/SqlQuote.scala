@@ -5,10 +5,11 @@ import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
-
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.DbConnection
 import com.krishna.model.InspirationalQuote
+
+import java.util.UUID
 
 object SqlQuote:
 
@@ -29,6 +30,16 @@ object SqlQuote:
       for
         txa      <- DbConnection.transactor
         response <- getQuery.to[List].transact(txa)
+      yield ZIO.attemptBlockingIO(response)
+    }
+
+  def runQueryTxa[T](
+    getQuery: doobie.ConnectionIO[T]
+  ): ZIO[DatabaseConfig, Throwable, Task[T]] =
+    ZIO.scoped {
+      for
+        txa      <- DbConnection.transactor
+        response <- getQuery.transact(txa)
       yield ZIO.attemptBlockingIO(response)
     }
 
@@ -58,8 +69,16 @@ object SqlQuote:
         .query[(String, String, Option[String], Option[String], List[String], String)]
         .map(InspirationalQuote.rowToQuote)
 
-  lazy val getRandomQuote: String => doobie.Query0[InspirationalQuote] = tableName =>
+  lazy val getRandomQuote: (String, Int) => doobie.Query0[InspirationalQuote] = (tableName, rows) =>
     (selectQuoteColumns ++ Fragment.const(tableName) ++ fr" OFFSET floor(random() * (" ++
-      countRows(tableName) ++ fr")) LIMIT 1")
+      countRows(tableName) ++ fr")) LIMIT $rows")
       .query[(String, String, Option[String], Option[String], List[String], String)]
       .map(InspirationalQuote.rowToQuote)
+
+  lazy val getQuoteById: (String, UUID) => doobie.ConnectionIO[InspirationalQuote] =
+    (tableName, uuid) =>
+      (selectQuoteColumns ++ Fragment.const(tableName) ++
+        fr" WHERE serial_id = $uuid")
+        .query[(String, String, Option[String], Option[String], List[String], String)]
+        .map(InspirationalQuote.rowToQuote)
+        .unique

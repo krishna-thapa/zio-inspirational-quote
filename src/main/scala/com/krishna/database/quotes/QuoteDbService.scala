@@ -1,10 +1,11 @@
 package com.krishna.database.quotes
 
-import zio.*
-
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
+import zio.*
+
+import java.util.UUID
 
 case class QuoteDbService() extends Persistence:
 
@@ -57,10 +58,16 @@ case class QuoteDbService() extends Persistence:
       response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
-  def runRandomQuote(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+  def runRandomQuote(rows: Int): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
     for
       tableName <- validateDbTable
-      response  <- runQueryTxa(getRandomQuote(tableName))
+      response  <- runQueryTxa(getRandomQuote(tableName, rows))
+    yield response
+
+  def runSelectQuote(uuid: UUID): ZIO[DatabaseConfig, Throwable, Task[InspirationalQuote]] =
+    for
+      tableName <- validateDbTable
+      response  <- runQueryTxa(getQuoteById(tableName, uuid))
     yield response
 
 object QuoteDbService:

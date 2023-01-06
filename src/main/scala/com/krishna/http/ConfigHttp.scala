@@ -1,9 +1,9 @@
 package com.krishna.http
 
-import zio.{Chunk, ULayer}
+import zio.{ Chunk, ULayer }
 import zio.http.ServerConfig.LeakDetectionLevel
 import zio.http.*
-import zio.json.EncoderOps
+import zio.json.{ EncoderOps, JsonEncoder }
 import com.krishna.config.QuoteAndDbConfig
 import com.krishna.database.quotes.Persistence
 import com.krishna.http.api.*
@@ -24,5 +24,17 @@ object ConfigHttp:
 
   val configLayer: ULayer[ServerConfig] = ServerConfig.live(config)
 
-  private[http] def convertToJson(quotes: Chunk[InspirationalQuote]): Response =
+  // ==================== Helper methods ==========================
+  private[http] def convertToJson[T](quotes: Chunk[T])(using JsonEncoder[T]): Response =
     Response.json(quotes.toJson)
+
+  private[http] def convertToJson[T](quote: T)(using JsonEncoder[T]): Response =
+    Response.json(quote.toJson)
+
+  private[http] def getQueryParameter(request: Request, parameterWithDefault: (String, Int)): Int =
+    request
+      .url
+      .queryParams
+      .get(parameterWithDefault._1)
+      .flatMap(_.apply(0).toIntOption)
+      .getOrElse(parameterWithDefault._2)
