@@ -43,11 +43,23 @@ object SqlQuote:
       fr"VALUES (${quote.serialId}, ${quote.quote.quote}, ${quote.author}, ${quote.relatedInfo}, ${quote.genre.toArray}, ${quote.storedDate})"
     (insertToTable ++ valuesToInsert).update
 
+  lazy val selectQuoteColumns: Fragment =
+    fr"SELECT serial_id, quote, author, related_info, genre, stored_date from "
+
+  lazy val countRows: String => Fragment = tableName =>
+    fr"SELECT COUNT (*) from " ++ Fragment.const(tableName)
+
   lazy val getAllQuotes: (String, Int, Int) => doobie.Query0[InspirationalQuote] =
     (tableName, offset, limit) =>
       val getQuotes =
-        fr"SELECT serial_id, quote, author, related_info, genre, stored_date from " ++ Fragment
-          .const(tableName) ++ fr" ORDER BY csv_id LIMIT $limit OFFSET $offset"
+        selectQuoteColumns ++ Fragment.const(tableName) ++
+          fr" ORDER BY csv_id LIMIT $limit OFFSET $offset"
       getQuotes
         .query[(String, String, Option[String], Option[String], List[String], String)]
         .map(InspirationalQuote.rowToQuote)
+
+  lazy val getRandomQuote: String => doobie.Query0[InspirationalQuote] = tableName =>
+    (selectQuoteColumns ++ Fragment.const(tableName) ++ fr" OFFSET floor(random() * (" ++
+      countRows(tableName) ++ fr")) LIMIT 1")
+      .query[(String, String, Option[String], Option[String], List[String], String)]
+      .map(InspirationalQuote.rowToQuote)

@@ -14,7 +14,8 @@ import com.krishna.csvStore.CsvQuoteService
 import com.krishna.database.quotes.{ Persistence, QuoteDbService }
 import com.krishna.database.{ DatabaseMigrator, DbConnection }
 import com.krishna.errorHandle.ErrorHandle
-import com.krishna.http.{ AdminHttp, ConfigHttp, HomePage }
+import com.krishna.http.api.{AdminHttp, HomePage}
+import com.krishna.http.ConfigHttp
 import com.krishna.model.InspirationalQuote
 
 object MainApp extends ZIOAppDefault:

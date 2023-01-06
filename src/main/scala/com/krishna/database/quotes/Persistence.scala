@@ -16,6 +16,8 @@ trait Persistence:
     limit: Int
   ): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
 
+  def runRandomQuote(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
+
 object Persistence:
 
   def runTruncateTable(): ZIO[Persistence with DatabaseConfig, Throwable, Unit] =
@@ -43,5 +45,13 @@ object Persistence:
     ZIO.serviceWithZIO[Persistence](
       _.runGetAllQuotes(offset, limit).tapError(ex =>
         ZIO.logError(s"Error while running runGetAllQuotes, with exception:  $ex")
+      )
+    )
+
+  def runRandomQuote()
+    : ZIO[Persistence with DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+    ZIO.serviceWithZIO[Persistence](
+      _.runRandomQuote().tapError(ex =>
+        ZIO.logError(s"Error while running runRandomQuote, with exception:  $ex")
       )
     )

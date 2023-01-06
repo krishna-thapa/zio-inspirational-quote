@@ -1,20 +1,17 @@
-package com.krishna.http
-
-import zio.http.*
-import zio.http.model.{ Header, Method }
-import zio.json.EncoderOps
-import zio.{ Chunk, Scope, ZIO }
+package com.krishna.http.api
 
 import com.krishna.config.*
+import com.krishna.http.ConfigHttp
 import com.krishna.csvStore.CsvQuoteService
 import com.krishna.database.quotes.{ Persistence, QuoteDbService }
+import com.krishna.http.VerboseLog
 import com.krishna.model.InspirationalQuote
 import com.krishna.wikiHttp.WebClient
+import zio.http.*
+import zio.http.model.{ Header, Method }
+import zio.{ Chunk, Scope, ZIO }
 
 object AdminHttp:
-
-  private val convertToJson: Chunk[InspirationalQuote] => Response =
-    (quotes: Chunk[InspirationalQuote]) => Response.json(quotes.toJson)
 
   private val getQueryParameter: (Request, (String, Int)) => Int =
     (request, parameterWithDefault) =>
@@ -30,7 +27,7 @@ object AdminHttp:
       case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
         val getRows: Option[Int] = rows.toIntOption
         ZIO.logInfo(s"Retrieving total $rows quotes from the CSV file data!") *>
-          CsvQuoteService.getQuotesFromCsv(rows = getRows).map(convertToJson)
+          CsvQuoteService.getQuotesFromCsv(rows = getRows).map(ConfigHttp.convertToJson)
       case Method.GET -> !! / "admin" / "migrate"           =>
         ZIO.logInfo("Migrating quote records from CSV file to Postgres Database!") *>
           CsvQuoteService
@@ -45,5 +42,5 @@ object AdminHttp:
           (for
             results <- Persistence.runGetAllQuotes(offset, limit)
             quotes  <- results
-          yield convertToJson(Chunk.fromIterable(quotes)))
+          yield ConfigHttp.convertToJson(Chunk.fromIterable(quotes)))
     } @@ (Middleware.basicAuth("admin", "admin") ++ VerboseLog.log)

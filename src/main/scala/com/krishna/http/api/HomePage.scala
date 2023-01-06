@@ -1,4 +1,4 @@
-package com.krishna.http
+package com.krishna.http.api
 
 import zio.http.*
 import zio.http.model.Method

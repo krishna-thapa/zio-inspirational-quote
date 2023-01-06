@@ -57,5 +57,11 @@ case class QuoteDbService() extends Persistence:
       response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
+  def runRandomQuote(): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+    for
+      tableName <- validateDbTable
+      response  <- runQueryTxa(getRandomQuote(tableName))
+    yield response
+
 object QuoteDbService:
   val layer: ULayer[QuoteDbService] = ZLayer.succeed(QuoteDbService())
