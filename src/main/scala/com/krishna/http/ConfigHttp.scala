@@ -12,7 +12,7 @@ import com.krishna.http.api.*
 object ConfigHttp:
 
   private val port: Int = 9000
-
+  //Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response]
   val combinedHttp: Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
     HomePage() ++ AdminHttp() ++ UserHttp()
 
