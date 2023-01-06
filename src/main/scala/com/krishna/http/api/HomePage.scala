@@ -3,6 +3,8 @@ package com.krishna.http.api
 import zio.http.*
 import zio.http.model.Method
 
+import com.krishna.http.VerboseLog
+
 /** An http app that:
   *   - Accepts a `Request` and returns a `Response`
   *   - Does not fail
@@ -10,7 +12,7 @@ import zio.http.model.Method
   */
 object HomePage:
 
-  def apply(): Http[Any, Nothing, Request, Response] =
+  def apply(): Http[Any, Throwable, Request, Response] =
     Http.collect[Request] {
       // GET /greet?name=:name
       case req @ Method.GET -> !! / "greet" if req.url.queryParams.nonEmpty =>
@@ -27,4 +29,4 @@ object HomePage:
       case Method.GET -> !! => Response.text("Home page!!")
 
       case Method.GET -> !! / "ping" => Response.text("Http response with pong!!")
-    }
+    } @@ VerboseLog.log

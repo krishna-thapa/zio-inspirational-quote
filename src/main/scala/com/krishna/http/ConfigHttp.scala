@@ -1,13 +1,13 @@
 package com.krishna.http
 
-import zio.{ Chunk, ULayer }
+import zio.ULayer
 import zio.http.ServerConfig.LeakDetectionLevel
 import zio.http.*
 import zio.json.{ EncoderOps, JsonEncoder }
+
 import com.krishna.config.QuoteAndDbConfig
 import com.krishna.database.quotes.Persistence
 import com.krishna.http.api.*
-import com.krishna.model.InspirationalQuote
 
 object ConfigHttp:
 

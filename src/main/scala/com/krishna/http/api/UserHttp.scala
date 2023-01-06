@@ -1,13 +1,14 @@
 package com.krishna.http.api
 
-import com.krishna.config.DatabaseConfig
-import com.krishna.database.quotes.Persistence
-import com.krishna.http.{ ConfigHttp, VerboseLog }
-import zio.{ Chunk, ZIO }
+import java.util.UUID
+
+import zio.ZIO
 import zio.http.*
 import zio.http.model.Method
 
-import java.util.UUID
+import com.krishna.config.DatabaseConfig
+import com.krishna.database.quotes.Persistence
+import com.krishna.http.ConfigHttp
 
 object UserHttp:
 

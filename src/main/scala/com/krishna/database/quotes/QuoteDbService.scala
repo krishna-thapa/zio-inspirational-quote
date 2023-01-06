@@ -1,11 +1,12 @@
 package com.krishna.database.quotes
 
+import java.util.UUID
+
+import zio.*
+
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
-import zio.*
-
-import java.util.UUID
 
 case class QuoteDbService() extends Persistence:
 

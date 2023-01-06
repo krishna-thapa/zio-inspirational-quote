@@ -1,15 +1,13 @@
 package com.krishna.http.api
 
-import com.krishna.config.*
-import com.krishna.http.ConfigHttp
-import com.krishna.csvStore.CsvQuoteService
-import com.krishna.database.quotes.{ Persistence, QuoteDbService }
-import com.krishna.http.VerboseLog
-import com.krishna.model.InspirationalQuote
-import com.krishna.wikiHttp.WebClient
+import zio.ZIO
 import zio.http.*
-import zio.http.model.{ Header, Method }
-import zio.{ Chunk, Scope, ZIO }
+import zio.http.model.Method
+
+import com.krishna.config.*
+import com.krishna.csvStore.CsvQuoteService
+import com.krishna.database.quotes.Persistence
+import com.krishna.http.ConfigHttp
 
 object AdminHttp:
 
@@ -36,4 +34,4 @@ object AdminHttp:
             results <- Persistence.runGetAllQuotes(offset, limit)
             quotes  <- results
           yield ConfigHttp.convertToJson(quotes))
-    } @@ (Middleware.basicAuth("admin", "admin") ++ VerboseLog.log)
+    } @@ Middleware.basicAuth("admin", "admin")

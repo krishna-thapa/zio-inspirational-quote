@@ -1,17 +1,18 @@
 package com.krishna.database.quotes
 
+import java.util.UUID
+
 import cats.data.NonEmptyList
+import doobie.ConnectionIO
 import doobie.implicits.*
 import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
+
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.DbConnection
 import com.krishna.model.InspirationalQuote
-import doobie.ConnectionIO
-
-import java.util.UUID
 
 object SqlQuote:
 

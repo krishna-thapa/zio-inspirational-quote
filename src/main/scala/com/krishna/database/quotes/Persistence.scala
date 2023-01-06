@@ -1,11 +1,12 @@
 package com.krishna.database.quotes
 
+import java.util.UUID
+
 import zio.*
+
 import com.krishna.config.DatabaseConfig
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.model.InspirationalQuote
-
-import java.util.UUID
 
 trait Persistence:
 

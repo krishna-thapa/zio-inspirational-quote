@@ -26,7 +26,11 @@ lazy val root = (project in file("."))
       "ch.qos.logback" % "logback-classic"   % "1.4.5",
       "dev.zio"       %% "zio-logging"       % zioLogger,
       "dev.zio"       %% "zio-logging-slf4j" % zioLogger
-    ) ++ zioConfigDependencies ++ flywayMigrationDependencies ++ doobieDependencies
+    ) ++
+      zioConfigDependencies ++
+      flywayMigrationDependencies ++
+      doobieDependencies ++
+      jwtScala
   )
 
 // https://zio.dev/zio-config/
@@ -48,11 +52,14 @@ val flywayMigrationDependencies: Seq[ModuleID] = Seq(
 val doobieJdbc = "1.0.0-RC2"
 
 val doobieDependencies: Seq[ModuleID] = Seq(
-  "org.tpolecat" %% "doobie-core" % doobieJdbc,
-  "org.tpolecat" %% "doobie-postgres" % doobieJdbc,
-  "org.tpolecat" %% "doobie-hikari" % doobieJdbc,
-  "dev.zio" %% "zio-interop-cats" % "23.0.0.0"
+  "org.tpolecat" %% "doobie-core"      % doobieJdbc,
+  "org.tpolecat" %% "doobie-postgres"  % doobieJdbc,
+  "org.tpolecat" %% "doobie-hikari"    % doobieJdbc,
+  "dev.zio"      %% "zio-interop-cats" % "23.0.0.0"
 )
+
+// https://jwt-scala.github.io/jwt-scala/jwt-core-jwt.html
+val jwtScala: Seq[ModuleID] = Seq("com.github.jwt-scala" %% "jwt-core" % "9.1.2")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
