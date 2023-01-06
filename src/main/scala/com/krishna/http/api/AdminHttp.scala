@@ -12,13 +12,15 @@ import zio.http.model.{ Header, Method }
 import zio.{ Chunk, Scope, ZIO }
 
 object AdminHttp:
-  
+
   def apply(): Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
         val getRows: Option[Int] = rows.toIntOption
         ZIO.logInfo(s"Retrieving total $rows quotes from the CSV file data!") *>
-          CsvQuoteService.getQuotesFromCsv(rows = getRows).map(ConfigHttp.convertToJson)
+          CsvQuoteService
+            .getQuotesFromCsv(rows = getRows)
+            .map(quotes => ConfigHttp.convertToJson(quotes.toList))
       case Method.GET -> !! / "admin" / "migrate"           =>
         ZIO.logInfo("Migrating quote records from CSV file to Postgres Database!") *>
           CsvQuoteService
@@ -33,5 +35,5 @@ object AdminHttp:
           (for
             results <- Persistence.runGetAllQuotes(offset, limit)
             quotes  <- results
-          yield ConfigHttp.convertToJson(Chunk.fromIterable(quotes)))
+          yield ConfigHttp.convertToJson(quotes))
     } @@ (Middleware.basicAuth("admin", "admin") ++ VerboseLog.log)

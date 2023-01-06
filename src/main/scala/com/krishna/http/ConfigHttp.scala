@@ -25,9 +25,6 @@ object ConfigHttp:
   val configLayer: ULayer[ServerConfig] = ServerConfig.live(config)
 
   // ==================== Helper methods ==========================
-  private[http] def convertToJson[T](quotes: Chunk[T])(using JsonEncoder[T]): Response =
-    Response.json(quotes.toJson)
-
   private[http] def convertToJson[T](quote: T)(using JsonEncoder[T]): Response =
     Response.json(quote.toJson)
 

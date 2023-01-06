@@ -21,6 +21,12 @@ trait Persistence:
 
   def runSelectQuote(uuid: UUID): ZIO[DatabaseConfig, Throwable, Task[InspirationalQuote]]
 
+  def runSelectGenreQuote(
+    genre: String
+  ): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]]
+
+  def runSelectGenreTitles(term: String): ZIO[DatabaseConfig, Throwable, Task[List[String]]]
+
 object Persistence:
 
   def runTruncateTable(): ZIO[Persistence with DatabaseConfig, Throwable, Unit] =
@@ -65,6 +71,24 @@ object Persistence:
   ): ZIO[Persistence with DatabaseConfig, Throwable, Task[InspirationalQuote]] =
     ZIO.serviceWithZIO[Persistence](
       _.runSelectQuote(uuid).tapError(ex =>
-        ZIO.logError(s"Error while running runRandomQuote, with exception:  $ex")
+        ZIO.logError(s"Error while running runSelectQuote, with exception:  $ex")
+      )
+    )
+
+  def runSelectGenreQuote(
+    genre: String
+  ): ZIO[Persistence with DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+    ZIO.serviceWithZIO[Persistence](
+      _.runSelectGenreQuote(genre).tapError(ex =>
+        ZIO.logError(s"Error while running runSelectGenreQuote, with exception:  $ex")
+      )
+    )
+
+  def runSelectGenreTitles(
+    term: String
+  ): ZIO[Persistence with DatabaseConfig, Throwable, Task[List[String]]] =
+    ZIO.serviceWithZIO[Persistence](
+      _.runSelectGenreTitles(term).tapError(ex =>
+        ZIO.logError(s"Error while running runSelectGenreTitles, with exception:  $ex")
       )
     )

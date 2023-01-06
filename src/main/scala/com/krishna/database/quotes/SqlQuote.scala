@@ -1,5 +1,6 @@
 package com.krishna.database.quotes
 
+import cats.data.NonEmptyList
 import doobie.implicits.*
 import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
@@ -8,6 +9,7 @@ import zio.{ Task, ZIO }
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.DbConnection
 import com.krishna.model.InspirationalQuote
+import doobie.ConnectionIO
 
 import java.util.UUID
 
@@ -44,12 +46,12 @@ object SqlQuote:
     }
 
   lazy val truncateTable: String => doobie.Update0 = tableName =>
-    (fr"TRUNCATE TABLE " ++ Fragment.const(tableName) ++ fr" CASCADE").update
+    (fr"TRUNCATE TABLE " ++ Fragment.const(tableName) ++ fr"CASCADE").update
 
   lazy val insertQuote: (String, InspirationalQuote) => doobie.Update0 = (tableName, quote) =>
     val insertToTable  = fr"INSERT INTO " ++
       Fragment.const(tableName) ++
-      fr" (serial_id, quote, author, related_info, genre, stored_date) "
+      fr"(serial_id, quote, author, related_info, genre, stored_date) "
     val valuesToInsert =
       fr"VALUES (${quote.serialId}, ${quote.quote.quote}, ${quote.author}, ${quote.relatedInfo}, ${quote.genre.toArray}, ${quote.storedDate})"
     (insertToTable ++ valuesToInsert).update
@@ -64,13 +66,13 @@ object SqlQuote:
     (tableName, offset, limit) =>
       val getQuotes =
         selectQuoteColumns ++ Fragment.const(tableName) ++
-          fr" ORDER BY csv_id LIMIT $limit OFFSET $offset"
+          fr"ORDER BY csv_id LIMIT $limit OFFSET $offset"
       getQuotes
         .query[(String, String, Option[String], Option[String], List[String], String)]
         .map(InspirationalQuote.rowToQuote)
 
   lazy val getRandomQuote: (String, Int) => doobie.Query0[InspirationalQuote] = (tableName, rows) =>
-    (selectQuoteColumns ++ Fragment.const(tableName) ++ fr" OFFSET floor(random() * (" ++
+    (selectQuoteColumns ++ Fragment.const(tableName) ++ fr"OFFSET floor(random() * (" ++
       countRows(tableName) ++ fr")) LIMIT $rows")
       .query[(String, String, Option[String], Option[String], List[String], String)]
       .map(InspirationalQuote.rowToQuote)
@@ -78,7 +80,21 @@ object SqlQuote:
   lazy val getQuoteById: (String, UUID) => doobie.ConnectionIO[InspirationalQuote] =
     (tableName, uuid) =>
       (selectQuoteColumns ++ Fragment.const(tableName) ++
-        fr" WHERE serial_id = $uuid")
+        fr"WHERE serial_id = $uuid")
         .query[(String, String, Option[String], Option[String], List[String], String)]
         .map(InspirationalQuote.rowToQuote)
         .unique
+
+  lazy val getQuoteByGenre: (String, String) => ConnectionIO[NonEmptyList[InspirationalQuote]] =
+    (tableName, genre) =>
+      (selectQuoteColumns ++ Fragment.const(tableName) ++
+        fr"WHERE $genre = ANY(genre) ORDER BY random() limit 5")
+        .query[(String, String, Option[String], Option[String], List[String], String)]
+        .map(InspirationalQuote.rowToQuote)
+        .nel
+
+  lazy val getGenreTitles: (String, String) => doobie.Query0[Option[String]] =
+    (tableName, term) =>
+      (fr"SELECT DISTINCT g from" ++ Fragment.const(tableName) ++
+        fr"i, unnest(genre) g WHERE lower (g) LIKE ${term.toLowerCase + "%"}")
+        .query[Option[String]]
