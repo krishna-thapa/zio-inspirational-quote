@@ -1,18 +1,17 @@
 package com.krishna.http.api
 
 import java.util.UUID
-
 import zio.ZIO
 import zio.http.*
 import zio.http.model.Method
-
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.Persistence
 import com.krishna.http.ConfigHttp
+import pdi.jwt.JwtClaim
 
 object UserHttp:
 
-  def apply(): Http[Persistence with DatabaseConfig, Throwable, Request, Response] =
+  def apply(claim: JwtClaim): Http[Persistence with DatabaseConfig, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       case req @ Method.GET -> !! / "quote" / "random"       =>
         val rows: Int    = ConfigHttp.getQueryParameter(req, ("rows", 1))

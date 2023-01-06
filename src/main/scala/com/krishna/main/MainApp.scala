@@ -26,7 +26,7 @@ object MainApp extends ZIOAppDefault:
   val program =
     for
       _    <- ZIO.logInfo("Running ZIO inspirational quote API project!!")
-      port <- DatabaseMigrator.migrate <*> Server.install(ConfigHttp.combinedHttp)
+      port <- DatabaseMigrator.migrate <*> Server.install(ConfigHttp.combinedHttps)
       _    <- ZIO.logInfo(s"Starting server on http://localhost:$port")
       _    <- ZIO.never
     yield ()

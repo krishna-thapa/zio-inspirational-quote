@@ -1,20 +1,26 @@
 package com.krishna.http
 
-import zio.ULayer
+import com.krishna.auth.JwtService
+import zio.{ ULayer, ZIO }
 import zio.http.ServerConfig.LeakDetectionLevel
 import zio.http.*
 import zio.json.{ EncoderOps, JsonEncoder }
-
 import com.krishna.config.QuoteAndDbConfig
 import com.krishna.database.quotes.Persistence
 import com.krishna.http.api.*
+import pdi.jwt.JwtClaim
 
 object ConfigHttp:
 
   private val port: Int = 9000
-  //Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response]
-  val combinedHttp: Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
-    HomePage() ++ AdminHttp() ++ UserHttp()
+
+  val jwtAuthHttps
+    : JwtClaim => Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] = claim =>
+    AdminHttp.apply(claim) ++ UserHttp.apply(claim)
+
+  val combinedHttps: Http[Persistence with QuoteAndDbConfig, Throwable, Request, Response] =
+    HomePage() ++ AuthHttp() ++
+      JwtService.authenticate(jwtAuthHttps)
 
   val config: ServerConfig = ServerConfig
     .default

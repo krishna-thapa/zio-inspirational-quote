@@ -14,6 +14,8 @@ Authorization: Basic admin:admin
 
 // curl -X GET -i http://localhost:9000/admin/db-quotes?offset=0\&limit=10 -u "admin:admin"
 
+curl POST -v http://localhost:9000/login -H "Content-Type: application/json" -d '{"userName": "79", "password": "3"}'
+
 
 // Auth
 // Author
