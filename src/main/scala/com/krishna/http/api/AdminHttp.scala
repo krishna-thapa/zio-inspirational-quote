@@ -5,7 +5,6 @@ import zio.ZIO
 import zio.http.*
 import zio.http.model.Method
 
-import com.krishna.config.*
 import com.krishna.csvStore.CsvQuoteService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
@@ -14,7 +13,7 @@ object AdminHttp:
 
   def apply(
     claim: JwtClaim
-  ): Http[QuoteRepo with QuoteAndDbConfig, Throwable, Request, Response] =
+  ): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
 
       case Method.GET -> !! / "admin" / "csv-quotes" / rows =>

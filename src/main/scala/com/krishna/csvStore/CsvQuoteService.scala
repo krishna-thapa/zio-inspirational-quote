@@ -82,9 +82,9 @@ object CsvQuoteService:
     */
   def getQuotesFromCsv(
     rows: Option[Int] = None
-  ): ZIO[QuoteConfig, Throwable, Chunk[InspirationalQuote]] =
+  ): Task[Chunk[InspirationalQuote]] =
     for
-      quoteConfig <- com.krishna.config.quoteConfig
+      quoteConfig <- CsvUtil.quoteConfig
       getRows     <- validateRows(rows)
       result      <- csvStream(quoteConfig.csvPath)
         .take(getRows)
@@ -112,10 +112,10 @@ object CsvQuoteService:
     * @return
     *   Total amount of records stored in the Database
     */
-  def migrateQuotesToDb(): ZIO[QuoteRepo with QuoteConfig, Throwable, Long] =
+  def migrateQuotesToDb(): ZIO[QuoteRepo, Throwable, Long] =
     for
       _           <- QuoteRepo.runTruncateTable()
-      quoteConfig <- com.krishna.config.quoteConfig
+      quoteConfig <- CsvUtil.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
         .drop(1) // Drop the CSV header row
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)

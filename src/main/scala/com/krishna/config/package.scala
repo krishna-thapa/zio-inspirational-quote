@@ -68,7 +68,10 @@ package object config:
     val databaseLayer: Layer[ReadError[String], DatabaseConfig] =
       getEnvironmentConfig[DatabaseConfig]("DatabaseConfig")
 
+    val quoteLayer: Layer[ReadError[String], QuoteConfig] =
+      getEnvironmentConfig[QuoteConfig]("QuoteConfig")
+    
     val layer: Layer[ReadError[String], Configuration] =
       getEnvironmentConfig[WikiConfig]("WikiConfig") ++
-        getEnvironmentConfig[QuoteConfig]("QuoteConfig") ++
-        getEnvironmentConfig[DatabaseConfig]("DatabaseConfig")
+        quoteLayer ++
+        databaseLayer

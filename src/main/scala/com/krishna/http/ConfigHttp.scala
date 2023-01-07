@@ -16,10 +16,10 @@ object ConfigHttp:
   private val port: Int = 9000
 
   private val jwtAuthHttps
-    : JwtClaim => Http[QuoteRepo with QuoteAndDbConfig, Throwable, Request, Response] = claim =>
+    : JwtClaim => Http[QuoteRepo, Throwable, Request, Response] = claim =>
     AdminHttp.apply(claim) ++ UserHttp.apply(claim)
 
-  val combinedHttps: Http[QuoteRepo with QuoteAndDbConfig, Throwable, Request, Response] =
+  val combinedHttps: Http[QuoteRepo, Throwable, Request, Response] =
     HomePage() ++ AuthHttp() ++
       JwtService.authenticate(jwtAuthHttps)
 

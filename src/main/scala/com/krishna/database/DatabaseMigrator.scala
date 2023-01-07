@@ -1,11 +1,16 @@
 package com.krishna.database
 
+import com.krishna.config
 import org.flywaydb.core.Flyway
 import zio.*
-
-import com.krishna.config.DatabaseConfig
+import com.krishna.config.{ Configuration, DatabaseConfig }
 
 object DatabaseMigrator:
+
+  val dbConfig: Task[config.DatabaseConfig] = {
+    for quoteConfig <- com.krishna.config.databaseConfig
+    yield quoteConfig
+  }.provide(Configuration.databaseLayer)
 
   /** Use of flyway Database migration to migrate the SQL queries. It will always migrate when the
     * project is ran but only will apply if there are new changes.
@@ -15,10 +20,10 @@ object DatabaseMigrator:
     * @return
     *   Success or failure of the Database migration
     */
-  def migrate: ZIO[DatabaseConfig, Throwable, Unit] =
+  def migrate: Task[Unit] =
     for
       _           <- ZIO.logInfo("Running flyway Database migration!!")
-      getDbConfig <- com.krishna.config.databaseConfig
+      getDbConfig <- dbConfig
       dbConfig    <- DatabaseConfig.validateConfig(getDbConfig)
       flyway      <- ZIO.attempt(
         Flyway
