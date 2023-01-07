@@ -1,10 +1,11 @@
 package com.krishna.auth
 
 import java.time.Clock
-import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
+
+import pdi.jwt.{ Jwt, JwtAlgorithm, JwtClaim }
 import zio.ZIO
 import zio.http.model.Status
-import zio.http.{Http, HttpApp, Request}
+import zio.http.{ Http, HttpApp, Request }
 
 object JwtService:
 
