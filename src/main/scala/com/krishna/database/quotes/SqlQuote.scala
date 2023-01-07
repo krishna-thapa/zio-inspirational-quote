@@ -10,41 +10,9 @@ import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
 
-import com.krishna.config.DatabaseConfig
-import com.krishna.database.DbConnection
 import com.krishna.model.InspirationalQuote
 
 object SqlQuote:
-
-  def runUpdateTxa(
-    updateQuery: doobie.Update0
-  ): ZIO[DatabaseConfig, Throwable, Task[Int]] =
-    ZIO.scoped {
-      for
-        txa      <- DbConnection.transactor
-        response <- updateQuery.run.transact(txa)
-      yield ZIO.attemptBlockingIO(response)
-    }
-
-  def runQueryTxa[T](
-    getQuery: doobie.Query0[T]
-  ): ZIO[DatabaseConfig, Throwable, Task[List[T]]] =
-    ZIO.scoped {
-      for
-        txa      <- DbConnection.transactor
-        response <- getQuery.to[List].transact(txa)
-      yield ZIO.attemptBlockingIO(response)
-    }
-
-  def runQueryTxa[T](
-    getQuery: doobie.ConnectionIO[T]
-  ): ZIO[DatabaseConfig, Throwable, Task[T]] =
-    ZIO.scoped {
-      for
-        txa      <- DbConnection.transactor
-        response <- getQuery.transact(txa)
-      yield ZIO.attemptBlockingIO(response)
-    }
 
   lazy val truncateTable: String => doobie.Update0 = tableName =>
     (fr"TRUNCATE TABLE " ++ Fragment.const(tableName) ++ fr"CASCADE").update

@@ -1,9 +1,10 @@
 package com.krishna.auth
 
-import com.krishna.model.auth.LoginForm
-import zio.{ Task, ZIO }
 import zio.http.Response
 import zio.http.model.{ HttpError, Status }
+import zio.{ Task, ZIO }
+
+import com.krishna.auth.model.LoginForm
 
 object AuthService:
 

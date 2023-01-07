@@ -1,11 +1,12 @@
 package com.krishna.http.api
 
-import com.krishna.auth.AuthService
-import com.krishna.model.auth.LoginForm
 import zio.*
 import zio.http.*
 import zio.http.model.{ HttpError, Method }
 import zio.json.*
+
+import com.krishna.auth.AuthService
+import com.krishna.auth.model.LoginForm
 
 object AuthHttp:
 

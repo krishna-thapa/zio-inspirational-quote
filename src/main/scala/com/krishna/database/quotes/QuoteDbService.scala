@@ -7,22 +7,16 @@ import zio.*
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
+import com.krishna.util.DbUtils.validateDbTable
+import com.krishna.util.sqlCommon.*
 
-case class QuoteDbService() extends Persistence:
-
-  /** Validates the table name that is coming from the config file
-    */
-  private val validateDbTable: ZIO[DatabaseConfig, RuntimeException, String] =
-    for
-      getDbConfig <- com.krishna.config.databaseConfig
-      tableName   <- DatabaseConfig.validateTable(getDbConfig)
-    yield tableName
+case class QuoteDbService() extends QuoteRepo:
 
   /** Truncate the given table
     * @return
     *   Task that represent the SQL Truncate effect
     */
-  def runTruncateTable(): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]] =
+  def runTruncateTable(): Task[RuntimeFlags] =
     for
       tableName <- validateDbTable
       response  <- runUpdateTxa(truncateTable(tableName))
@@ -36,7 +30,7 @@ case class QuoteDbService() extends Persistence:
     */
   def runMigrateQuote(
     quote: InspirationalQuote
-  ): ZIO[DatabaseConfig, Throwable, Task[RuntimeFlags]] =
+  ): Task[RuntimeFlags] =
     for
       tableName <- validateDbTable
       response  <- runUpdateTxa(insertQuote(tableName, quote))
@@ -53,19 +47,19 @@ case class QuoteDbService() extends Persistence:
   def runGetAllQuotes(
     offset: Int,
     limit: Int
-  ): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+  ): Task[List[InspirationalQuote]] =
     for
       tableName <- validateDbTable
       response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
-  def runRandomQuote(rows: Int): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+  def runRandomQuote(rows: Int): Task[List[InspirationalQuote]] =
     for
       tableName <- validateDbTable
       response  <- runQueryTxa(getRandomQuote(tableName, rows))
     yield response
 
-  def runSelectQuote(uuid: UUID): ZIO[DatabaseConfig, Throwable, Task[InspirationalQuote]] =
+  def runSelectQuote(uuid: UUID): Task[InspirationalQuote] =
     for
       tableName <- validateDbTable
       response  <- runQueryTxa(getQuoteById(tableName, uuid))
@@ -73,17 +67,17 @@ case class QuoteDbService() extends Persistence:
 
   def runSelectGenreQuote(
     genre: String
-  ): ZIO[DatabaseConfig, Throwable, Task[List[InspirationalQuote]]] =
+  ): Task[List[InspirationalQuote]] =
     for
       tableName <- validateDbTable
       response  <- runQueryTxa(getQuoteByGenre(tableName, genre))
-    yield response.map(_.toList)
+    yield response.toList
 
-  def runSelectGenreTitles(term: String): ZIO[DatabaseConfig, Throwable, Task[List[String]]] =
+  def runSelectGenreTitles(term: String): Task[List[String]] =
     for
       tableName <- validateDbTable
       response  <- runQueryTxa(getGenreTitles(tableName, term))
-    yield response.map(_.flatten)
+    yield response.flatten
 
 object QuoteDbService:
   val layer: ULayer[QuoteDbService] = ZLayer.succeed(QuoteDbService())

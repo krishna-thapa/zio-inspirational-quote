@@ -22,5 +22,6 @@ create TABLE IF NOT EXISTS inspirational_quotes (
   stored_date DATE NOT NULL
 );
 
+-- Create a trigger that will update the TS vector column when adding any quote
 create or replace trigger tsvectorupdate before insert or update on inspirational_quotes for each row EXECUTE procedure
       tsvector_update_trigger(quote_tsv, 'pg_catalog.english', quote);

@@ -6,12 +6,12 @@ import java.util.UUID
 
 import scala.Option.unless
 
+import zio.*
 import zio.stream.{ ZPipeline, ZSink, ZStream }
-import zio.{ Task, * }
 
 import com.krishna.config.*
 import com.krishna.database.DbConnection
-import com.krishna.database.quotes.Persistence
+import com.krishna.database.quotes.QuoteRepo
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.model.{ AuthorDetail, InspirationalQuote, Quote }
 import com.krishna.wikiHttp.WebClient
@@ -98,8 +98,8 @@ object CsvQuoteService:
     */
   def insertQuoteToDb(
     quote: InspirationalQuote
-  ): ZIO[Persistence with DatabaseConfig, Throwable, Unit] =
-    for _ <- Persistence.runMigrateQuote(quote)
+  ): ZIO[QuoteRepo, Throwable, Unit] =
+    for _ <- QuoteRepo.runMigrateQuote(quote)
     yield ()
 
   /** Collect all total Quotes count that is migrated to Database
@@ -112,9 +112,9 @@ object CsvQuoteService:
     * @return
     *   Total amount of records stored in the Database
     */
-  def migrateQuotesToDb(): ZIO[Persistence with QuoteAndDbConfig, Throwable, Long] =
+  def migrateQuotesToDb(): ZIO[QuoteRepo with QuoteConfig, Throwable, Long] =
     for
-      _           <- Persistence.runTruncateTable()
+      _           <- QuoteRepo.runTruncateTable()
       quoteConfig <- com.krishna.config.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
         .drop(1) // Drop the CSV header row

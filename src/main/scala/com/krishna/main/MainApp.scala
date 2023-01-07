@@ -11,7 +11,7 @@ import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
 import com.krishna.config.*
 import com.krishna.csvStore.CsvQuoteService
-import com.krishna.database.quotes.{ Persistence, QuoteDbService }
+import com.krishna.database.quotes.{QuoteDbService, QuoteRepo}
 import com.krishna.database.{ DatabaseMigrator, DbConnection }
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.http.ConfigHttp

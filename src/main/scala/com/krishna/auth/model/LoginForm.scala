@@ -1,4 +1,4 @@
-package com.krishna.model.auth
+package com.krishna.auth.model
 
 import zio.json.*
 
