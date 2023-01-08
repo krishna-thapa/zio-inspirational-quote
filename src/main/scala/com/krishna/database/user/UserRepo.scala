@@ -21,6 +21,10 @@ trait UserRepo:
 
   def deleteUser(email: String): Task[Int]
 
+  def uploadPicture(email: String, picture: Array[Byte]): Task[Int]
+
+  def getPicture(email: String): Task[Option[Array[Byte]]]
+
 object UserRepo:
 
   def loginUser(user: LoginForm): ZIO[UserRepo, Throwable, Boolean] =
@@ -41,3 +45,9 @@ object UserRepo:
 
   def deleteUser(email: String): ZIO[UserRepo, Throwable, Int] =
     ZIO.serviceWithZIO[UserRepo](_.deleteUser(email))
+
+  def uploadPicture(email: String, picture: Array[Byte]): ZIO[UserRepo, Throwable, Int] =
+    ZIO.serviceWithZIO[UserRepo](_.uploadPicture(email, picture))
+
+  def getPicture(email: String): ZIO[UserRepo, Throwable, Option[Array[Byte]]] =
+    ZIO.serviceWithZIO[UserRepo](_.getPicture(email))

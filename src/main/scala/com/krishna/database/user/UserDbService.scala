@@ -1,12 +1,14 @@
 package com.krishna.database.user
 
 import zio.{ Task, ULayer, ZIO, ZLayer }
+
+import com.krishna.auth.BcryptObject
 import com.krishna.model.user.{ LoginForm, RegisterUser, UserInfo }
 import com.krishna.util.DbUtils
 import com.krishna.util.DbUtils.getUserTable
 import com.krishna.util.sqlCommon.*
+
 import SqlUser.*
-import com.krishna.auth.BcryptObject
 
 case class UserDbService() extends UserRepo:
 
@@ -53,6 +55,18 @@ case class UserDbService() extends UserRepo:
     for
       tableName <- getUserTable
       response  <- runUpdateTxa(delete(tableName, email))
+    yield response
+
+  override def uploadPicture(email: String, picture: Array[Byte]): Task[Int] =
+    for
+      tableName <- getUserTable
+      response  <- runUpdateTxa(addPicture(tableName, email, picture))
+    yield response
+
+  override def getPicture(email: String): Task[Option[Array[Byte]]] =
+    for
+      tableName <- getUserTable
+      response  <- runQueryTxa(downloadPicture(tableName, email))
     yield response
 
 object UserDbService:

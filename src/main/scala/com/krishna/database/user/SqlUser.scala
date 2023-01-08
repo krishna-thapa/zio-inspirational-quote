@@ -35,7 +35,21 @@ object SqlUser:
       .unique
 
   lazy val adminRole: (String, String) => doobie.Update0 = (tableName, email) =>
-    (fr"UPDATE" ++ Fragment.const(tableName) ++ fr"SET is_admin = NOT is_admin WHERE email=$email").update
+    (fr"UPDATE" ++ Fragment.const(
+      tableName
+    ) ++ fr"SET is_admin = NOT is_admin WHERE email=$email").update
 
   lazy val delete: (String, String) => doobie.Update0 = (tableName, email) =>
     (fr"DELETE FROM" ++ Fragment.const(tableName) ++ fr"WHERE email=$email").update
+
+  lazy val addPicture: (String, String, Array[Byte]) => doobie.Update0 =
+    (tableName, email, picture) =>
+      (fr"UPDATE" ++ Fragment.const(
+        tableName
+      ) ++ fr"SET profile_picture=$picture WHERE email=$email").update
+
+  lazy val downloadPicture: (String, String) => doobie.ConnectionIO[Option[Array[Byte]]] =
+    (tableName, email) =>
+      (fr"SELECT profile_picture FROM" ++ Fragment.const(tableName) ++ fr"WHERE email=$email")
+        .query[Array[Byte]]
+        .option

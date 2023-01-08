@@ -1,8 +1,10 @@
 package com.krishna.database.user
 
-import zio.http.Response
-import zio.http.model.Status
+import zio.http.*
+import zio.http.model.{ Headers, Status }
+import zio.stream.ZStream
 import zio.{ Task, UIO, ZIO }
+
 import com.krishna.auth.JwtService
 import com.krishna.http.ConfigHttp
 import com.krishna.model.user.RegisterUser.validateForm
@@ -90,6 +92,30 @@ object UserService:
 
     validateEmailAndResponse(email, response)
 
+  def uploadPicture(email: String, picture: Array[Byte]): ZIO[UserRepo, Throwable, Response] =
+    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
+      for
+        res      <- UserRepo.uploadPicture(email, picture)
+        validRes <- validateDatabaseResponse(res, "upload a user's profile picture")
+      yield validRes
+
+    validateEmailAndResponse(email, response)
+
+  def getUserPicture(email: String): ZIO[UserRepo, Throwable, Response] =
+    for res <- UserRepo.getPicture(email)
+    yield
+      if res.isEmpty then
+        Response
+          .text("No profile picture found!")
+          .setStatus(Status.NotFound)
+      else
+        Response(
+          status = Status.Ok,
+          headers = Headers.contentLength(res.get.length.toLong),
+          body = Body.fromStream(ZStream.fromIterable(res.get))
+        ).setHeaders(Headers.contentType("image/jpeg"))
+          .setHeaders(Headers.contentDisposition(s"attachment; filename=$email.jpg"))
+
   private def validateEmailAndResponse(
     email: String,
     responseFun: String => ZIO[UserRepo, Throwable, Response]
@@ -115,5 +141,5 @@ object UserService:
     else
       val successMsg: String = s"$service success!!"
       ZIO
-        .logError(successMsg)
+        .logInfo(successMsg)
         .as(Response.text(successMsg))

@@ -90,7 +90,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:9000/user/demo@com
+GET http://localhost:9000/user/demo7@com
 ###
 
 GET http://localhost:9000/users

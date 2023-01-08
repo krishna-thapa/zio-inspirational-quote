@@ -1,9 +1,9 @@
 package com.krishna.model.user
 
-import zio.json.{ DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder }
-
 import java.time.LocalDate
 import java.util.UUID
+
+import zio.json.{ DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder }
 
 case class UserInfo(
   userId: UUID,
@@ -20,7 +20,7 @@ object UserInfo:
   given JsonEncoder[UserInfo] = DeriveJsonEncoder.gen[UserInfo]
 
   given JsonDecoder[UserInfo] = DeriveJsonDecoder.gen[UserInfo]
-  
+
   def apply(form: RegisterUser): UserInfo =
     UserInfo(
       UUID.randomUUID(),

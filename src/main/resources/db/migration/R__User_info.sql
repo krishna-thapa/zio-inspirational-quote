@@ -9,5 +9,6 @@ CREATE TABLE user_details_table (
     email varchar(255) NOT NULL UNIQUE,
     password varchar(255) NOT NULL,
     created_date date NOT NULL,
-    is_admin boolean default true
+    is_admin boolean default true,
+    profile_picture bytea
 );

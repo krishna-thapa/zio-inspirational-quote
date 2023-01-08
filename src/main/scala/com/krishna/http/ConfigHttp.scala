@@ -27,6 +27,7 @@ object ConfigHttp:
   val config: ServerConfig = ServerConfig
     .default
     .port(port)
+    .objectAggregator(2097152)
     .leakDetection(LeakDetectionLevel.PARANOID)
     .maxThreads(5)
 

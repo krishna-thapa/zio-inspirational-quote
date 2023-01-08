@@ -1,7 +1,8 @@
 package com.krishna.auth
 
-import com.github.t3hnar.bcrypt.*
 import scala.util.Try
+
+import com.github.t3hnar.bcrypt.*
 
 object BcryptObject:
 
