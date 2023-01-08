@@ -33,7 +33,7 @@ object ConfigHttp:
   val configLayer: ULayer[ServerConfig] = ServerConfig.live(config)
 
   // ==================== Helper methods ==========================
-  private[http] def convertToJson[T](quote: T)(using JsonEncoder[T]): Response =
+  def convertToJson[T](quote: T)(using JsonEncoder[T]): Response =
     Response.json(quote.toJson)
 
   private[http] def getQueryParameter(request: Request, parameterWithDefault: (String, Int)): Int =

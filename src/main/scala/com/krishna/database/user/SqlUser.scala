@@ -35,7 +35,7 @@ object SqlUser:
       .unique
 
   lazy val adminRole: (String, String) => doobie.Update0 = (tableName, email) =>
-    (fr"UPDATE INTO" ++ Fragment.const(tableName) ++ fr"VALUES ()").update
+    (fr"UPDATE" ++ Fragment.const(tableName) ++ fr"SET is_admin = NOT is_admin WHERE email=$email").update
 
   lazy val delete: (String, String) => doobie.Update0 = (tableName, email) =>
-    (fr"DELETE * FROM" ++ Fragment.const(tableName) ++ fr"WHERE email=$email").update
+    (fr"DELETE FROM" ++ Fragment.const(tableName) ++ fr"WHERE email=$email").update
