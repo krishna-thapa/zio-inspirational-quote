@@ -1,22 +1,6 @@
 // Home page request
 GET http://localhost:9000/
 
-// Request to ping to check the HTTP response
-###
-GET http://localhost:9000/migrate
-Authorization: Basic admin:admin
-
-// Curl command to be used in the terminal
-// curl -X GET -i http://localhost:9000/
-// curl -X GET -i http://localhost:9000/admin/csv-quotes/5 -u "admin:admin"
-// curl -X GET -i http://localhost:9000/admin/migrate -u "admin:admin"
-// curl -X GET -i http://localhost:9000/admin/db-quotes -u "admin:admin"
-
-// curl -X GET -i http://localhost:9000/admin/db-quotes?offset=0\&limit=10 -u "admin:admin"
-
-curl POST -v http://localhost:9000/login -H "Content-Type: application/json" -d '{"userName": "79", "password": "3"}'
-
-
 // Auth
 // Author
 // Swagger
@@ -24,6 +8,13 @@ curl POST -v http://localhost:9000/login -H "Content-Type: application/json" -d 
 
 
 # ===== User API endpoint
+
+
+###
+
+GET http://localhost:9000/
+
+
 ###
 
 # curl -X GET -i http://localhost:9000/quote/random -u "admin:admin"
@@ -64,3 +55,37 @@ Authorization: Basic admin admin
 
 ###
 
+# curl POST -i http://localhost:9000/user/login -H "Content-Type: application/json" -d '{"userName": "79", "password": "3"}'
+POST http://localhost:9000/user/login
+Content-Type: application/json
+
+{
+  "email": "demo@com",
+  "password": "123"
+}
+
+###
+
+POST http://localhost:9000/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Krishna3",
+  "lastName": "Thapa3",
+  "email": "demo3@com",
+  "password": "123"
+}
+
+###
+
+PUT http://localhost:9000/user/update
+Content-Type: application/json
+
+{
+  "firstName": "krishna4",
+  "lastName": "Thapa4",
+  "email": "demo9@com",
+  "password": "123"
+}
+
+###

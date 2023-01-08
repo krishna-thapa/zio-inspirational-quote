@@ -2,12 +2,12 @@ package com.krishna.http.api
 
 import zio.*
 import zio.http.*
-import zio.http.model.{ HttpError, Method }
+import zio.http.model.{ HttpError, Method, Status }
 import zio.json.*
 
-import com.krishna.auth.{ AuthService, LoginForm }
 import com.krishna.database.user.{ UserRepo, UserService }
-import com.krishna.model.user.RegisterUser
+import com.krishna.errorHandle.ErrorHandle
+import com.krishna.model.user.{ LoginForm, RegisterUser }
 
 object AuthHttp:
 
@@ -17,11 +17,22 @@ object AuthHttp:
         case req @ Method.POST -> !! / "user" / "login"    =>
           for
             loginForm <- req.body.asString.map(_.fromJson[LoginForm])
-            response  <- AuthService.loginResponse(loginForm)
+            response  <- UserService
+              .loginResponse(loginForm)
+              .catchAll(ErrorHandle.responseError("loginUser", _))
           yield response
         case req @ Method.POST -> !! / "user" / "register" =>
           for
             userForm <- req.body.asString.map(_.fromJson[RegisterUser])
-            response <- UserService.registerUser(userForm)
+            response <- UserService
+              .registerOrUpdateUser(userForm)
+              .catchAll(ErrorHandle.responseError("registerUser", _))
+          yield response
+        case req @ Method.PUT -> !! / "user" / "update"    =>
+          for
+            userForm <- req.body.asString.map(_.fromJson[RegisterUser])
+            response <- UserService
+              .registerOrUpdateUser(userForm, isUpdate = true)
+              .catchAll(ErrorHandle.responseError("updateUser", _))
           yield response
       }
