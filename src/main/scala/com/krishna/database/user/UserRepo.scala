@@ -1,8 +1,7 @@
-package com.krishna.auth.user
+package com.krishna.database.user
 
+import com.krishna.model.user.{ RegisterUser, UserInfo }
 import zio.{ Task, ZIO }
-
-import com.krishna.auth.model.UserInfo
 
 trait UserRepo:
 
@@ -16,8 +15,8 @@ trait UserRepo:
 
 object UserRepo:
 
-  def register(user: UserInfo): ZIO[UserRepo, Throwable, Int] =
-    ZIO.serviceWithZIO[UserRepo](_.registerUser(user))
+  def register(userForm: RegisterUser): ZIO[UserRepo, Throwable, Int] =
+    ZIO.serviceWithZIO[UserRepo](_.registerUser(UserInfo(userForm)))
 
   def lookup(id: String): ZIO[UserRepo, Throwable, Option[UserInfo]] =
     ZIO.serviceWithZIO[UserRepo](_.lookupUser(id))

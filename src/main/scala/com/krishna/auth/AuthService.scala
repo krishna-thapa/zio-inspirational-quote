@@ -4,8 +4,6 @@ import zio.http.Response
 import zio.http.model.{ HttpError, Status }
 import zio.{ Task, ZIO }
 
-import com.krishna.auth.model.LoginForm
-
 object AuthService:
 
   def loginResponse(loginForm: Either[String, LoginForm]): Task[Response] =
@@ -25,5 +23,5 @@ object AuthService:
       case Left(error)  =>
         val errorMsg: String = s"Failed to parse the user login form input, error: $error"
         ZIO
-          .logError(s"Failed to parse the user login form input, error: $errorMsg")
+          .logError(errorMsg)
           .as(Response.text(errorMsg).setStatus(Status.BadRequest))

@@ -7,7 +7,7 @@ import zio.*
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
-import com.krishna.util.DbUtils.validateDbTable
+import com.krishna.util.DbUtils.getQuoteTable
 import com.krishna.util.sqlCommon.*
 
 case class QuoteDbService() extends QuoteRepo:
@@ -18,7 +18,7 @@ case class QuoteDbService() extends QuoteRepo:
     */
   def runTruncateTable(): Task[RuntimeFlags] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runUpdateTxa(truncateTable(tableName))
     yield response
 
@@ -32,7 +32,7 @@ case class QuoteDbService() extends QuoteRepo:
     quote: InspirationalQuote
   ): Task[RuntimeFlags] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runUpdateTxa(insertQuote(tableName, quote))
     yield response
 
@@ -49,19 +49,19 @@ case class QuoteDbService() extends QuoteRepo:
     limit: Int
   ): Task[List[InspirationalQuote]] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
   def runRandomQuote(rows: Int): Task[List[InspirationalQuote]] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runQueryTxa(getRandomQuote(tableName, rows))
     yield response
 
   def runSelectQuote(uuid: UUID): Task[InspirationalQuote] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runQueryTxa(getQuoteById(tableName, uuid))
     yield response
 
@@ -69,13 +69,13 @@ case class QuoteDbService() extends QuoteRepo:
     genre: String
   ): Task[List[InspirationalQuote]] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runQueryTxa(getQuoteByGenre(tableName, genre))
     yield response.toList
 
   def runSelectGenreTitles(term: String): Task[List[String]] =
     for
-      tableName <- validateDbTable
+      tableName <- getQuoteTable
       response  <- runQueryTxa(getGenreTitles(tableName, term))
     yield response.flatten
 
