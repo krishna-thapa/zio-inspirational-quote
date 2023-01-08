@@ -1,6 +1,7 @@
 package com.krishna.util
 
 import zio.{ Task, ZIO }
+
 import com.krishna.config.{ Configuration, DatabaseConfig, Tables }
 
 object DbUtils:
@@ -17,8 +18,7 @@ object DbUtils:
   val getQuoteTable: Task[String] =
     for validateTables <- validateDbTable
     yield validateTables.quotesTable
-  
+
   val getUserTable: Task[String] =
     for validateTables <- validateDbTable
-      yield validateTables.userTable
-    
+    yield validateTables.userTable

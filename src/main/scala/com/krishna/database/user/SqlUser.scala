@@ -1,9 +1,10 @@
 package com.krishna.database.user
 
-import com.krishna.model.user.UserInfo
 import doobie.implicits.*
 import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
+
+import com.krishna.model.user.UserInfo
 
 object SqlUser:
 

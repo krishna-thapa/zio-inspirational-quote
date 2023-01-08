@@ -1,8 +1,9 @@
 package com.krishna.csvStore
 
+import zio.{ Task, ZIO }
+
 import com.krishna.config
 import com.krishna.config.Configuration
-import zio.{ Task, ZIO }
 
 object CsvUtil:
 

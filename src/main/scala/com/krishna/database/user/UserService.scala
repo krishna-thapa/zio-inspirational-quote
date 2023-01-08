@@ -1,11 +1,12 @@
 package com.krishna.database.user
 
+import zio.http.Response
+import zio.http.model.Status
+import zio.{ Task, ZIO }
+
 import com.krishna.auth.JwtService
 import com.krishna.model.user.RegisterUser
 import com.krishna.model.user.RegisterUser.validateForm
-import zio.{ Task, ZIO }
-import zio.http.Response
-import zio.http.model.Status
 
 object UserService:
 

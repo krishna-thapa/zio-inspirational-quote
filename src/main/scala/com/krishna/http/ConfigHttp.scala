@@ -5,6 +5,7 @@ import zio.http.ServerConfig.LeakDetectionLevel
 import zio.http.*
 import zio.json.{ EncoderOps, JsonEncoder }
 import zio.{ ULayer, ZIO }
+
 import com.krishna.auth.JwtService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.database.user.UserRepo
@@ -16,8 +17,7 @@ object ConfigHttp:
 
   private type AllRepo = QuoteRepo with UserRepo
 
-  private val jwtAuthHttps
-    : JwtClaim => Http[QuoteRepo, Throwable, Request, Response] = claim =>
+  private val jwtAuthHttps: JwtClaim => Http[QuoteRepo, Throwable, Request, Response] = claim =>
     AdminHttp.apply(claim) ++ UserHttp.apply(claim)
 
   val combinedHttps: Http[AllRepo, Throwable, Request, Response] =

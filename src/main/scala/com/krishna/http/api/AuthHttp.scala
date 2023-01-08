@@ -14,12 +14,12 @@ object AuthHttp:
   def apply(): Http[UserRepo, Throwable, Request, Response] =
     Http
       .collectZIO[Request] {
-        case req @ Method.POST -> !! / "user" / "login" =>
+        case req @ Method.POST -> !! / "user" / "login"    =>
           for
             loginForm <- req.body.asString.map(_.fromJson[LoginForm])
             response  <- AuthService.loginResponse(loginForm)
           yield response
-        case req@Method.POST -> !! / "user" / "register" =>
+        case req @ Method.POST -> !! / "user" / "register" =>
           for
             userForm <- req.body.asString.map(_.fromJson[RegisterUser])
             response <- UserService.registerUser(userForm)

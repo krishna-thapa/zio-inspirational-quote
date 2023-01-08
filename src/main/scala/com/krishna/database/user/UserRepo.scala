@@ -1,7 +1,8 @@
 package com.krishna.database.user
 
-import com.krishna.model.user.{ RegisterUser, UserInfo }
 import zio.{ Task, ZIO }
+
+import com.krishna.model.user.{ RegisterUser, UserInfo }
 
 trait UserRepo:
 
