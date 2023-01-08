@@ -1,26 +1,28 @@
 package com.krishna.database.user
 
-import zio.{ Task, ULayer, ZLayer }
-
+import zio.{ Task, ULayer, ZIO, ZLayer }
 import com.krishna.model.user.{ LoginForm, RegisterUser, UserInfo }
 import com.krishna.util.DbUtils
 import com.krishna.util.DbUtils.getUserTable
 import com.krishna.util.sqlCommon.*
-
 import SqlUser.*
+import com.krishna.auth.BcryptObject
 
 case class UserDbService() extends UserRepo:
 
-  override def loginUser(user: LoginForm): Task[Option[UserInfo]] =
+  override def loginUser(user: LoginForm): Task[Boolean] =
     for
       tableName <- getUserTable
       response  <- runQueryTxa(validateUser(tableName, user))
-    yield response
+    yield response.exists(userInfo =>
+      BcryptObject.validatePassword(user.password, userInfo.password).getOrElse(false)
+    )
 
   override def registerUser(user: UserInfo): Task[Int] =
     for
-      tableName <- getUserTable
-      response  <- runUpdateTxa(insertUser(tableName, user))
+      tableName      <- getUserTable
+      hashedPassword <- ZIO.fromTry(BcryptObject.encryptPassword(user.password))
+      response       <- runUpdateTxa(insertUser(tableName, user.copy(password = hashedPassword)))
     yield response
 
   override def userInfo(email: String): Task[UserInfo] =

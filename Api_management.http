@@ -60,8 +60,8 @@ POST http://localhost:9000/user/login
 Content-Type: application/json
 
 {
-  "email": "demo@com",
-  "password": "123"
+  "email": "demo7@com",
+  "password": "abcdef"
 }
 
 ###
@@ -70,10 +70,10 @@ POST http://localhost:9000/user/register
 Content-Type: application/json
 
 {
-  "firstName": "Krishna5",
-  "lastName": "Thapa5",
-  "email": "demo5@com",
-  "password": "123"
+  "firstName": "Krishna7",
+  "lastName": "Thapa7",
+  "email": "demo7@com",
+  "password": "abcdef"
 }
 
 ###

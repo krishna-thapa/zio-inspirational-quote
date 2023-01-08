@@ -15,7 +15,7 @@ object UserService:
       case Right(login) if LoginForm.validateEmail(login.email) =>
         for res <- UserRepo.loginUser(login)
         yield
-          if res.isDefined then
+          if res then
             Response
               .text("Login success!!")
               .addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(login.email))

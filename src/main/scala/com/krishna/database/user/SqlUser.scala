@@ -12,7 +12,7 @@ object SqlUser:
     (tableName, login) =>
       (fr"SELECT * FROM" ++ Fragment.const(
         tableName
-      ) ++ fr"WHERE email=${login.email} AND password=${login.password}")
+      ) ++ fr"WHERE email=${login.email}")
         .query[UserInfo]
         .option
 

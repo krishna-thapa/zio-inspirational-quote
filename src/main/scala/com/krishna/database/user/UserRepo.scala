@@ -7,7 +7,7 @@ import com.krishna.model.user.{ LoginForm, RegisterUser, UserInfo }
 
 trait UserRepo:
 
-  def loginUser(user: LoginForm): Task[Option[UserInfo]]
+  def loginUser(user: LoginForm): Task[Boolean]
 
   def registerUser(user: UserInfo): Task[Int]
 
@@ -23,7 +23,7 @@ trait UserRepo:
 
 object UserRepo:
 
-  def loginUser(user: LoginForm): ZIO[UserRepo, Throwable, Option[UserInfo]] =
+  def loginUser(user: LoginForm): ZIO[UserRepo, Throwable, Boolean] =
     ZIO.serviceWithZIO[UserRepo](_.loginUser(user))
 
   def registerOrUpdate(userForm: RegisterUser, isUpdate: Boolean): ZIO[UserRepo, Throwable, Int] =

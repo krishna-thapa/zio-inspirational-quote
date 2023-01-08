@@ -30,7 +30,7 @@ lazy val root = (project in file("."))
       zioConfigDependencies ++
       flywayMigrationDependencies ++
       doobieDependencies ++
-      jwtScala
+      authScala
   )
 
 // https://zio.dev/zio-config/
@@ -59,7 +59,10 @@ val doobieDependencies: Seq[ModuleID] = Seq(
 )
 
 // https://jwt-scala.github.io/jwt-scala/jwt-core-jwt.html
-val jwtScala: Seq[ModuleID] = Seq("com.github.jwt-scala" %% "jwt-core" % "9.1.2")
+val authScala: Seq[ModuleID] = Seq(
+  "com.github.jwt-scala" %% "jwt-core" % "9.1.2",
+  ("com.github.t3hnar" %% "scala-bcrypt" % "4.3.0").cross(CrossVersion.for3Use2_13)
+)
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
