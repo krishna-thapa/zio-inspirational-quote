@@ -69,5 +69,11 @@ case class UserDbService() extends UserRepo:
       response  <- runQueryTxa(downloadPicture(tableName, email))
     yield response
 
+  override def deletePicture(email: String): Task[Int] =
+    for
+      tableName <- getUserTable
+      response  <- runUpdateTxa(removePicture(tableName, email))
+    yield response
+
 object UserDbService:
   val layer: ULayer[UserDbService] = ZLayer.succeed(UserDbService())

@@ -51,7 +51,7 @@ object AuthHttp:
               .catchAll(ErrorHandle.responseError("updateUser", _))
           yield response
 
-        case Method.GET -> !! / "user" / "toggle-to-admin" / email =>
+        case Method.POST -> !! / "user" / "toggle-to-admin" / email =>
           for response <- UserService
               .toggleAdminRole(email)
               .catchAll(ErrorHandle.responseError("ToggleAdminRole", _))
@@ -76,5 +76,11 @@ object AuthHttp:
           for response <- UserService
               .getUserPicture(email)
               .catchAll(ErrorHandle.responseError("downloadPicture", _))
+          yield response
+
+        case Method.DELETE -> !! / "user" / "picture" / email =>
+          for response <- UserService
+              .deleteUserPicture(email)
+              .catchAll(ErrorHandle.responseError("deletePicture", _))
           yield response
       }

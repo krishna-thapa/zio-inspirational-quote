@@ -102,19 +102,31 @@ object UserService:
     validateEmailAndResponse(email, response)
 
   def getUserPicture(email: String): ZIO[UserRepo, Throwable, Response] =
-    for res <- UserRepo.getPicture(email)
-    yield
-      if res.isEmpty then
-        Response
-          .text("No profile picture found!")
-          .setStatus(Status.NotFound)
-      else
-        Response(
-          status = Status.Ok,
-          headers = Headers.contentLength(res.get.length.toLong),
-          body = Body.fromStream(ZStream.fromIterable(res.get))
-        ).setHeaders(Headers.contentType("image/jpeg"))
-          .setHeaders(Headers.contentDisposition(s"attachment; filename=$email.jpg"))
+    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
+      for res <- UserRepo.getPicture(email)
+      yield
+        if res.isEmpty then
+          Response
+            .text("No profile picture found!")
+            .setStatus(Status.NotFound)
+        else
+          Response(
+            status = Status.Ok,
+            headers = Headers.contentLength(res.get.length.toLong),
+            body = Body.fromStream(ZStream.fromIterable(res.get))
+          ).setHeaders(Headers.contentType("image/jpeg"))
+            .setHeaders(Headers.contentDisposition(s"attachment; filename=$email.jpg"))
+            
+    validateEmailAndResponse(email, response)
+
+  def deleteUserPicture(email: String): ZIO[UserRepo, Throwable, Response] =
+    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
+      for
+        res      <- UserRepo.deletePicture(email)
+        validRes <- validateDatabaseResponse(res, "delete a user picture")
+      yield validRes
+
+    validateEmailAndResponse(email, response)
 
   private def validateEmailAndResponse(
     email: String,

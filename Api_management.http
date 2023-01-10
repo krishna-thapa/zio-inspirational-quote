@@ -70,10 +70,10 @@ POST http://localhost:9000/user/register
 Content-Type: application/json
 
 {
-  "firstName": "Krishna7",
-  "lastName": "Thapa7",
-  "email": "demo7@com",
-  "password": "abcdef"
+  "firstName": "Krishna",
+  "lastName": "Thapa",
+  "email": "demo@com",
+  "password": "abc"
 }
 
 ###
@@ -82,21 +82,21 @@ PUT http://localhost:9000/user/update
 Content-Type: application/json
 
 {
-  "firstName": "krishna6",
-  "lastName": "Thapa6",
+  "firstName": "krishna",
+  "lastName": "Thapa",
   "email": "demo5@com",
   "password": "123"
 }
 
 ###
 
-GET http://localhost:9000/user/demo7@com
+GET http://localhost:9000/user/demo@com
 ###
 
 GET http://localhost:9000/users
 ###
 
-GET http://localhost:9000/user/toggle-to-admin/demo5@com
+GET http://localhost:9000/user/toggle-to-admin/demo@com
 ###
 
 DELETE http://localhost:9000/user/demo@com

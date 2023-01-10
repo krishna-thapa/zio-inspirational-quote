@@ -53,3 +53,8 @@ object SqlUser:
       (fr"SELECT profile_picture FROM" ++ Fragment.const(tableName) ++ fr"WHERE email=$email")
         .query[Array[Byte]]
         .option
+
+  lazy val removePicture: (String, String) => doobie.Update0 = (tableName, email) =>
+    (fr"UPDATE" ++ Fragment.const(
+      tableName
+    ) ++ fr"SET profile_picture=NULL WHERE email=$email").update
