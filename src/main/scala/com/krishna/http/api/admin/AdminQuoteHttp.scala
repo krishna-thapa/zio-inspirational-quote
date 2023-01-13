@@ -1,6 +1,5 @@
-package com.krishna.http.api
+package com.krishna.http.api.admin
 
-import pdi.jwt.JwtClaim
 import zio.ZIO
 import zio.http.*
 import zio.http.model.Method
@@ -8,11 +7,12 @@ import zio.http.model.Method
 import com.krishna.csvStore.CsvQuoteService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.model.user.JwtUser
 
-object AdminHttp:
+object AdminQuoteHttp:
 
   def apply(
-    claim: JwtClaim
+    claim: JwtUser
   ): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
 
@@ -33,7 +33,7 @@ object AdminHttp:
         val offset: Int = ConfigHttp.getQueryParameter(req, ("offset", 0))
         val limit: Int  = ConfigHttp.getQueryParameter(req, ("limit", 10))
         ZIO.logInfo(
-          s"Retrieving all quotes from Postgres Database with offset $offset and limit ${claim.content}."
+          s"Retrieving all quotes from Postgres Database with offset $offset and limit $limit."
         ) *>
           (for
             quotes <- QuoteRepo.runGetAllQuotes(offset, limit)

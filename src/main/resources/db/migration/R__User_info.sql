@@ -12,3 +12,6 @@ CREATE TABLE user_details_table (
     is_admin boolean default true,
     profile_picture bytea
 );
+
+-- Admin account in the database with "admin" as encrypted password
+INSERT INTO user_details_table VALUES (gen_random_uuid(), 'admin', 'admin', 'admin@com', '$2a$05$qURyvfv6eJtoroIDL48ExuAeOGxN705UcTgrHYyrrDjBLm5UrBDgO', '2020-10-15', true, null);

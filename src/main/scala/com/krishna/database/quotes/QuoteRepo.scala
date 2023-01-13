@@ -10,6 +10,7 @@ import com.krishna.model.InspirationalQuote
 trait QuoteRepo:
 
   def runTruncateTable(): Task[RuntimeFlags]
+
   def runMigrateQuote(quote: InspirationalQuote): Task[RuntimeFlags]
 
   def runGetAllQuotes(

@@ -2,12 +2,15 @@ package com.krishna.model.user
 
 import zio.json.{ DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder }
 
+import com.krishna.model.user.traits.{ Email, UserDetail }
+
 case class RegisterUser(
   firstName: String,
   lastName: String,
   email: String,
   password: String
 ) extends Email
+  with UserDetail
 
 object RegisterUser:
   given JsonEncoder[RegisterUser] = DeriveJsonEncoder.gen[RegisterUser]

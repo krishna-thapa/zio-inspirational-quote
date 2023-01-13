@@ -1,4 +1,4 @@
-package com.krishna.model.user
+package com.krishna.model.user.traits
 
 trait Email:
 

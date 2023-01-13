@@ -8,33 +8,35 @@ import zio.{ Task, UIO, ZIO }
 import com.krishna.auth.JwtService
 import com.krishna.http.ConfigHttp
 import com.krishna.model.user.RegisterUser.validateForm
-import com.krishna.model.user.{ Email, LoginForm, RegisterUser }
+import com.krishna.model.user.traits.Email
+import com.krishna.model.user.{ JwtUser, LoginForm, RegisterUser }
 
 object UserService:
+
+  val responseWithLog: (String, Status) => UIO[Response] = (message, status) =>
+    ZIO
+      .logError(message)
+      .as(Response.text(message).setStatus(status))
 
   def loginResponse(loginForm: Either[String, LoginForm]): ZIO[UserRepo, Throwable, Response] =
     loginForm match
       case Right(login) if LoginForm.validateEmail(login.email) =>
         for res <- UserRepo.loginUser(login)
         yield
-          if res then
+          if res.isDefined then
             Response
               .text("Login success!!")
-              .addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(login.email))
+              .addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(JwtUser(res.get)))
           else
             Response
               .text(s"Invalid login user form for username ${login.email}")
               .setStatus(Status.Unauthorized)
       case Right(login)                                         =>
         val errorMsg: String = s"Invalid email pattern for email: ${login.email}"
-        ZIO
-          .logError(errorMsg)
-          .as(Response.text(errorMsg).setStatus(Status.BadRequest))
+        responseWithLog(errorMsg, Status.BadRequest)
       case Left(error)                                          =>
         val errorMsg: String = s"Failed to parse the user login form input, error: $error"
-        ZIO
-          .logError(errorMsg)
-          .as(Response.text(errorMsg).setStatus(Status.BadRequest))
+        responseWithLog(errorMsg, Status.BadRequest)
 
   def registerOrUpdateUser(
     userForm: Either[String, RegisterUser],
@@ -48,26 +50,29 @@ object UserService:
             validRes <- validateDatabaseResponse(res, "inserting or updating a user record")
           yield
             if validRes.status == Status.Ok
-            then validRes.addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(form.email))
+            then validRes.addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(JwtUser(form)))
             else validRes
         else
           val errorMsg: String =
             s"Invalid register user form. Fields should be non-empty with valid email and password with minimum length of 3."
-          ZIO
-            .logError(errorMsg)
-            .as(Response.text(errorMsg).setStatus(Status.BadRequest))
+          responseWithLog(errorMsg, Status.BadRequest)
       case Left(error) =>
         val errorMsg: String = s"Failed to parse the user register form input, error: $error"
-        ZIO
-          .logError(errorMsg)
-          .as(Response.text(errorMsg).setStatus(Status.BadRequest))
+        responseWithLog(errorMsg, Status.BadRequest)
+
+  def updateUser(
+    userForm: Either[String, RegisterUser],
+    email: String
+  ): ZIO[UserRepo, Throwable, Response] =
+    case Right(form) => ???
+    case Left(error) =>
+      val errorMsg: String = s"Failed to parse the user register form input, error: $error"
+      responseWithLog(errorMsg, Status.BadRequest)
+
 
   def getUserInfo(email: String): ZIO[UserRepo, Throwable, Response] =
-    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
-      for res <- UserRepo.userInfo(email)
-      yield ConfigHttp.convertToJson(res)
-
-    validateEmailAndResponse(email, response)
+    for res <- UserRepo.userInfo(email)
+    yield ConfigHttp.convertToJson(res)
 
   def getAllUserInfo(): ZIO[UserRepo, Throwable, Response] =
     for res <- UserRepo.users
@@ -93,40 +98,31 @@ object UserService:
     validateEmailAndResponse(email, response)
 
   def uploadPicture(email: String, picture: Array[Byte]): ZIO[UserRepo, Throwable, Response] =
-    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
-      for
-        res      <- UserRepo.uploadPicture(email, picture)
-        validRes <- validateDatabaseResponse(res, "upload a user's profile picture")
-      yield validRes
-
-    validateEmailAndResponse(email, response)
+    for
+      res      <- UserRepo.uploadPicture(email, picture)
+      validRes <- validateDatabaseResponse(res, "upload a user's profile picture")
+    yield validRes
 
   def getUserPicture(email: String): ZIO[UserRepo, Throwable, Response] =
-    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
-      for res <- UserRepo.getPicture(email)
-      yield
-        if res.isEmpty then
-          Response
-            .text("No profile picture found!")
-            .setStatus(Status.NotFound)
-        else
-          Response(
-            status = Status.Ok,
-            headers = Headers.contentLength(res.get.length.toLong),
-            body = Body.fromStream(ZStream.fromIterable(res.get))
-          ).setHeaders(Headers.contentType("image/jpeg"))
-            .setHeaders(Headers.contentDisposition(s"attachment; filename=$email.jpg"))
-            
-    validateEmailAndResponse(email, response)
+    for res <- UserRepo.getPicture(email)
+    yield
+      if res.isEmpty then
+        Response
+          .text("No profile picture found!")
+          .setStatus(Status.NotFound)
+      else
+        Response(
+          status = Status.Ok,
+          headers = Headers.contentLength(res.get.length.toLong),
+          body = Body.fromStream(ZStream.fromIterable(res.get))
+        ).setHeaders(Headers.contentType("image/jpeg"))
+          .setHeaders(Headers.contentDisposition(s"attachment; filename=$email.jpg"))
 
   def deleteUserPicture(email: String): ZIO[UserRepo, Throwable, Response] =
-    val response: String => ZIO[UserRepo, Throwable, Response] = email =>
-      for
-        res      <- UserRepo.deletePicture(email)
-        validRes <- validateDatabaseResponse(res, "delete a user picture")
-      yield validRes
-
-    validateEmailAndResponse(email, response)
+    for
+      res      <- UserRepo.deletePicture(email)
+      validRes <- validateDatabaseResponse(res, "delete a user picture")
+    yield validRes
 
   private def validateEmailAndResponse(
     email: String,
@@ -136,20 +132,12 @@ object UserService:
     else
       val errorMsg: String =
         s"Invalid pattern of the email address: $email."
-      ZIO
-        .logError(errorMsg)
-        .as(Response.text(errorMsg).setStatus(Status.BadRequest))
+      responseWithLog(errorMsg, Status.BadRequest)
 
   private def validateDatabaseResponse(response: Int, service: String): UIO[Response] =
     if response != 1 then
       val errorMsg: String = s"Invalid response from the Postgres service while $service"
-      ZIO
-        .logError(errorMsg)
-        .as(
-          Response
-            .text(errorMsg)
-            .setStatus(Status.InternalServerError)
-        )
+      responseWithLog(errorMsg, Status.InternalServerError)
     else
       val successMsg: String = s"$service success!!"
       ZIO

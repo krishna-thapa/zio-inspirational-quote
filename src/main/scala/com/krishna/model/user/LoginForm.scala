@@ -2,6 +2,8 @@ package com.krishna.model.user
 
 import zio.json.*
 
+import com.krishna.model.user.traits.Email
+
 case class LoginForm(
   email: String,
   password: String

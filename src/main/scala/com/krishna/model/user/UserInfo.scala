@@ -5,6 +5,8 @@ import java.util.UUID
 
 import zio.json.{ DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder }
 
+import com.krishna.model.user.traits.{ Email, UserDetail }
+
 case class UserInfo(
   userId: UUID,
   firstName: String,
@@ -13,7 +15,8 @@ case class UserInfo(
   password: String,
   createdDate: LocalDate,
   isAdmin: Boolean = false
-)
+) extends Email
+  with UserDetail
 
 object UserInfo:
 

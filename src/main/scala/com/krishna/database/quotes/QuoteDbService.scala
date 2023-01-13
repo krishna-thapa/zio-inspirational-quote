@@ -53,18 +53,36 @@ case class QuoteDbService() extends QuoteRepo:
       response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
+  /** Get single or multiple random quote
+    * @param rows
+    *   default o value 0
+    * @return
+    *   List of Random quote/s
+    */
   def runRandomQuote(rows: Int): Task[List[InspirationalQuote]] =
     for
       tableName <- getQuoteTable
       response  <- runQueryTxa(getRandomQuote(tableName, rows))
     yield response
 
+  /** Get a quote by its UUID
+    * @param uuid
+    *   selected uuid
+    * @return
+    *   Selected quote
+    */
   def runSelectQuote(uuid: UUID): Task[InspirationalQuote] =
     for
       tableName <- getQuoteTable
       response  <- runQueryTxa(getQuoteById(tableName, uuid))
     yield response
 
+  /** Get a Quote by its genre
+    * @param genre
+    *   to be selected from any quote
+    * @return
+    *   Random 5 quotes from the selected genre
+    */
   def runSelectGenreQuote(
     genre: String
   ): Task[List[InspirationalQuote]] =
@@ -73,6 +91,12 @@ case class QuoteDbService() extends QuoteRepo:
       response  <- runQueryTxa(getQuoteByGenre(tableName, genre))
     yield response.toList
 
+  /** Auto-completed logic on selecting the genre that is present int he any quotes
+    * @param term
+    *   User's input term should be max of three characters
+    * @return
+    *   List of matched genre to show the auto-suggestion while user is typing
+    */
   def runSelectGenreTitles(term: String): Task[List[String]] =
     for
       tableName <- getQuoteTable

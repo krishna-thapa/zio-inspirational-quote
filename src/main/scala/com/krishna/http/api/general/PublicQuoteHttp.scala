@@ -1,16 +1,16 @@
-package com.krishna.http.api
+package com.krishna.http.api.general
 
-import pdi.jwt.JwtClaim
 import zio.ZIO
 import zio.http.*
 import zio.http.model.Method
 
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.model.user.JwtUser
 
-object UserHttp:
+object PublicQuoteHttp:
 
-  def apply(claim: JwtClaim): Http[QuoteRepo, Throwable, Request, Response] =
+  def apply(): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
 
       case req @ Method.GET -> !! / "quote" / "random" =>
@@ -21,13 +21,6 @@ object UserHttp:
             quotes <- QuoteRepo.runRandomQuote(maxRows)
             _      <- ZIO.logInfo(s"Success on getting random quote of size $maxRows")
           yield ConfigHttp.convertToJson(quotes))
-
-      case Method.GET -> !! / "quote" / uuid(uuid) =>
-        ZIO.logInfo(s"Getting a quote from the Postgres database with id $uuid!") *>
-          (for
-            quote <- QuoteRepo.runSelectQuote(uuid)
-            _     <- ZIO.logInfo(s"Success on getting quote with id $uuid")
-          yield ConfigHttp.convertToJson(quote))
 
       case Method.GET -> !! / "quote" / "genre" / genre =>
         ZIO.logInfo(s"Getting a quote from the Postgres database with genre type $genre!") *>

@@ -55,13 +55,23 @@ Authorization: Basic admin admin
 
 ###
 
+# curl POST -i http://localhost:9000/user/login -H "Content-Type: application/json" -d '{"userName": "admin@com", "password": "admin"}'
+POST http://localhost:9000/user/login
+Content-Type: application/json
+
+{
+  "email": "admin@com",
+  "password": "admin"
+}
+###
+
 # curl POST -i http://localhost:9000/user/login -H "Content-Type: application/json" -d '{"userName": "79", "password": "3"}'
 POST http://localhost:9000/user/login
 Content-Type: application/json
 
 {
-  "email": "demo7@com",
-  "password": "abcdef"
+  "email": "demo@com",
+  "password": "abc"
 }
 
 ###

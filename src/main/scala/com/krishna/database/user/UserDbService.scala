@@ -12,13 +12,14 @@ import SqlUser.*
 
 case class UserDbService() extends UserRepo:
 
-  override def loginUser(user: LoginForm): Task[Boolean] =
+  override def loginUser(user: LoginForm): Task[Option[UserInfo]] =
     for
       tableName <- getUserTable
       response  <- runQueryTxa(validateUser(tableName, user))
-    yield response.exists(userInfo =>
-      BcryptObject.validatePassword(user.password, userInfo.password).getOrElse(false)
-    )
+      validatePassword = response.exists(userInfo =>
+        BcryptObject.validatePassword(user.password, userInfo.password).getOrElse(false)
+      )
+    yield if validatePassword then response else None
 
   override def registerUser(user: UserInfo): Task[Int] =
     for
@@ -35,8 +36,9 @@ case class UserDbService() extends UserRepo:
 
   override def updateUserInfo(user: RegisterUser): Task[Int] =
     for
-      tableName <- getUserTable
-      response  <- runUpdateTxa(updateUser(tableName, user))
+      tableName      <- getUserTable
+      hashedPassword <- ZIO.fromTry(BcryptObject.encryptPassword(user.password))
+      response       <- runUpdateTxa(updateUser(tableName, user.copy(password = hashedPassword)))
     yield response
 
   override def listAllUser: Task[List[UserInfo]] =

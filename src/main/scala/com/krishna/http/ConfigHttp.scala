@@ -10,6 +10,10 @@ import com.krishna.auth.JwtService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.database.user.UserRepo
 import com.krishna.http.api.*
+import com.krishna.http.api.admin.*
+import com.krishna.http.api.user.*
+import com.krishna.http.api.general.*
+import com.krishna.model.user.JwtUser
 
 object ConfigHttp:
 
@@ -17,12 +21,16 @@ object ConfigHttp:
 
   private type AllRepo = QuoteRepo with UserRepo
 
-  private val jwtAuthHttps: JwtClaim => Http[QuoteRepo, Throwable, Request, Response] = claim =>
-    AdminHttp.apply(claim) ++ UserHttp.apply(claim)
+  private val jwtUserHttps: JwtUser => Http[AllRepo, Throwable, Request, Response] = claim =>
+    UserQuoteHttp.apply(claim) ++ UserAuthHttp(claim)
+
+  private val jwtAdminHttps: JwtUser => Http[AllRepo, Throwable, Request, Response] = claim =>
+    AdminAuthHttp(claim) ++ AdminQuoteHttp.apply(claim)
 
   val combinedHttps: Http[AllRepo, Throwable, Request, Response] =
-    HomePage() ++ AuthHttp() ++
-      JwtService.authenticate(jwtAuthHttps)
+    HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() ++
+      JwtService.authenticateUser(jwtUserHttps) ++
+      JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
 
   val config: ServerConfig = ServerConfig
     .default
