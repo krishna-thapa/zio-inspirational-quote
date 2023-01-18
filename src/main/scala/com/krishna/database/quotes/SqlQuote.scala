@@ -67,3 +67,11 @@ object SqlQuote:
       (fr"SELECT DISTINCT g from" ++ Fragment.const(tableName) ++
         fr"i, unnest(genre) g WHERE lower (g) LIKE ${term.toLowerCase + "%"}")
         .query[Option[String]]
+
+  import zio.stream.ZStream
+  import zio.stream.interop.fs2z._
+
+  lazy val getAuthorWithId = (tableName: String) =>
+    (fr"SELECT serial_id, author from" ++ Fragment.const(tableName))
+      .query[(UUID, Option[String])]
+      .stream

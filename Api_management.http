@@ -1,11 +1,10 @@
 // Home page request
 GET http://localhost:9000/
 
-// Auth
 // Author
 // Swagger
 // Redis
-
+// Add GraphQL
 
 # ===== User API endpoint
 

@@ -102,6 +102,6 @@ case class QuoteDbService() extends QuoteRepo:
       tableName <- getQuoteTable
       response  <- runQueryTxa(getGenreTitles(tableName, term))
     yield response.flatten
-
+  
 object QuoteDbService:
   val layer: ULayer[QuoteDbService] = ZLayer.succeed(QuoteDbService())

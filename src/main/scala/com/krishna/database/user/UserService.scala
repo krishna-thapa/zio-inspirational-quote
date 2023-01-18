@@ -38,16 +38,15 @@ object UserService:
         val errorMsg: String = s"Failed to parse the user login form input, error: $error"
         responseWithLog(errorMsg, Status.BadRequest)
 
-  def registerOrUpdateUser(
-    userForm: Either[String, RegisterUser],
-    isUpdate: Boolean = false
+  def registerUser(
+    userForm: Either[String, RegisterUser]
   ): ZIO[UserRepo, Throwable, Response] =
     userForm match
       case Right(form) =>
         if validateForm(form) then
           for
-            res      <- UserRepo.registerOrUpdate(form, isUpdate)
-            validRes <- validateDatabaseResponse(res, "inserting or updating a user record")
+            res      <- UserRepo.registerUser(form)
+            validRes <- validateDatabaseResponse(res, "inserting a user record")
           yield
             if validRes.status == Status.Ok
             then validRes.addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(JwtUser(form)))
@@ -63,12 +62,22 @@ object UserService:
   def updateUser(
     userForm: Either[String, RegisterUser],
     email: String
-  ): ZIO[UserRepo, Throwable, Response] =
-    case Right(form) => ???
-    case Left(error) =>
+  ): ZIO[UserRepo, Throwable, Response] = userForm match
+    case Right(form) if form.email == email && validateForm(form) =>
+      for
+        res      <- UserRepo.updateUserInfo(form)
+        validRes <- validateDatabaseResponse(res, "updating a user record")
+      yield
+        if validRes.status == Status.Ok
+        then validRes.addHeader("X-ACCESS-TOKEN", JwtService.jwtEncode(JwtUser(form)))
+        else validRes
+    case Right(_)                                                 =>
+      val errorMsg: String =
+        s"Invalid user form. Fields should be non-empty with valid email and password with minimum length of 3."
+      responseWithLog(errorMsg, Status.BadRequest)
+    case Left(error)                                              =>
       val errorMsg: String = s"Failed to parse the user register form input, error: $error"
       responseWithLog(errorMsg, Status.BadRequest)
-
 
   def getUserInfo(email: String): ZIO[UserRepo, Throwable, Response] =
     for res <- UserRepo.userInfo(email)

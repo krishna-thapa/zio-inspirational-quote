@@ -26,7 +26,7 @@ object PublicAuthHttp:
           for
             userForm <- req.body.asString.map(_.fromJson[RegisterUser])
             response <- UserService
-              .registerOrUpdateUser(userForm)
+              .registerUser(userForm)
               .catchAll(ErrorHandle.responseError("registerUser", _))
           yield response
       }

@@ -32,9 +32,11 @@ object UserRepo:
   def loginUser(user: LoginForm): ZIO[UserRepo, Throwable, Option[UserInfo]] =
     ZIO.serviceWithZIO[UserRepo](_.loginUser(user))
 
-  def registerOrUpdate(userForm: RegisterUser, isUpdate: Boolean): ZIO[UserRepo, Throwable, Int] =
-    if isUpdate then ZIO.serviceWithZIO[UserRepo](_.updateUserInfo(userForm))
-    else ZIO.serviceWithZIO[UserRepo](_.registerUser(UserInfo(userForm)))
+  def registerUser(userForm: RegisterUser): ZIO[UserRepo, Throwable, Int] =
+    ZIO.serviceWithZIO[UserRepo](_.registerUser(UserInfo(userForm)))
+
+  def updateUserInfo(userForm: RegisterUser): ZIO[UserRepo, Throwable, Int] =
+    ZIO.serviceWithZIO[UserRepo](_.updateUserInfo(userForm))
 
   def userInfo(email: String): ZIO[UserRepo, Throwable, UserInfo] =
     ZIO.serviceWithZIO[UserRepo](_.userInfo(email))

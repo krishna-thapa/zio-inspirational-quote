@@ -2,10 +2,9 @@ package com.krishna.http
 
 import pdi.jwt.JwtClaim
 import zio.http.ServerConfig.LeakDetectionLevel
-import zio.http.*
+import zio.http.{ Server, * }
 import zio.json.{ EncoderOps, JsonEncoder }
 import zio.{ ULayer, ZIO }
-
 import com.krishna.auth.JwtService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.database.user.UserRepo
@@ -28,9 +27,21 @@ object ConfigHttp:
     AdminAuthHttp(claim) ++ AdminQuoteHttp.apply(claim)
 
   val combinedHttps: Http[AllRepo, Throwable, Request, Response] =
-    HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() ++
-      JwtService.authenticateUser(jwtUserHttps) ++
-      JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
+    HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() //++
+     // JwtService.authenticateUser(jwtUserHttps) ++
+     // JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
+
+//  OpenAPI.apply(
+//    info = Info(
+//      title = "title",
+//      version = "version",
+//      description = Doc.p("description"),
+//      termsOfService = new URI("https://google.com"),
+//      contact = None,
+//      license = None,
+//    ),
+//    servers = Server.install(ConfigHttp.combinedHttps)
+//  )
 
   val config: ServerConfig = ServerConfig
     .default
