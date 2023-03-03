@@ -1,11 +1,11 @@
 ## Overview
 
 ## Versions used
-- Scala:
-- sbt:
-- JDK: 
+- Scala: 3.2.2
+- sbt: 1.8.1
+- JDK: JDK 11
 
-
+## References
 - https://en.wikipedia.org/w/api.php?action=help&modules=query%2Ballimages
 - https://en.wikipedia.org/w/api.php?action=help&modules=query
 - https://forestry.io/blog/full-text-searching-with-postgres/#indexing
@@ -44,3 +44,11 @@ Password as POSTGRES_PASSWORD
 - [Doobie](https://tpolecat.github.io/doobie/)
 - [Use of ZIO with Doobie](https://zio.dev/guides/interop/with-cats-effect/#using-zio-with-doobie)
 - [Sample project](https://github.com/wi101/zio-examples/blob/master/src/main/scala/com/zio/examples/http4s_doobie/persistence/UserPersistenceService.scala)
+
+## Further work stories
+- [ ] Create a user table for the Authorization service layer
+- [ ] Add the Author details to the postgres table
+- [ ] Use of the fs2 for reading the quotes from the postgres as stream
+- [ ] Add the Swagger API management tool
+- [ ] Add the Redis for the cache management and to handle the uniqueness on the random quotes
+- [ ] Dockerized the whole app and deploy the image to the GitHub docker hub

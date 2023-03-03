@@ -28,20 +28,8 @@ object ConfigHttp:
 
   val combinedHttps: Http[AllRepo, Throwable, Request, Response] =
     HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() //++
-     // JwtService.authenticateUser(jwtUserHttps) ++
-     // JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
-
-//  OpenAPI.apply(
-//    info = Info(
-//      title = "title",
-//      version = "version",
-//      description = Doc.p("description"),
-//      termsOfService = new URI("https://google.com"),
-//      contact = None,
-//      license = None,
-//    ),
-//    servers = Server.install(ConfigHttp.combinedHttps)
-//  )
+      JwtService.authenticateUser(jwtUserHttps) ++
+      JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
 
   val config: ServerConfig = ServerConfig
     .default

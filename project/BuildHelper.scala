@@ -3,7 +3,7 @@ import sbt.{ Def, * }
 import scalafix.sbt.ScalafixPlugin.autoImport.*
 
 object BuildHelper {
-  val ScalaVersion = "3.2.1"
+  val ScalaVersion = "3.2.2"
 
   val commonSettings: Seq[String] = Seq(
     "-Yretain-trees" // To use the default parameters for the ZIO JSON for Scala 3

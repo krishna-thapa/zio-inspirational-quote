@@ -1,10 +1,10 @@
-val zioVersion = "2.0.5"
-val zioLogger  = "2.1.7"
+val zioVersion = "2.0.9"
+val zioLogger  = "2.1.9"
 val zioJson    = "0.4.2"
 
 ThisBuild / organization := "com.krishna"
 ThisBuild / version      := "0.0.1"
-ThisBuild / description  := ""
+ThisBuild / description  := "ZIO based Scala project"
 
 lazy val root = (project in file("."))
   .settings(BuildHelper.stdSettings)
@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
   )
 
 // https://zio.dev/zio-config/
-val zioConfig = "3.0.6"
+val zioConfig = "3.0.7"
 
 val zioConfigDependencies: Seq[ModuleID] = Seq(
   "dev.zio" %% "zio-config"          % zioConfig,
@@ -44,8 +44,8 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
 
 // https://flywaydb.org/
 val flywayMigrationDependencies: Seq[ModuleID] = Seq(
-  "org.flywaydb"   % "flyway-core" % "9.10.2",
-  "org.postgresql" % "postgresql"  % "42.5.1"
+  "org.flywaydb"   % "flyway-core" % "9.15.0",
+  "org.postgresql" % "postgresql"  % "42.5.4"
 )
 
 // https://tpolecat.github.io/doobie/
@@ -60,7 +60,7 @@ val doobieDependencies: Seq[ModuleID] = Seq(
 
 // https://jwt-scala.github.io/jwt-scala/jwt-core-jwt.html
 val authScala: Seq[ModuleID] = Seq(
-  "com.github.jwt-scala" %% "jwt-core" % "9.1.2",
+  "com.github.jwt-scala" %% "jwt-core" % "9.2.0",
   ("com.github.t3hnar" %% "scala-bcrypt" % "4.3.0").cross(CrossVersion.for3Use2_13)
 )
 
