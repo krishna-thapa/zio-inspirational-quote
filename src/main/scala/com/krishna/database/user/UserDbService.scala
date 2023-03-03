@@ -45,7 +45,7 @@ case class UserDbService() extends UserRepo:
     for
       tableName <- getUserTable
       response  <- runQueryTxa(getAllUsers(tableName))
-    yield response
+    yield response.sortBy(_.firstName).filterNot(_.isAdmin)
 
   override def toggleAdminRole(email: String): Task[Int] =
     for

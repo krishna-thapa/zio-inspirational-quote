@@ -13,7 +13,7 @@ import com.krishna.model.user.{ JwtUser, LoginForm, RegisterUser }
 
 object UserService:
 
-  val responseWithLog: (String, Status) => UIO[Response] = (message, status) =>
+  private val responseWithLog: (String, Status) => UIO[Response] = (message, status) =>
     ZIO
       .logError(message)
       .as(Response.text(message).setStatus(status))
@@ -84,7 +84,11 @@ object UserService:
     yield ConfigHttp.convertToJson(res)
 
   def getAllUserInfo(): ZIO[UserRepo, Throwable, Response] =
-    for res <- UserRepo.users
+    for
+      res <- UserRepo.users
+      _   <-
+        if res.isEmpty then ZIO.logWarning("Database is empty!")
+        else ZIO.logInfo(s"Success on returning total ${res.length} users from database!")
     yield ConfigHttp.convertToJson(res)
 
   // TODO: Does this need to return a new JWT token that has field of admin as true or false

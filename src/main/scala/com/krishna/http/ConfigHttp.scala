@@ -5,13 +5,14 @@ import zio.http.ServerConfig.LeakDetectionLevel
 import zio.http.{ Server, * }
 import zio.json.{ EncoderOps, JsonEncoder }
 import zio.{ ULayer, ZIO }
+
 import com.krishna.auth.JwtService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.database.user.UserRepo
 import com.krishna.http.api.*
 import com.krishna.http.api.admin.*
-import com.krishna.http.api.user.*
 import com.krishna.http.api.general.*
+import com.krishna.http.api.user.*
 import com.krishna.model.user.JwtUser
 
 object ConfigHttp:
@@ -27,13 +28,14 @@ object ConfigHttp:
     AdminAuthHttp(claim) ++ AdminQuoteHttp.apply(claim)
 
   val combinedHttps: Http[AllRepo, Throwable, Request, Response] =
-    HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() //++
+    HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() ++
       JwtService.authenticateUser(jwtUserHttps) ++
       JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
 
   val config: ServerConfig = ServerConfig
     .default
     .port(port)
+    // To upload and download the image, have to increase the request size
     .objectAggregator(2097152)
     .leakDetection(LeakDetectionLevel.PARANOID)
     .maxThreads(5)
