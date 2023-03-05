@@ -1,6 +1,7 @@
 package com.krishna.database.quotes
 
 import java.util.UUID
+
 import cats.data.NonEmptyList
 import doobie.ConnectionIO
 import doobie.implicits.*
@@ -8,6 +9,7 @@ import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
+
 import com.krishna.model.{ FavQuote, InspirationalQuote }
 
 object SqlQuote:
@@ -86,6 +88,18 @@ object SqlQuote:
       (fr"UPDATE" ++ Fragment.const(
         tableName
       ) ++ fr"SET fav_tag = NOT fav_tag WHERE id = $favRowId").update
+
+  lazy val getAllFavQuotes
+    : (String, String, UUID, Boolean) => doobie.util.query.Query0[InspirationalQuote] =
+    (quoteTable, favQuoteTable, userId, historyQuotes) =>
+      val userFavQuery: Fragment =
+        fr"SELECT csv_id from" ++ Fragment.const(favQuoteTable) ++ fr"WHERE user_id=$userId"
+      val innerQuery: Fragment   =
+        if !historyQuotes then userFavQuery ++ fr"AND fav_tag" else userFavQuery
+      (selectQuoteColumns ++ Fragment.const(quoteTable) ++
+        fr"WHERE csv_id IN (" ++ innerQuery ++ fr")")
+        .query[(String, String, Option[String], Option[String], List[String], String)]
+        .map(InspirationalQuote.rowToQuote)
 
   // ============================ TODO fix this =====================================
   import zio.stream.ZStream

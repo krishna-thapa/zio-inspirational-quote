@@ -12,16 +12,15 @@ import SqlUser.*
 
 case class UserDbService() extends UserRepo:
 
-  override def isAccountExist(email: String): Task[Option[UserInfo]] = {
+  override def isAccountExist(email: String): Task[Option[UserInfo]] =
     for
       tableName <- getUserTable
-      response <- runQueryTxa(validateUser(tableName, email))
+      response  <- runQueryTxa(validateUser(tableName, email))
     yield response
-  }
 
   override def loginUser(user: LoginForm): Task[Option[UserInfo]] =
     for
-      response  <- isAccountExist(user.email)
+      response <- isAccountExist(user.email)
       validatePassword = response.exists(userInfo =>
         BcryptObject.validatePassword(user.password, userInfo.password).getOrElse(false)
       )

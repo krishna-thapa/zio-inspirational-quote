@@ -12,7 +12,12 @@ package object config:
   final case class WikiConfig(apiUrl: String)
   final case class QuoteConfig(csvPath: String, batchSize: Int)
 
-  final case class Tables(quotesTable: String, authorTable: String, userTable: String, userFavTable: String)
+  final case class Tables(
+    quotesTable: String,
+    authorTable: String,
+    userTable: String,
+    userFavTable: String
+  )
 
   final case class DatabaseConfig(
     dataSourceClassName: String,

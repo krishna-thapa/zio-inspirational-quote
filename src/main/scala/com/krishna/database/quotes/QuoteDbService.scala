@@ -97,10 +97,10 @@ case class QuoteDbService() extends QuoteRepo:
 
   def runGetAllFavQuotes(userId: UUID, historyQuotes: Boolean): Task[List[InspirationalQuote]] =
     for
-      tableName <- getQuoteTable
+      quoteTable   <- getQuoteTable
       userFavTable <- getFavTable
-      favQuotes <-
-    yield ???
+      favQuotes    <- runQueryTxa(getAllFavQuotes(quoteTable, userFavTable, userId, historyQuotes))
+    yield favQuotes
 
   /** Get a Quote by its genre
     * @param genre
