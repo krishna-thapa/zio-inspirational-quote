@@ -1,7 +1,6 @@
 package com.krishna.database.quotes
 
 import java.util.UUID
-
 import cats.data.NonEmptyList
 import doobie.ConnectionIO
 import doobie.implicits.*
@@ -9,8 +8,7 @@ import doobie.postgres.implicits.*
 import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
-
-import com.krishna.model.InspirationalQuote
+import com.krishna.model.{ FavQuote, InspirationalQuote }
 
 object SqlQuote:
 
@@ -18,18 +16,18 @@ object SqlQuote:
     (fr"TRUNCATE TABLE " ++ Fragment.const(tableName) ++ fr"CASCADE").update
 
   lazy val insertQuote: (String, InspirationalQuote) => doobie.Update0 = (tableName, quote) =>
-    val insertToTable  = fr"INSERT INTO " ++
+    val insertToTable  = fr"INSERT INTO" ++
       Fragment.const(tableName) ++
-      fr"(serial_id, quote, author, related_info, genre, stored_date) "
+      fr"(serial_id, quote, author, related_info, genre, stored_date)"
     val valuesToInsert =
       fr"VALUES (${quote.serialId}, ${quote.quote.quote}, ${quote.author}, ${quote.relatedInfo}, ${quote.genre.toArray}, ${quote.storedDate})"
     (insertToTable ++ valuesToInsert).update
 
   lazy val selectQuoteColumns: Fragment =
-    fr"SELECT serial_id, quote, author, related_info, genre, stored_date from "
+    fr"SELECT serial_id, quote, author, related_info, genre, stored_date from"
 
   lazy val countRows: String => Fragment = tableName =>
-    fr"SELECT COUNT (*) from " ++ Fragment.const(tableName)
+    fr"SELECT COUNT (*) from" ++ Fragment.const(tableName)
 
   lazy val getAllQuotes: (String, Int, Int) => doobie.Query0[InspirationalQuote] =
     (tableName, offset, limit) =>
@@ -68,6 +66,28 @@ object SqlQuote:
         fr"i, unnest(genre) g WHERE lower (g) LIKE ${term.toLowerCase + "%"}")
         .query[Option[String]]
 
+  lazy val isFavRecordExist: (String, UUID, String) => doobie.ConnectionIO[Option[FavQuote]] =
+    (tableName, userId, quoteId) =>
+      (fr"SELECT * FROM" ++ Fragment.const(
+        tableName
+      ) ++ fr"WHERE user_id=$userId AND csv_id=$quoteId")
+        .query[FavQuote]
+        .option
+
+  lazy val insertFavQuoteRow: (String, UUID, String) => doobie.Update0 =
+    (tableName, userId, quoteId) =>
+      (fr"INSERT INTO" ++ Fragment.const(
+        tableName
+      ) ++ fr"(user_id, csv_id)" ++
+        fr"VALUES ($userId, $quoteId)").update
+
+  lazy val alterFavQuoteRow: (String, Int) => doobie.Update0 =
+    (tableName, favRowId) =>
+      (fr"UPDATE" ++ Fragment.const(
+        tableName
+      ) ++ fr"SET fav_tag = NOT fav_tag WHERE id = $favRowId").update
+
+  // ============================ TODO fix this =====================================
   import zio.stream.ZStream
   import zio.stream.interop.fs2z.*
 

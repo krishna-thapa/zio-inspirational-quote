@@ -7,7 +7,7 @@ import zio.*
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
-import com.krishna.util.DbUtils.getQuoteTable
+import com.krishna.util.DbUtils.*
 import com.krishna.util.SqlCommon.*
 
 case class QuoteDbService() extends QuoteRepo:
@@ -76,6 +76,31 @@ case class QuoteDbService() extends QuoteRepo:
       tableName <- getQuoteTable
       response  <- runQueryTxa(getQuoteById(tableName, uuid))
     yield response
+
+  def runUpdateFavQuote(
+    userId: UUID,
+    quoteId: String
+  ): Task[Int] =
+    for
+      userFavTable  <- getFavTable
+      isFavRowExist <- runQueryTxa(isFavRecordExist(userFavTable, userId, quoteId))
+      response      <-
+        if isFavRowExist.isEmpty then
+          ZIO.logInfo(s"Inserting a new fav quote for the user with id: $userId") *>
+            runUpdateTxa(insertFavQuoteRow(userFavTable, userId, quoteId))
+        else
+          ZIO.logInfo(
+            s"Quote is already in the database, toggling the fav boolean tag for quote id: $quoteId"
+          ) *>
+            runUpdateTxa(alterFavQuoteRow(userFavTable, isFavRowExist.get.id))
+    yield response
+
+  def runGetAllFavQuotes(userId: UUID, historyQuotes: Boolean): Task[List[InspirationalQuote]] =
+    for
+      tableName <- getQuoteTable
+      userFavTable <- getFavTable
+      favQuotes <-
+    yield ???
 
   /** Get a Quote by its genre
     * @param genre

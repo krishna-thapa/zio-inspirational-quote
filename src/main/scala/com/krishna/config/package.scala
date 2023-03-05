@@ -12,7 +12,7 @@ package object config:
   final case class WikiConfig(apiUrl: String)
   final case class QuoteConfig(csvPath: String, batchSize: Int)
 
-  final case class Tables(quotesTable: String, authorTable: String, userTable: String)
+  final case class Tables(quotesTable: String, authorTable: String, userTable: String, userFavTable: String)
 
   final case class DatabaseConfig(
     dataSourceClassName: String,
@@ -29,7 +29,7 @@ package object config:
 
     def validateTable(dbConfig: DatabaseConfig): ZIO[Any, RuntimeException, Tables] =
       if dbConfig.tables.quotesTable.nonEmpty && dbConfig.tables.authorTable.nonEmpty &&
-        dbConfig.tables.userTable.nonEmpty
+        dbConfig.tables.userTable.nonEmpty && dbConfig.tables.userFavTable.nonEmpty
       then ZIO.succeed(dbConfig.tables)
       else
         ZIO.fail(

@@ -19,6 +19,10 @@ object DbUtils:
     for validateTables <- validateDbTable
     yield validateTables.quotesTable
 
+  val getFavTable: Task[String] =
+    for validateTables <- validateDbTable
+    yield validateTables.userFavTable
+
   val getUserTable: Task[String] =
     for validateTables <- validateDbTable
     yield validateTables.userTable

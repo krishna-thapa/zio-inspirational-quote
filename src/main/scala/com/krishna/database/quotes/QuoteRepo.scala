@@ -22,6 +22,13 @@ trait QuoteRepo:
 
   def runSelectQuote(uuid: UUID): Task[InspirationalQuote]
 
+  def runUpdateFavQuote(
+    userId: UUID,
+    quoteId: String
+  ): Task[Int]
+
+  def runGetAllFavQuotes(userId: UUID, historyQuotes: Boolean): Task[List[InspirationalQuote]]
+
   def runSelectGenreQuote(
     genre: String
   ): Task[List[InspirationalQuote]]
@@ -73,6 +80,26 @@ object QuoteRepo:
     ZIO.serviceWithZIO[QuoteRepo](
       _.runSelectQuote(uuid).tapError(ex =>
         ZIO.logError(s"Error while running runSelectQuote, with exception:  $ex")
+      )
+    )
+
+  def runUpdateFavQuote(
+    userId: UUID,
+    quoteId: String
+  ): ZIO[QuoteRepo, Throwable, RuntimeFlags] =
+    ZIO.serviceWithZIO[QuoteRepo](
+      _.runUpdateFavQuote(userId, quoteId).tapError(ex =>
+        ZIO.logError(s"Error while running runUpdateFavQuote, with exception:  $ex")
+      )
+    )
+
+  def runGetAllFavQuotes(
+    userId: UUID,
+    historyQuotes: Boolean
+  ): ZIO[QuoteRepo, Throwable, List[InspirationalQuote]] =
+    ZIO.serviceWithZIO[QuoteRepo](
+      _.runGetAllFavQuotes(userId, historyQuotes).tapError(ex =>
+        ZIO.logError(s"Error while running runGetAllFavQuotes, with exception:  $ex")
       )
     )
 
