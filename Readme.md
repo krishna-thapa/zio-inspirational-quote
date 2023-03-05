@@ -46,9 +46,9 @@ Password as POSTGRES_PASSWORD
 - [Sample project](https://github.com/wi101/zio-examples/blob/master/src/main/scala/com/zio/examples/http4s_doobie/persistence/UserPersistenceService.scala)
 
 ## Further work stories
-- [ ] Create a user table for the Authorization service layer
+- [x] Create a user table for the Authorization service layer
 - [ ] Add the Author details to the postgres table
-- [ ] Add the favorite quote API endpoints for the users
+- [x] Add the favorite quote API endpoints for the users
 - [ ] Use of the fs2/ZIO Stream for reading the quotes from the postgres as stream
 - [ ] Add the Swagger API management tool
 - [ ] Add the Redis for the cache management and to handle the uniqueness on the random quotes
