@@ -48,7 +48,10 @@ Password as POSTGRES_PASSWORD
 ## Further work stories
 - [ ] Create a user table for the Authorization service layer
 - [ ] Add the Author details to the postgres table
-- [ ] Use of the fs2 for reading the quotes from the postgres as stream
+- [ ] Add the favorite quote API endpoints for the users
+- [ ] Use of the fs2/ZIO Stream for reading the quotes from the postgres as stream
 - [ ] Add the Swagger API management tool
 - [ ] Add the Redis for the cache management and to handle the uniqueness on the random quotes
 - [ ] Dockerized the whole app and deploy the image to the GitHub docker hub
+- [ ] Start writing some test cases
+- [ ] See how the email notification can be achieved using publisher and subscriber pattern

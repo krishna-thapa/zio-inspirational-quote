@@ -69,7 +69,7 @@ object SqlQuote:
         .query[Option[String]]
 
   import zio.stream.ZStream
-  import zio.stream.interop.fs2z._
+  import zio.stream.interop.fs2z.*
 
   lazy val getAuthorWithId = (tableName: String) =>
     (fr"SELECT serial_id, author from" ++ Fragment.const(tableName))

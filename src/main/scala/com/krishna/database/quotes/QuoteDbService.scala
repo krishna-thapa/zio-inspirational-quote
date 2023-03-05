@@ -8,7 +8,7 @@ import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
 import com.krishna.util.DbUtils.getQuoteTable
-import com.krishna.util.sqlCommon.*
+import com.krishna.util.SqlCommon.*
 
 case class QuoteDbService() extends QuoteRepo:
 
@@ -102,6 +102,6 @@ case class QuoteDbService() extends QuoteRepo:
       tableName <- getQuoteTable
       response  <- runQueryTxa(getGenreTitles(tableName, term))
     yield response.flatten
-  
+
 object QuoteDbService:
   val layer: ULayer[QuoteDbService] = ZLayer.succeed(QuoteDbService())

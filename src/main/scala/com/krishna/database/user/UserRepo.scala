@@ -7,6 +7,8 @@ import com.krishna.model.user.{ LoginForm, RegisterUser, UserInfo }
 
 trait UserRepo:
 
+  def isAccountExist(email: String): Task[Option[UserInfo]]
+
   def loginUser(user: LoginForm): Task[Option[UserInfo]]
 
   def registerUser(user: UserInfo): Task[Int]
@@ -28,6 +30,9 @@ trait UserRepo:
   def deletePicture(email: String): Task[Int]
 
 object UserRepo:
+
+  def isAccountExist(email: String): ZIO[UserRepo, Throwable, Option[UserInfo]] =
+    ZIO.serviceWithZIO[UserRepo](_.isAccountExist(email))
 
   def loginUser(user: LoginForm): ZIO[UserRepo, Throwable, Option[UserInfo]] =
     ZIO.serviceWithZIO[UserRepo](_.loginUser(user))

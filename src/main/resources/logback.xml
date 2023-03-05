@@ -26,9 +26,9 @@
   <!-- logger name="com.krishna.db.QuotesPostgresDriver" level="OFF"/ -->
 
   <!-- To print all the debug coming from hikari Postgres container -->
-  <!--  <logger name="com.zaxxer.hikari" level="debug" additivity="false">-->
-  <!--    <appender-ref ref="STDOUT"/>-->
-  <!--  </logger>-->
+  <logger name="com.zaxxer.hikari" level="OFF" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
 
   <root level="INFO">
     <appender-ref ref="ASYNCFILE"/>

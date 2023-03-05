@@ -16,7 +16,7 @@ object AdminAuthHttp:
       .collectZIO[Request] {
         case Method.GET -> !! / "users" =>
           for response <- UserService
-              .getAllUserInfo()
+              .getAllUserInfo
               .catchAll(ErrorHandle.responseError("updateUser", _))
           yield response
 

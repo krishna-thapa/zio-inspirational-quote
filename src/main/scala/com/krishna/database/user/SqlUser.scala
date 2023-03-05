@@ -8,11 +8,11 @@ import com.krishna.model.user.{ LoginForm, RegisterUser, UserInfo }
 
 object SqlUser:
 
-  lazy val validateUser: (String, LoginForm) => doobie.ConnectionIO[Option[UserInfo]] =
-    (tableName, login) =>
+  lazy val validateUser: (String, String) => doobie.ConnectionIO[Option[UserInfo]] =
+    (tableName, email) =>
       (fr"SELECT * FROM" ++ Fragment.const(
         tableName
-      ) ++ fr"WHERE email=${login.email}")
+      ) ++ fr"WHERE email=$email")
         .query[UserInfo]
         .option
 

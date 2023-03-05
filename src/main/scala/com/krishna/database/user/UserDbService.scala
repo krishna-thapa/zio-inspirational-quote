@@ -6,16 +6,22 @@ import com.krishna.auth.BcryptObject
 import com.krishna.model.user.{ LoginForm, RegisterUser, UserInfo }
 import com.krishna.util.DbUtils
 import com.krishna.util.DbUtils.getUserTable
-import com.krishna.util.sqlCommon.*
+import com.krishna.util.SqlCommon.*
 
 import SqlUser.*
 
 case class UserDbService() extends UserRepo:
 
-  override def loginUser(user: LoginForm): Task[Option[UserInfo]] =
+  override def isAccountExist(email: String): Task[Option[UserInfo]] = {
     for
       tableName <- getUserTable
-      response  <- runQueryTxa(validateUser(tableName, user))
+      response <- runQueryTxa(validateUser(tableName, email))
+    yield response
+  }
+
+  override def loginUser(user: LoginForm): Task[Option[UserInfo]] =
+    for
+      response  <- isAccountExist(user.email)
       validatePassword = response.exists(userInfo =>
         BcryptObject.validatePassword(user.password, userInfo.password).getOrElse(false)
       )
@@ -45,7 +51,7 @@ case class UserDbService() extends UserRepo:
     for
       tableName <- getUserTable
       response  <- runQueryTxa(getAllUsers(tableName))
-    yield response.sortBy(_.firstName).filterNot(_.isAdmin)
+    yield response.sortBy(_.firstName)
 
   override def toggleAdminRole(email: String): Task[Int] =
     for
