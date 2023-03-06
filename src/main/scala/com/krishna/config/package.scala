@@ -11,6 +11,7 @@ package object config:
 
   final case class WikiConfig(apiUrl: String)
   final case class QuoteConfig(csvPath: String, batchSize: Int)
+  final case class RedisConfig(hostname: String, database: Int)
 
   final case class Tables(
     quotesTable: String,
@@ -51,6 +52,7 @@ package object config:
         ZIO.fail(new RuntimeException(s"Missing the Database configuration environment variables."))
 
   val wikiConfig: URIO[WikiConfig, WikiConfig]             = ZIO.service[WikiConfig]
+  val redisConfig: URIO[RedisConfig, RedisConfig]          = ZIO.service[RedisConfig]
   val quoteConfig: URIO[QuoteConfig, QuoteConfig]          = ZIO.service[QuoteConfig]
   val databaseConfig: URIO[DatabaseConfig, DatabaseConfig] = ZIO.service[DatabaseConfig]
 
@@ -74,6 +76,9 @@ package object config:
 
     val quoteLayer: Layer[ReadError[String], QuoteConfig] =
       getEnvironmentConfig[QuoteConfig]("QuoteConfig")
+
+    val redisLayer: Layer[ReadError[String], RedisConfig] =
+      getEnvironmentConfig[RedisConfig]("RedisConfig")
 
     val layer: Layer[ReadError[String], Configuration] =
       getEnvironmentConfig[WikiConfig]("WikiConfig") ++

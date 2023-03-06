@@ -6,6 +6,14 @@ ThisBuild / organization := "com.krishna"
 ThisBuild / version      := "0.0.1"
 ThisBuild / description  := "ZIO based Scala project"
 
+resolvers +=
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
+val zioRedisExclusionRules = Seq(
+  ExclusionRule("dev.zio"),
+  ExclusionRule("org.scala-lang.modules")
+)
+
 lazy val root = (project in file("."))
   .settings(BuildHelper.stdSettings)
   .settings(
@@ -20,7 +28,10 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-json" % zioJson,
 
       // https://zio.github.io/zio-http/
-      "dev.zio" %% "zio-http" % "0.0.3",
+      "dev.zio"  %% "zio-http"  % "0.0.3",
+
+      // https://github.com/profunktor/redis4cats
+      "dev.profunktor" %% "redis4cats-effects" % "1.4.0",
 
       // https://zio.github.io/zio-logging/
       "ch.qos.logback" % "logback-classic"   % "1.4.5",
@@ -60,8 +71,8 @@ val doobieDependencies: Seq[ModuleID] = Seq(
 
 // https://jwt-scala.github.io/jwt-scala/jwt-core-jwt.html
 val authScala: Seq[ModuleID] = Seq(
-  "com.github.jwt-scala" %% "jwt-core" % "9.2.0",
-  ("com.github.t3hnar" %% "scala-bcrypt" % "4.3.0").cross(CrossVersion.for3Use2_13)
+  "com.github.jwt-scala" %% "jwt-core"     % "9.2.0",
+  ("com.github.t3hnar"   %% "scala-bcrypt" % "4.3.0").cross(CrossVersion.for3Use2_13)
 )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

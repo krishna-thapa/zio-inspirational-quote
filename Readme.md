@@ -40,6 +40,20 @@ Port `5432`
 Username as POSTGRES_USER
 Password as POSTGRES_PASSWORD
 
+```
+redis-cli -a redis123
+
+// Get all the lists
+KEYS * 
+
+// Delete the list
+DEL cache-quoteOfTheDay
+
+// Get all the stored values inside the list
+LRANGE cache-random-quote 0 -1
+LRANGE cache-quoteOfTheDay 0 -1
+```
+
 ## Use of Doobie for the JDBC
 - [Doobie](https://tpolecat.github.io/doobie/)
 - [Use of ZIO with Doobie](https://zio.dev/guides/interop/with-cats-effect/#using-zio-with-doobie)
@@ -51,6 +65,7 @@ Password as POSTGRES_PASSWORD
 - [x] Add the favorite quote API endpoints for the users
 - [ ] Use of the fs2/ZIO Stream for reading the quotes from the postgres as stream
 - [ ] Add the Swagger API management tool
+- [ ] Add the Postgres full text search and new API endpoint for it
 - [ ] Add the Redis for the cache management and to handle the uniqueness on the random quotes
 - [ ] Dockerized the whole app and deploy the image to the GitHub docker hub
 - [ ] Start writing some test cases

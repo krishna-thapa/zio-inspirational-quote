@@ -12,6 +12,12 @@ object PublicQuoteHttp:
 
   def apply(): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
+      case Method.GET -> !! / "quote" / "quoteOfTheDay" =>
+        ZIO.logInfo(s"Getting a quote of the day!") *>
+          (for
+            quotes <- QuoteRepo.runQuoteOfTheDayQuote()
+            _      <- ZIO.logInfo(s"Success on getting quote of the day!")
+          yield ConfigHttp.convertToJson(quotes))
 
       case req @ Method.GET -> !! / "quote" / "random" =>
         val rows: Int    = ConfigHttp.getQueryParameter(req, ("rows", 1))

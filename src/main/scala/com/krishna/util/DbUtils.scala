@@ -2,7 +2,7 @@ package com.krishna.util
 
 import zio.{ Task, ZIO }
 
-import com.krishna.config.{ Configuration, DatabaseConfig, Tables }
+import com.krishna.config.{ Configuration, DatabaseConfig, RedisConfig, Tables }
 
 object DbUtils:
 
@@ -14,6 +14,11 @@ object DbUtils:
       tables      <- DatabaseConfig.validateTable(getDbConfig)
     yield tables
   }.provide(Configuration.databaseLayer)
+
+  val getRedisConfig: Task[RedisConfig] = {
+    for getRedisConfig <- com.krishna.config.redisConfig
+    yield getRedisConfig
+  }.provide(Configuration.redisLayer)
 
   val getQuoteTable: Task[String] =
     for validateTables <- validateDbTable

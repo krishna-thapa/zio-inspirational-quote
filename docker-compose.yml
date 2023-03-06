@@ -15,6 +15,18 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data/pgdata
 
+  # https://redis.io/
+  redis:
+    image: redis:latest
+    container_name: redis-docker
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - "redis-data:/data:rw"
+    command: >
+      bash -c "redis-server --appendonly yes"
+
   # pgadmin:
   #   image: dpage/pgadmin4
   #   container_name: pgadmin4-docker
@@ -33,4 +45,6 @@ volumes:
   postgres-data:
     driver: local
   pgadmin-data:
+    driver: local
+  redis-data:
     driver: local

@@ -2,15 +2,22 @@ package com.krishna.database.quotes
 
 import java.util.UUID
 
-import zio.*
+import scala.concurrent.duration.DurationInt
 
+import zio.*
+import zio.json.*
+
+import com.krishna.config
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
 import com.krishna.model.InspirationalQuote
 import com.krishna.util.DbUtils.*
 import com.krishna.util.SqlCommon.*
+import com.krishna.util.{ DateConversion, RedisClient }
 
-case class QuoteDbService() extends QuoteRepo:
+case class QuoteDbService() extends QuoteRepo with RedisClient:
+
+  override val redisConfig: Task[config.RedisConfig] = getRedisConfig
 
   /** Truncate the given table
     * @return
@@ -35,6 +42,28 @@ case class QuoteDbService() extends QuoteRepo:
       tableName <- getQuoteTable
       response  <- runUpdateTxa(insertQuote(tableName, quote))
     yield response
+
+  def runQuoteOfTheDayQuote(): Task[InspirationalQuote] =
+    lazy val getRandomQuoteFromDb: ZIO[Any, Throwable, InspirationalQuote] =
+      for
+        _           <- ZIO.logInfo("Retrieving the quote of the day from the Postgres DB!")
+        randomQuote <- runRandomQuote(1)
+        _           <- setCachedQuote(randomQuote.head.toJson)
+      yield randomQuote.head
+
+    for
+      _           <- ZIO.logInfo("Checking if the quote of the day is already defined")
+      optionQuote <- getCachedQuote
+      nextQuote   <-
+        if optionQuote.isDefined then
+          optionQuote.get.fromJson[InspirationalQuote] match
+            case Left(errorMsg) => ZIO.fail(new Exception(s"Parsing error with message: $errorMsg"))
+            case Right(quote)   =>
+              ZIO.logInfo("Quote is found in the Redis cache memory!") *> ZIO.succeed(
+                quote
+              )
+        else getRandomQuoteFromDb
+    yield nextQuote
 
   /** Retrieve all the quotes from the Postgres Database
     * @param offset
@@ -63,7 +92,7 @@ case class QuoteDbService() extends QuoteRepo:
     for
       tableName <- getQuoteTable
       response  <- runQueryTxa(getRandomQuote(tableName, rows))
-    yield response
+    yield response.toList
 
   /** Get a quote by its UUID
     * @param uuid

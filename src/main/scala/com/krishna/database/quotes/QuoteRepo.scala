@@ -13,6 +13,8 @@ trait QuoteRepo:
 
   def runMigrateQuote(quote: InspirationalQuote): Task[RuntimeFlags]
 
+  def runQuoteOfTheDayQuote(): Task[InspirationalQuote]
+
   def runGetAllQuotes(
     offset: Int,
     limit: Int
@@ -62,6 +64,13 @@ object QuoteRepo:
     ZIO.serviceWithZIO[QuoteRepo](
       _.runGetAllQuotes(offset, limit).tapError(ex =>
         ZIO.logError(s"Error while running runGetAllQuotes, with exception:  $ex")
+      )
+    )
+
+  def runQuoteOfTheDayQuote(): ZIO[QuoteRepo, Throwable, InspirationalQuote] =
+    ZIO.serviceWithZIO[QuoteRepo](
+      _.runQuoteOfTheDayQuote().tapError(ex =>
+        ZIO.logError(s"Error while running runQuoteOfTheDayQuote, with exception:  $ex")
       )
     )
 

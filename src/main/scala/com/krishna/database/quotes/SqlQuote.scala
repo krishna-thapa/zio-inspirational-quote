@@ -40,11 +40,13 @@ object SqlQuote:
         .query[(String, String, Option[String], Option[String], List[String], String)]
         .map(InspirationalQuote.rowToQuote)
 
-  lazy val getRandomQuote: (String, Int) => doobie.Query0[InspirationalQuote] = (tableName, rows) =>
-    (selectQuoteColumns ++ Fragment.const(tableName) ++ fr"OFFSET floor(random() * (" ++
-      countRows(tableName) ++ fr")) LIMIT $rows")
-      .query[(String, String, Option[String], Option[String], List[String], String)]
-      .map(InspirationalQuote.rowToQuote)
+  lazy val getRandomQuote: (String, Int) => ConnectionIO[NonEmptyList[InspirationalQuote]] =
+    (tableName, rows) =>
+      (selectQuoteColumns ++ Fragment.const(tableName) ++ fr"OFFSET floor(random() * (" ++
+        countRows(tableName) ++ fr")) LIMIT $rows")
+        .query[(String, String, Option[String], Option[String], List[String], String)]
+        .map(InspirationalQuote.rowToQuote)
+        .nel
 
   lazy val getQuoteById: (String, UUID) => doobie.ConnectionIO[InspirationalQuote] =
     (tableName, uuid) =>

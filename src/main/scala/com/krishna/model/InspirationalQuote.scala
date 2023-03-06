@@ -17,6 +17,7 @@ case class InspirationalQuote(
 
 object InspirationalQuote:
   given JsonEncoder[InspirationalQuote] = DeriveJsonEncoder.gen
+  given JsonDecoder[InspirationalQuote] = DeriveJsonDecoder.gen
 
   def rowToQuote(
     row: (String, String, Option[String], Option[String], List[String], String)
