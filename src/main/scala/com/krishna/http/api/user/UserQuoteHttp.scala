@@ -49,7 +49,8 @@ object UserQuoteHttp:
             quotes <- QuoteRepo.runGetAllFavQuotes(userId, getHistoryQuotes)
             _      <- ZIO.logInfo(s"Success on getting all fav quotes for user id $userId")
           yield ConfigHttp.convertToJson(quotes))
-      case Method.GET -> !! / "quote" / uuid(uuid)          =>
+
+      case Method.GET -> !! / "quote" / uuid(uuid) =>
         ZIO.logInfo(s"Getting a quote from the Postgres database with id $uuid!") *>
           (for
             quote <- QuoteRepo.runSelectQuote(uuid)

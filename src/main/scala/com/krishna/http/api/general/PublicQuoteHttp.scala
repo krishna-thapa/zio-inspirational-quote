@@ -28,6 +28,15 @@ object PublicQuoteHttp:
             _      <- ZIO.logInfo(s"Success on getting random quote of size $maxRows")
           yield ConfigHttp.convertToJson(quotes))
 
+      case Method.GET -> !! / "quote" / "search" / searchInput =>
+        ZIO.logInfo(
+          s"Getting a quote from the Postgres database with searched parameter $searchInput!"
+        ) *>
+          (for
+            quotes <- QuoteRepo.runSearchQuote(searchInput)
+            _ <- ZIO.logInfo(s"Success on getting quote with searched parameter ${quotes.size}")
+          yield ConfigHttp.convertToJson(quotes))
+
       case Method.GET -> !! / "quote" / "genre" / genre =>
         ZIO.logInfo(s"Getting a quote from the Postgres database with genre type $genre!") *>
           (for

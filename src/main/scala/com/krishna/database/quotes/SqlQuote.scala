@@ -64,6 +64,14 @@ object SqlQuote:
         .map(InspirationalQuote.rowToQuote)
         .nel
 
+  lazy val getQuoteBySearchedText: (String, String) => doobie.Query0[InspirationalQuote] =
+    (tableName, searchInput) =>
+      (fr"SELECT serial_id, quote, author, related_info, genre, stored_date, ts_rank(quote_tsv, query) AS rank from"
+        ++ Fragment.const(tableName) ++ fr", to_tsquery('english', $searchInput) query" ++
+        fr"WHERE query @@ quote_tsv order by rank DESC limit 5")
+        .query[(String, String, Option[String], Option[String], List[String], String)]
+        .map(InspirationalQuote.rowToQuote)
+
   lazy val getGenreTitles: (String, String) => doobie.Query0[Option[String]] =
     (tableName, term) =>
       (fr"SELECT DISTINCT g from" ++ Fragment.const(tableName) ++

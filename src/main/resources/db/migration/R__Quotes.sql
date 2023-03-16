@@ -5,6 +5,7 @@
 drop table IF EXISTS inspirational_quotes CASCADE;
 drop sequence if EXISTS serial_csv_id CASCADE;
 drop trigger IF EXISTS tsvectorupdate on inspirational_quotes CASCADE;
+drop index IF EXISTS quotes_search_idx;
 
 -- CSV Id starts from 101
 create sequence IF NOT EXISTS serial_csv_id START 101;
@@ -30,3 +31,6 @@ create or replace trigger tsvectorupdate
     for each row
 EXECUTE procedure
     tsvector_update_trigger(quote_tsv, 'pg_catalog.english', quote);
+
+-- Creating the proper index (a GIN index for text search), it can improve the search speed
+CREATE INDEX quotes_search_idx ON inspirational_quotes USING GIN (quote_tsv);

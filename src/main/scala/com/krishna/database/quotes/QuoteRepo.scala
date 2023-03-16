@@ -35,6 +35,10 @@ trait QuoteRepo:
     genre: String
   ): Task[List[InspirationalQuote]]
 
+  def runSearchQuote(
+    searchInput: String
+  ): Task[List[InspirationalQuote]]
+
   def runSelectGenreTitles(term: String): Task[List[String]]
 
 object QuoteRepo:
@@ -118,6 +122,15 @@ object QuoteRepo:
     ZIO.serviceWithZIO[QuoteRepo](
       _.runSelectGenreQuote(genre).tapError(ex =>
         ZIO.logError(s"Error while running runSelectGenreQuote, with exception:  $ex")
+      )
+    )
+
+  def runSearchQuote(
+    searchInput: String
+  ): ZIO[QuoteRepo, Throwable, List[InspirationalQuote]] =
+    ZIO.serviceWithZIO[QuoteRepo](
+      _.runSearchQuote(searchInput).tapError(ex =>
+        ZIO.logError(s"Error while running runSearchQuote, with exception:  $ex")
       )
     )
 

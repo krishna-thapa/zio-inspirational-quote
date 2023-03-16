@@ -145,6 +145,22 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       response  <- runQueryTxa(getQuoteByGenre(tableName, genre))
     yield response.toList
 
+  /** Full text search using the Postgres TS vector, more in this article:
+    * https://leandronsp.com/a-powerful-full-text-search-in-postgresql-in-less-than-20-lines
+    * @param searchInput
+    *   user's searched text parameter
+    * @return
+    *   list of matched quotes
+    */
+  def runSearchQuote(
+    searchInput: String
+  ): Task[List[InspirationalQuote]] =
+    val tsQueryInput = searchInput.trim.replace("%20", "&")
+    for
+      tableName <- getQuoteTable
+      response  <- runQueryTxa(getQuoteBySearchedText(tableName, tsQueryInput))
+    yield response
+
   /** Auto-completed logic on selecting the genre that is present int he any quotes
     * @param term
     *   User's input term should be max of three characters

@@ -1,5 +1,5 @@
-val zioVersion = "2.0.9"
-val zioLogger  = "2.1.9"
+val zioVersion = "2.0.10"
+val zioLogger  = "2.1.11"
 val zioJson    = "0.4.2"
 
 ThisBuild / organization := "com.krishna"
@@ -55,7 +55,7 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
 
 // https://flywaydb.org/
 val flywayMigrationDependencies: Seq[ModuleID] = Seq(
-  "org.flywaydb"   % "flyway-core" % "9.15.0",
+  "org.flywaydb"   % "flyway-core" % "9.15.2",
   "org.postgresql" % "postgresql"  % "42.5.4"
 )
 
