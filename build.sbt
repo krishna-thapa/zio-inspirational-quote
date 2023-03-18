@@ -17,7 +17,8 @@ val zioRedisExclusionRules = Seq(
 lazy val root = (project in file("."))
   .settings(BuildHelper.stdSettings)
   .settings(
-    name := "zio-inspirational-quote",
+    name           := "zio-inspirational-quote",
+    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio" % zioVersion,
 
@@ -28,7 +29,7 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-json" % zioJson,
 
       // https://zio.github.io/zio-http/
-      "dev.zio"  %% "zio-http"  % "0.0.3",
+      "dev.zio" %% "zio-http" % "0.0.3",
 
       // https://github.com/profunktor/redis4cats
       "dev.profunktor" %% "redis4cats-effects" % "1.4.0",
@@ -41,7 +42,8 @@ lazy val root = (project in file("."))
       zioConfigDependencies ++
       flywayMigrationDependencies ++
       doobieDependencies ++
-      authScala
+      authScala ++
+      zioTesting
   )
 
 // https://zio.dev/zio-config/
@@ -55,7 +57,7 @@ val zioConfigDependencies: Seq[ModuleID] = Seq(
 
 // https://flywaydb.org/
 val flywayMigrationDependencies: Seq[ModuleID] = Seq(
-  "org.flywaydb"   % "flyway-core" % "9.15.2",
+  "org.flywaydb"   % "flyway-core" % "9.16.0",
   "org.postgresql" % "postgresql"  % "42.5.4"
 )
 
@@ -67,6 +69,11 @@ val doobieDependencies: Seq[ModuleID] = Seq(
   "org.tpolecat" %% "doobie-postgres"  % doobieJdbc,
   "org.tpolecat" %% "doobie-hikari"    % doobieJdbc,
   "dev.zio"      %% "zio-interop-cats" % "23.0.0.0"
+)
+
+val zioTesting: Seq[ModuleID] = Seq(
+  "dev.zio" %% "zio-test"       % zioVersion,
+  "dev.zio" %% "zio-test-sbt"   % zioVersion
 )
 
 // https://jwt-scala.github.io/jwt-scala/jwt-core-jwt.html

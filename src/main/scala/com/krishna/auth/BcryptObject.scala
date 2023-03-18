@@ -1,8 +1,9 @@
 package com.krishna.auth
 
-import scala.util.Try
-
 import com.github.t3hnar.bcrypt.*
+import zio.{ Task, ZIO }
+
+import com.krishna.model.user.UserInfo
 
 object BcryptObject:
 
@@ -16,8 +17,11 @@ object BcryptObject:
       3. The salt is usually included in the resulting hash-string in readable searchForm.
       So with storing the hash-string you also store the salt.
    */
-  def encryptPassword(password: String): Try[String] =
-    password.bcryptSafeBounded(5)
+  def encryptPassword(password: String): Task[String] =
+    ZIO.fromTry(password.bcryptSafeBounded(5))
 
-  def validatePassword(password: String, encrypted: String): Try[Boolean] =
-    password.isBcryptedSafeBounded(encrypted)
+  def validatePassword(password: String, userInfo: Option[UserInfo]): Task[Option[Boolean]] =
+    val validatePassword: Option[Task[Boolean]] = userInfo.map { userInfo =>
+      ZIO.fromTry(password.isBcryptedSafeBounded(userInfo.password))
+    }
+    ZIO.foreach(validatePassword)(identity)

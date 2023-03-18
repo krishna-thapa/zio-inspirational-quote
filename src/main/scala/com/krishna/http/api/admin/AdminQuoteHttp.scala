@@ -18,7 +18,9 @@ object AdminQuoteHttp:
 
       case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
         val getRows: Option[Int] = rows.toIntOption
-        ZIO.logInfo(s"Retrieving total $rows quotes from the CSV file data!") *>
+        ZIO.logInfo(
+          s"Retrieving total $rows quotes from the CSV file data, not from Postgres DB!"
+        ) *>
           CsvQuoteService
             .getQuotesFromCsv(rows = getRows)
             .map(quotes => ConfigHttp.convertToJson(quotes.toList))

@@ -1,0 +1,25 @@
+name: zio-inspirational-quote
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_compile_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 18
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '18'
+      - name: Checking the code with scalafmt
+        uses: AvaPL/scalafmt-native-formatter@v0
+      - name: Cache scala dependencies
+        uses: coursier/cache-action@v6
+      - name: Run clean, compile and tests
+        run: |
+          sbt clean compile test

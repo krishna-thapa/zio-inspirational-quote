@@ -20,16 +20,15 @@ case class UserDbService() extends UserRepo:
 
   override def loginUser(user: LoginForm): Task[Option[UserInfo]] =
     for
-      response <- isAccountExist(user.email)
-      validatePassword = response.exists(userInfo =>
-        BcryptObject.validatePassword(user.password, userInfo.password).getOrElse(false)
-      )
-    yield if validatePassword then response else None
+      response           <- isAccountExist(user.email)
+      isValidatePassword <- BcryptObject.validatePassword(user.password, response)
+      checkPassword = isValidatePassword.getOrElse(false)
+    yield if checkPassword then response else None
 
   override def registerUser(user: UserInfo): Task[Int] =
     for
       tableName      <- getUserTable
-      hashedPassword <- ZIO.fromTry(BcryptObject.encryptPassword(user.password))
+      hashedPassword <- BcryptObject.encryptPassword(user.password)
       response       <- runUpdateTxa(insertUser(tableName, user.copy(password = hashedPassword)))
     yield response
 
@@ -42,7 +41,7 @@ case class UserDbService() extends UserRepo:
   override def updateUserInfo(user: RegisterUser): Task[Int] =
     for
       tableName      <- getUserTable
-      hashedPassword <- ZIO.fromTry(BcryptObject.encryptPassword(user.password))
+      hashedPassword <- BcryptObject.encryptPassword(user.password)
       response       <- runUpdateTxa(updateUser(tableName, user.copy(password = hashedPassword)))
     yield response
 

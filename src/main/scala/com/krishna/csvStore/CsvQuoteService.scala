@@ -96,10 +96,12 @@ object CsvQuoteService:
 
   /** Pipeline to insert a quote to Database Postgres
     */
-  def insertQuoteToDb(
-    quote: InspirationalQuote
+  def toInspirationQuoteAndInsertToDb(
+    line: String
   ): ZIO[QuoteRepo, Throwable, Unit] =
-    for _ <- QuoteRepo.runMigrateQuote(quote)
+    for
+      quote <- toInspirationQuote(line)
+      _     <- QuoteRepo.runMigrateQuote(quote)
     yield ()
 
   /** Collect all total Quotes count that is migrated to Database
@@ -118,9 +120,7 @@ object CsvQuoteService:
       quoteConfig <- CsvUtil.quoteConfig
       result      <- csvStream(quoteConfig.csvPath)
         .drop(1) // Drop the CSV header row
-        .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
-        // TODO Refactor this by merging logic in above map call method
-        .mapZIO(insertQuoteToDb)
+        .mapZIOPar(quoteConfig.batchSize)(toInspirationQuoteAndInsertToDb)
         .run(collectQuotesQuotes)
         .tapError(ErrorHandle.handelError("migrateQuotesToDb", _))
       _           <- ZIO.logInfo(
