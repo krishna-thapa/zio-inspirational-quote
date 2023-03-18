@@ -2,7 +2,7 @@ import sbt.Keys.*
 import sbt.{ Def, * }
 import scalafix.sbt.ScalafixPlugin.autoImport.*
 
-object BuildHelper {
+object BuildHelper:
   val ScalaVersion = "3.2.2"
 
   val commonSettings: Seq[String] = Seq(
@@ -22,4 +22,3 @@ object BuildHelper {
           "com.github.liancheng" %% "organize-imports" % "0.6.0"
         )
     )
-}
