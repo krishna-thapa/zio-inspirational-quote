@@ -17,7 +17,7 @@ case class WikiMockService() extends WebClient:
   override def getAuthorDetail(author: String): ZIO[WebClient, Throwable, AuthorDetail] =
     getWebClientResponse("mock url", Nil, Nil) *>
       ZIO.logInfo(s"Mocking Wiki API call for the author: $author") *>
-      ZIO.succeed(AuthorDetail(title = "", relatedInfo = None))
+      ZIO.succeed(AuthorDetail(title = "mock Author"))
 
 object WikiMockService:
   val layer: ULayer[WikiMockService] = ZLayer.succeed(WikiMockService())

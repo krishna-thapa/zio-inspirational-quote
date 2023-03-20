@@ -5,8 +5,8 @@ import java.net.URLEncoder
 import zio.json.*
 import zio.{ ZIO, ZLayer }
 
-import com.krishna.config.WikiConfig
 import com.krishna.model.AuthorDetail
+import com.krishna.util.DbUtils
 import com.krishna.wikiHttp.JsonRes.JsonBody
 
 object WikiHttpApi:
@@ -33,19 +33,16 @@ object WikiHttpApi:
 
   private val toAuthorDetail: (Array[String], String) => AuthorDetail =
     (authorWithInfo: Array[String], jsonData: String) =>
-      val title: String               = authorWithInfo.head.trim
-      val relatedInfo: Option[String] =
-        Option(authorWithInfo.tail.mkString(", ").trim).filter(_.nonEmpty)
+      val title: String = authorWithInfo.head.trim
       jsonData.fromJson[Entity].toOption match
         case Some(result) =>
           AuthorDetail(
             title,
-            relatedInfo,
             alias = result.query.pages.flatMap(_.terms.alias),
             description = result.query.pages.flatMap(_.terms.description),
             imageUrl = result.query.pages.map(_.thumbnail.source).head
           )
-        case None         => AuthorDetail(title, relatedInfo)
+        case None         => AuthorDetail(title)
 
   private val capitalizeAuthor = (author: String) =>
     author.split(" ").map(_.trim.capitalize).mkString(" ")
@@ -61,11 +58,11 @@ object WikiHttpApi:
 
   def getAuthorDetailFromUrl(
     author: String
-  ): ZIO[WebClient with WikiConfig, Throwable, AuthorDetail] =
+  ): ZIO[WebClient, Throwable, AuthorDetail] =
     val splitAuthorWithInfo: Array[String] = author.split(",")
     val encodedAuthor: String              = filterAuthor(splitAuthorWithInfo.head)
     for
-      wikiConfig  <- com.krishna.config.wikiConfig
+      wikiConfig  <- DbUtils.getWikiConfig
       jsonContent <- WebClient.getWebClientResponse(
         wikiConfig.apiUrl.concat(encodedAuthor)
       )

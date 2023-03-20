@@ -96,7 +96,7 @@ object CsvQuoteService:
 
   /** Pipeline to insert a quote to Database Postgres
     */
-  def toInspirationQuoteAndInsertToDb(
+  private def toInspirationQuoteAndInsertToDb(
     line: String
   ): ZIO[QuoteRepo, Throwable, Unit] =
     for

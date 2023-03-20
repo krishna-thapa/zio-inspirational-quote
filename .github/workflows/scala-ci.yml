@@ -3,8 +3,6 @@ name: zio-inspirational-quote
 on:
   push:
     branches: [ main ]
-#  pull_request:
-#    branches: [ main ]
 
 jobs:
   build_compile_test:

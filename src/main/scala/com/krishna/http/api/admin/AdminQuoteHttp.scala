@@ -7,13 +7,15 @@ import zio.http.model.Method
 import com.krishna.csvStore.CsvQuoteService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.model.InspirationalQuote
 import com.krishna.model.user.JwtUser
+import com.krishna.wikiHttp.WebClient
 
 object AdminQuoteHttp:
 
   def apply(
     claim: JwtUser
-  ): Http[QuoteRepo, Throwable, Request, Response] =
+  ): Http[QuoteRepo with WebClient, Throwable, Request, Response] =
     Http.collectZIO[Request] {
 
       case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
@@ -41,4 +43,14 @@ object AdminQuoteHttp:
             quotes <- QuoteRepo.runGetAllQuotes(offset, limit)
             _      <- ZIO.logInfo(s"Success on retrieving total quotes: ${quotes.size}")
           yield ConfigHttp.convertToJson(quotes))
+
+      case Method.GET -> !! / "admin" / "authors" =>
+        ZIO.logInfo(
+          "Downloading authors details from the Wiki Media API and storing in Postgres Database!"
+        ) *>
+          (for
+            authorsInserted <- QuoteRepo.runGetAndUploadAuthorDetails()
+            _               <- ZIO.logInfo(s"Success on uploading total authors: $authorsInserted")
+          yield Response.text(s"Success on uploading total $authorsInserted authors to database."))
+
     }

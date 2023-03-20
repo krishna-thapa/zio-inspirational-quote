@@ -3,9 +3,11 @@ package com.krishna.database.quotes
 import java.util.UUID
 
 import zio.*
+import zio.stream.UStream
 
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.model.InspirationalQuote
+import com.krishna.wikiHttp.WebClient
 
 trait QuoteRepo:
 
@@ -41,13 +43,15 @@ trait QuoteRepo:
 
   def runSelectGenreTitles(term: String): Task[List[String]]
 
+  def runGetAndUploadAuthorDetails(): ZIO[WebClient, Throwable, Long]
+
 object QuoteRepo:
 
   def runTruncateTable(): ZIO[QuoteRepo, Throwable, Unit] =
     ZIO.serviceWithZIO[QuoteRepo](
       _.runTruncateTable().foldZIO(
         err => ErrorHandle.handelError("runTruncateTable", err),
-        _ => ZIO.logInfo("Success on truncating the table inspiration_quote_db!")
+        _ => ZIO.logInfo("Success on truncating the table inspiration_quote_db.")
       )
     )
 
@@ -140,5 +144,12 @@ object QuoteRepo:
     ZIO.serviceWithZIO[QuoteRepo](
       _.runSelectGenreTitles(term).tapError(ex =>
         ZIO.logError(s"Error while running runSelectGenreTitles, with exception:  $ex")
+      )
+    )
+
+  def runGetAndUploadAuthorDetails(): ZIO[QuoteRepo with WebClient, Throwable, Long] =
+    ZIO.serviceWithZIO[QuoteRepo](
+      _.runGetAndUploadAuthorDetails().tapError(ex =>
+        ZIO.logError(s"Error while running runGetAndUploadAuthorDetails, with exception:  $ex")
       )
     )

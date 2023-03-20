@@ -80,6 +80,9 @@ package object config:
     val redisLayer: Layer[ReadError[String], RedisConfig] =
       getEnvironmentConfig[RedisConfig]("RedisConfig")
 
+    val wikiLayer: Layer[ReadError[String], WikiConfig] =
+      getEnvironmentConfig[WikiConfig]("WikiConfig")
+
     val layer: Layer[ReadError[String], Configuration] =
       getEnvironmentConfig[WikiConfig]("WikiConfig") ++
         quoteLayer ++

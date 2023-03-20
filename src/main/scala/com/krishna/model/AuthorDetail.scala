@@ -4,7 +4,6 @@ import zio.json.{ DeriveJsonEncoder, JsonEncoder }
 
 final case class AuthorDetail(
   title: AuthorDetail.Title,
-  relatedInfo: Option[String],
   alias: Seq[String] = Seq.empty,
   description: Seq[String] = Seq.empty,
   imageUrl: Option[String] = None

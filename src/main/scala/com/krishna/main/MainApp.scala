@@ -11,6 +11,7 @@ import com.krishna.database.quotes.QuoteDbService
 import com.krishna.database.user.UserDbService
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.http.ConfigHttp
+import com.krishna.wikiHttp.WikiHttpService
 
 object MainApp extends ZIOAppDefault:
 
@@ -34,7 +35,8 @@ object MainApp extends ZIOAppDefault:
         ConfigHttp.configLayer,
         Server.live,
         QuoteDbService.layer,
-        UserDbService.layer
+        UserDbService.layer,
+        WikiHttpService.layer
       )
       .catchAll(ErrorHandle.handelError("main app", _))
       .map(_ => ExitCode.success)

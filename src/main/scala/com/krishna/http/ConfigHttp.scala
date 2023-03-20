@@ -14,12 +14,13 @@ import com.krishna.http.api.admin.*
 import com.krishna.http.api.general.*
 import com.krishna.http.api.user.*
 import com.krishna.model.user.JwtUser
+import com.krishna.wikiHttp.WebClient
 
 object ConfigHttp:
 
   private val port: Int = 9000
 
-  private type AllRepo = QuoteRepo with UserRepo
+  private type AllRepo = QuoteRepo with UserRepo with WebClient
 
   private val jwtUserHttps: JwtUser => Http[AllRepo, Throwable, Request, Response] = claim =>
     UserQuoteHttp.apply(claim) ++ UserAuthHttp(claim)

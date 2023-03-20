@@ -4,7 +4,6 @@ import zio.*
 import zio.http.Client
 import zio.http.service.{ ChannelFactory, EventLoopGroup }
 
-import com.krishna.config.WikiConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 import com.krishna.wikiHttp.WikiHttpApi.*
@@ -26,7 +25,7 @@ case class WikiHttpService() extends WebClient:
 
   override def getAuthorDetail(
     author: String
-  ): ZIO[WebClient with WikiConfig, Throwable, AuthorDetail] =
+  ): ZIO[WebClient, Throwable, AuthorDetail] =
     getAuthorDetailFromUrl(author)
 
 object WikiHttpService:

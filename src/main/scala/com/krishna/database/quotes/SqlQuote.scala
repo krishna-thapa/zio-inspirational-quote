@@ -10,7 +10,7 @@ import doobie.util.fragment.Fragment
 import zio.interop.catz.*
 import zio.{ Task, ZIO }
 
-import com.krishna.model.{ FavQuote, InspirationalQuote }
+import com.krishna.model.{ AuthorDetail, FavQuote, InspirationalQuote }
 
 object SqlQuote:
 
@@ -111,11 +111,14 @@ object SqlQuote:
         .query[(String, String, Option[String], Option[String], List[String], String)]
         .map(InspirationalQuote.rowToQuote)
 
-  // ============================ TODO fix this =====================================
-  import zio.stream.ZStream
-  import zio.stream.interop.fs2z.*
+  lazy val getAuthors: String => doobie.ConnectionIO[List[String]] =
+    tableName =>
+      (fr"SELECT distinct author from" ++ Fragment.const(tableName))
+        .query[String]
+        .to[List]
 
-  lazy val getAuthorWithId = (tableName: String) =>
-    (fr"SELECT serial_id, author from" ++ Fragment.const(tableName))
-      .query[(UUID, Option[String])]
-      .stream
+  lazy val insertAuthor: (String, AuthorDetail) => doobie.Update0 =
+    (tableName, authorDetail) =>
+      (fr"INSERT INTO" ++ Fragment.const(tableName) ++
+        fr"(title, alias, description, imageUrl) VALUES (${authorDetail.title}, ${authorDetail.alias.toArray}," ++
+        fr"${authorDetail.description.toArray}, ${authorDetail.imageUrl})").update

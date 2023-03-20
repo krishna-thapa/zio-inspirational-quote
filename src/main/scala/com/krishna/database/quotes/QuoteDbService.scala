@@ -6,14 +6,17 @@ import scala.concurrent.duration.DurationInt
 
 import zio.*
 import zio.json.*
+import zio.stream.{ UStream, ZSink, ZStream }
 
 import com.krishna.config
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
-import com.krishna.model.InspirationalQuote
+import com.krishna.errorHandle.ErrorHandle
+import com.krishna.model.{ AuthorDetail, InspirationalQuote }
 import com.krishna.util.DbUtils.*
 import com.krishna.util.SqlCommon.*
 import com.krishna.util.{ DateConversion, RedisClient }
+import com.krishna.wikiHttp.WebClient
 
 case class QuoteDbService() extends QuoteRepo with RedisClient:
 
@@ -172,6 +175,35 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       tableName <- getQuoteTable
       response  <- runQueryTxa(getGenreTitles(tableName, term))
     yield response.flatten
+
+  // ============================= Author Detail Table =====================
+
+  private def runUploadAuthorDetail(authorDetail: AuthorDetail): Task[Int] =
+    for
+      tableName <- getAuthorTable
+      response  <- runUpdateTxa(insertAuthor(tableName, authorDetail))
+    yield response
+
+  /** Get all the distinct authors from the Postgres table
+    * @return
+    *   Authors
+    */
+  def runGetAndUploadAuthorDetails(): ZIO[WebClient, Throwable, Long] =
+    for
+      tableName      <- getQuoteTable
+      authors        <- runQueryTxa(getAuthors(tableName))
+      insertResponse <-
+        ZStream
+          .fromChunk(Chunk.fromIterable(authors))
+          .mapZIOPar(5) { author =>
+            for
+              authorDetail <- WebClient.getAuthorDetail(author)
+              response     <- runUploadAuthorDetail(authorDetail)
+            yield response
+          }
+          .run(ZSink.count)
+          .tapError(ErrorHandle.handelError("runGetAllAuthors", _))
+    yield insertResponse
 
 object QuoteDbService:
   val layer: ULayer[QuoteDbService] = ZLayer.succeed(QuoteDbService())

@@ -2,7 +2,6 @@ package com.krishna.wikiHttp
 
 import zio.ZIO
 
-import com.krishna.config.WikiConfig
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
 
@@ -17,7 +16,7 @@ trait WebClient:
 
   def getAuthorDetail(
     author: String
-  ): ZIO[WebClient with WikiConfig, Throwable, AuthorDetail]
+  ): ZIO[WebClient, Throwable, AuthorDetail]
 
 object WebClient:
 
@@ -31,5 +30,5 @@ object WebClient:
 
   def getAuthorDetail(
     author: String
-  ): ZIO[WebClient with WikiConfig, Throwable, AuthorDetail] =
+  ): ZIO[WebClient, Throwable, AuthorDetail] =
     ZIO.serviceWithZIO[WebClient](_.getAuthorDetail(author))
