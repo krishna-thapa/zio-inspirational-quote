@@ -59,6 +59,12 @@ LRANGE cache-quoteOfTheDay 0 -1
 - [Use of ZIO with Doobie](https://zio.dev/guides/interop/with-cats-effect/#using-zio-with-doobie)
 - [Sample project](https://github.com/wi101/zio-examples/blob/master/src/main/scala/com/zio/examples/http4s_doobie/persistence/UserPersistenceService.scala)
 
+## [GitHub action with Scala native packager](https://stackoverflow.com/questions/64666502/sbt-native-packager-push-to-github-actions-repository)
+
+## Run the project as Docker container
+- To publish it locally: `sbt docker:publishLocal`
+- To run the docker image: `docker run --network="host" <image id>`
+
 ## Further work stories
 - [x] Create a user table for the Authorization service layer
 - [x] Add the Author details to the postgres table
@@ -71,3 +77,4 @@ LRANGE cache-quoteOfTheDay 0 -1
 - [ ] Start writing some test cases and add integration test using test containers
 - [ ] See how the email notification can be achieved using publisher and subscriber pattern
 - [ ] Use of the opaque type of Scala 3
+- [ ] Add email system for the password recovery

@@ -178,10 +178,8 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
 
   // ============================= Author Detail Table =====================
 
-  private def runUploadAuthorDetail(authorDetail: AuthorDetail): Task[Int] =
-    for
-      tableName <- getAuthorTable
-      response  <- runUpdateTxa(insertAuthor(tableName, authorDetail))
+  private def runUploadAuthorDetail(authorDetail: AuthorDetail, authorTable: String): Task[Int] =
+    for response <- runUpdateTxa(insertAuthor(authorTable, authorDetail))
     yield response
 
   /** Get all the distinct authors from the Postgres table
@@ -190,6 +188,8 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
     */
   def runGetAndUploadAuthorDetails(): ZIO[WebClient, Throwable, Long] =
     for
+      authorTable    <- getAuthorTable
+      _              <- runUpdateTxa(truncateTable(authorTable))
       tableName      <- getQuoteTable
       authors        <- runQueryTxa(getAuthors(tableName))
       insertResponse <-
@@ -198,12 +198,18 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
           .mapZIOPar(5) { author =>
             for
               authorDetail <- WebClient.getAuthorDetail(author)
-              response     <- runUploadAuthorDetail(authorDetail)
+              response     <- runUploadAuthorDetail(authorDetail, authorTable)
             yield response
           }
           .run(ZSink.count)
           .tapError(ErrorHandle.handelError("runGetAllAuthors", _))
     yield insertResponse
+
+  def runGetAuthorDetail(author: String): Task[Option[AuthorDetail]] =
+    for
+      tableName <- getAuthorTable
+      author    <- runQueryTxa(getAuthor(tableName, author))
+    yield author
 
 object QuoteDbService:
   val layer: ULayer[QuoteDbService] = ZLayer.succeed(QuoteDbService())

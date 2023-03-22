@@ -6,7 +6,7 @@ import zio.*
 import zio.stream.UStream
 
 import com.krishna.errorHandle.ErrorHandle
-import com.krishna.model.InspirationalQuote
+import com.krishna.model.{ AuthorDetail, InspirationalQuote }
 import com.krishna.wikiHttp.WebClient
 
 trait QuoteRepo:
@@ -44,6 +44,8 @@ trait QuoteRepo:
   def runSelectGenreTitles(term: String): Task[List[String]]
 
   def runGetAndUploadAuthorDetails(): ZIO[WebClient, Throwable, Long]
+
+  def runGetAuthorDetail(author: String): Task[Option[AuthorDetail]]
 
 object QuoteRepo:
 
@@ -151,5 +153,12 @@ object QuoteRepo:
     ZIO.serviceWithZIO[QuoteRepo](
       _.runGetAndUploadAuthorDetails().tapError(ex =>
         ZIO.logError(s"Error while running runGetAndUploadAuthorDetails, with exception:  $ex")
+      )
+    )
+
+  def runGetAuthorDetail(author: String): ZIO[QuoteRepo, Throwable, Option[AuthorDetail]] =
+    ZIO.serviceWithZIO[QuoteRepo](
+      _.runGetAuthorDetail(author).tapError(ex =>
+        ZIO.logError(s"Error while running runGetAuthorDetail, with exception:  $ex")
       )
     )

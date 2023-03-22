@@ -18,3 +18,6 @@ addSbtPlugin("nl.gn0s1s" % "sbt-dotenv" % "3.0.0")
 
 // https://github.com/rtimush/sbt-updates
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
+
+// https://github.com/sbt/sbt-native-packager
+addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.16")

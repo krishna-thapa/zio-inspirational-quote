@@ -122,3 +122,11 @@ object SqlQuote:
       (fr"INSERT INTO" ++ Fragment.const(tableName) ++
         fr"(title, alias, description, imageUrl) VALUES (${authorDetail.title}, ${authorDetail.alias.toArray}," ++
         fr"${authorDetail.description.toArray}, ${authorDetail.imageUrl})").update
+
+  lazy val getAuthor: (String, String) => doobie.ConnectionIO[Option[AuthorDetail]] =
+    (tableName, author) =>
+      (fr"SELECT title, alias, description, imageUrl FROM" ++ Fragment.const(tableName) ++
+        fr"WHERE title = $author")
+        .query[(String, Array[String], Array[String], Option[String])]
+        .map(AuthorDetail.rowToAuthor)
+        .option

@@ -6,6 +6,8 @@ ThisBuild / organization := "com.krishna"
 ThisBuild / version      := "0.0.1"
 ThisBuild / description  := "ZIO based Scala project"
 
+enablePlugins(JavaAppPackaging, DockerPlugin)
+
 resolvers +=
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
@@ -94,6 +96,8 @@ addCommandAlias("fmt", "scalafmt; Test / scalafmt; sFix;")
 addCommandAlias("fmtCheck", "scalafmtCheck; Test / scalafmtCheck; sFixCheck")
 addCommandAlias("sFix", "scalafix OrganizeImports; Test / scalafix OrganizeImports")
 
+addCommandAlias("docker", "docker:publishLocal;")
+
 addCommandAlias(
   "sFixCheck",
   "scalafix --check OrganizeImports; Test / scalafix --check OrganizeImports"
@@ -115,6 +119,7 @@ onLoadMessage := {
       |
       |Useful sbt tasks:
       |${item("api")}: Run the Scala project that will restart automatically if there is a new change.
+      |${item("docker")}: Build the docker image locally.
       |${item("status")}: See the sbt status of the project.
       |${item("fmt")}: Prepares source files using scalafix and scalafmt.
       |${item("sFix")}: Fixes sources files using scalafix.
@@ -125,3 +130,17 @@ onLoadMessage := {
       """.stripMargin
   // @formatter:on
 }
+
+// =========== For the Docker image =======================
+import com.typesafe.sbt.packager.docker.Cmd
+
+dockerBaseImage := sys.env.getOrElse("BASE_IMAGE", "amazoncorretto:18-alpine-jdk")
+dockerRepository := Some(sys.env.getOrElse("REPO_URL", "ghcr.io/krishna-thapa/zio-inspirational-quote"))
+Docker / version := sys.env.getOrElse("IMAGE_TAG", "1.0.0")
+Docker / maintainer := "krishna.thapa91@gmail.com"
+dockerExposedPorts ++= Seq(9000)
+
+dockerCommands ++= Seq(
+  Cmd("USER", "root"),
+  Cmd("RUN", "apk add --no-cache bash")
+)

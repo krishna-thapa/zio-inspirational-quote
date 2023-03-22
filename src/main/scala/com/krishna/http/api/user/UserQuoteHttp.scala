@@ -21,6 +21,15 @@ object UserQuoteHttp:
         .setStatus(Status.InternalServerError)
     else Response.text(s"$service success!!")
 
+  private val internalServerError = (e: Exception) =>
+    val message: String = s"Internal server error with message: ${e.getMessage}"
+    ZIO
+      .logError(message)
+      .as(Response.text(message).setStatus(Status.InternalServerError))
+
+  private val emptyResponse: Response =
+    Response.text("Empty response from the database!").setStatus(Status.NotFound)
+
   def apply(claim: JwtUser): Http[QuoteRepo with UserRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
       case Method.POST -> !! / "quote" / "fav" / quoteId =>
@@ -48,12 +57,27 @@ object UserQuoteHttp:
             userId <- UserRepo.userInfo(claim.email).map(_.userId)
             quotes <- QuoteRepo.runGetAllFavQuotes(userId, getHistoryQuotes)
             _      <- ZIO.logInfo(s"Success on getting all fav quotes for user id $userId")
-          yield ConfigHttp.convertToJson(quotes))
+          yield
+            if quotes.nonEmpty then ConfigHttp.convertToJson(quotes) else emptyResponse).catchAll {
+            case e: Exception => internalServerError(e)
+          }
 
       case Method.GET -> !! / "quote" / uuid(uuid) =>
         ZIO.logInfo(s"Getting a quote from the Postgres database with id $uuid!") *>
           (for
             quote <- QuoteRepo.runSelectQuote(uuid)
             _     <- ZIO.logInfo(s"Success on getting quote with id $uuid")
-          yield ConfigHttp.convertToJson(quote))
+          yield ConfigHttp.convertToJson(quote)).catchAll {
+            case e: Exception => internalServerError(e)
+          }
+
+      case Method.GET -> !! / "quote" / "author" / author =>
+        ZIO.logInfo(s"Getting an author details from the Postgres database with for $author") *>
+          (for
+            author <- QuoteRepo.runGetAuthorDetail(author.trim.replace("%20", " "))
+            _      <- ZIO.logInfo(s"Success on getting response for author details: $author")
+          yield if author.isDefined then ConfigHttp.convertToJson(author) else emptyResponse)
+            .catchAll {
+              case e: Exception => internalServerError(e)
+            }
     }
