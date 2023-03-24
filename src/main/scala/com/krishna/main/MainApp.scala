@@ -2,7 +2,6 @@ package com.krishna.main
 
 import zio.http.*
 import zio.logging.backend.SLF4J
-import zio.logging.{ LogFilter, LogFormat, console }
 import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
 import com.krishna.config.*
@@ -11,6 +10,7 @@ import com.krishna.database.quotes.QuoteDbService
 import com.krishna.database.user.UserDbService
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.http.ConfigHttp
+import com.krishna.util.QuoteOfTheDayScheduler
 import com.krishna.wikiHttp.WikiHttpService
 
 object MainApp extends ZIOAppDefault:
@@ -23,6 +23,7 @@ object MainApp extends ZIOAppDefault:
       _    <- ZIO.logInfo("Running ZIO inspirational quote API project!!")
       port <- DatabaseMigrator.migrate <*> Server.install(ConfigHttp.combinedHttps)
       _    <- ZIO.logInfo(s"Starting server on http://localhost:$port")
+      _    <- QuoteOfTheDayScheduler.getQuoteOfTheDay
       _    <- ZIO.never
     yield ()
 

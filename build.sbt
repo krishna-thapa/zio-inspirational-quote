@@ -37,7 +37,7 @@ lazy val root = (project in file("."))
       "dev.profunktor" %% "redis4cats-effects" % "1.4.0",
 
       // https://zio.github.io/zio-logging/
-      "ch.qos.logback" % "logback-classic"   % "1.4.5",
+      "ch.qos.logback" % "logback-classic"   % "1.4.6",
       "dev.zio"       %% "zio-logging"       % zioLogger,
       "dev.zio"       %% "zio-logging-slf4j" % zioLogger
     ) ++
