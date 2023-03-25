@@ -204,10 +204,11 @@ object UserService:
           .text("No profile picture found!")
           .setStatus(Status.NotFound)
       else
+        val result: Array[Byte] = res.fold(Array.empty[Byte])(identity)
         Response(
           status = Status.Ok,
-          headers = Headers.contentLength(res.get.length.toLong),
-          body = Body.fromStream(ZStream.fromIterable(res.get))
+          headers = Headers.contentLength(result.length.toLong),
+          body = Body.fromStream(ZStream.fromIterable(result))
         ).setHeaders(Headers.contentType("image/jpeg"))
           .setHeaders(Headers.contentDisposition(s"attachment; filename=$email.jpg"))
 

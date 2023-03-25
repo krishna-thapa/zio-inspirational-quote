@@ -59,7 +59,11 @@ LRANGE cache-quoteOfTheDay 0 -1
 - [Use of ZIO with Doobie](https://zio.dev/guides/interop/with-cats-effect/#using-zio-with-doobie)
 - [Sample project](https://github.com/wi101/zio-examples/blob/master/src/main/scala/com/zio/examples/http4s_doobie/persistence/UserPersistenceService.scala)
 
-## [GitHub action with Scala native packager](https://stackoverflow.com/questions/64666502/sbt-native-packager-push-to-github-actions-repository)
+## Links to resources
+- [Javax email in ZIO](https://github.com/funcit/zio-email)
+- [GitHub action with Scala native packager](https://stackoverflow.com/questions/64666502/sbt-native-packager-push-to-github-actions-repository)
+
+
 
 ## Run the project as Docker container
 - To publish it locally: `sbt docker:publishLocal`
@@ -75,6 +79,6 @@ LRANGE cache-quoteOfTheDay 0 -1
 - [ ] Add the Redis for the cache management and to handle the uniqueness on the random quotes
 - [ ] Dockerized the whole app and deploy the image to the GitHub docker hub
 - [ ] Start writing some test cases and add integration test using test containers
-- [ ] See how the email notification can be achieved using publisher and subscriber pattern
+- [ ] See how the email notification can be achieved using publisher and subscriber pattern with scheduler as cron job
 - [ ] Use of the opaque type of Scala 3
 - [ ] Add email system for the password recovery

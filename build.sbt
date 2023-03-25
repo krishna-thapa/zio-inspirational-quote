@@ -16,6 +16,17 @@ val zioRedisExclusionRules = Seq(
   ExclusionRule("org.scala-lang.modules")
 )
 
+lazy val mailService = project
+  .in(file("modules/mailService"))
+  .settings(
+    name := "mailService",
+    version := "1.0-SNAPSHOT",
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % zioVersion,
+      "com.sun.mail" % "javax.mail" % "1.6.2"
+    )
+  )
+
 lazy val root = (project in file("."))
   .settings(BuildHelper.stdSettings)
   .settings(
@@ -47,6 +58,8 @@ lazy val root = (project in file("."))
       authScala ++
       zioTesting
   )
+  .aggregate(mailService)
+  .dependsOn(mailService)
 
 // https://zio.dev/zio-config/
 val zioConfig = "3.0.7"

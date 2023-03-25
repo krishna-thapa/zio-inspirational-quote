@@ -11,7 +11,7 @@ final case class AuthorDetail(
 
 object AuthorDetail:
 
-  type Title = String
+  private type Title = String
 
   def rowToAuthor(row: (String, Array[String], Array[String], Option[String])): AuthorDetail =
     AuthorDetail(

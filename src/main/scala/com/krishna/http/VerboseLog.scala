@@ -31,7 +31,7 @@ object VerboseLog:
             for
               _ <- ZIO.logInfo(s"<<< ${res.status}")
               _ <- ZIO.logInfo(s"<<< Code: ${res.status.code}")
-              _ <- ZIO.foreach(res.headers.toList) { h =>
+              _ <- ZIO.foreachDiscard(res.headers.toList) { h =>
                 ZIO.logInfo(s"<<< ${h._1}: ${h._2}")
               }
             yield res

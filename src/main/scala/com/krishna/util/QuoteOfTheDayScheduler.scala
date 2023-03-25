@@ -8,6 +8,7 @@ import zio.{ IO, Schedule, ZIO }
 
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.service.EmailInterface
 
 object QuoteOfTheDayScheduler:
 
@@ -27,14 +28,15 @@ object QuoteOfTheDayScheduler:
     * If there is error, it will fail but the project will keep on running. Once the fix is made,
     * the project have to restart to continue the cron job scheduler.
     */
-  def getQuoteOfTheDay: ZIO[QuoteRepo, Nothing, AnyVal] =
-    val quoteOfTheDay: ZIO[QuoteRepo, Throwable, Response] =
+  def getQuoteOfTheDay: ZIO[EmailInterface with QuoteRepo, Throwable, AnyVal] =
+    val quoteOfTheDay: ZIO[EmailInterface with QuoteRepo, Throwable, Response] =
       ZIO.logInfo(s"Getting quote of the day for today's, running every day at 2 am!") *>
         (for
           quote <- QuoteRepo.runQuoteOfTheDayQuote()
           _     <- ZIO.logInfo(
             s"Success on getting quote of the day using scheduler cron, quote id: ${quote.serialId}!"
           )
+          _     <- EmailQuoteOfTheDay.sendmailNotification
         yield ConfigHttp.convertToJson(quote))
 
     quoteOfTheDay

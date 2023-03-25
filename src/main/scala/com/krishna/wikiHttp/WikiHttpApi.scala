@@ -40,7 +40,7 @@ object WikiHttpApi:
             title,
             alias = result.query.pages.flatMap(_.terms.alias),
             description = result.query.pages.flatMap(_.terms.description),
-            imageUrl = result.query.pages.map(_.thumbnail.source).head
+            imageUrl = result.query.pages.flatMap(_.thumbnail.source).headOption
           )
         case None         => AuthorDetail(title)
 
@@ -51,10 +51,7 @@ object WikiHttpApi:
 
   private def filterAuthor(author: String): String =
     // TODO: Remove the initial from the authors
-    Seq(author)
-      .map(capitalizeAuthor)
-      .map(encodeAuthor)
-      .head
+    encodeAuthor(capitalizeAuthor(author))
 
   def getAuthorDetailFromUrl(
     author: String
