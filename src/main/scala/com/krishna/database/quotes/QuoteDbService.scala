@@ -22,22 +22,24 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
 
   override val redisConfig: Task[config.RedisConfig] = getRedisConfig
 
-  /** Truncate the given table
-    * @return
-    *   Task that represent the SQL Truncate effect
-    */
+  /**
+   * Truncate the given table
+   * @return
+   *   Task that represent the SQL Truncate effect
+   */
   def runTruncateTable(): Task[RuntimeFlags] =
     for
       tableName <- getQuoteTable
       response  <- runUpdateTxa(truncateTable(tableName))
     yield response
 
-  /** Insert the quote to the Postgres DB table
-    * @param quote
-    *   InspirationalQuote to be inserted
-    * @return
-    *   Task that represent the SQL Insert effect
-    */
+  /**
+   * Insert the quote to the Postgres DB table
+   * @param quote
+   *   InspirationalQuote to be inserted
+   * @return
+   *   Task that represent the SQL Insert effect
+   */
   def runMigrateQuote(
     quote: InspirationalQuote
   ): Task[RuntimeFlags] =
@@ -68,14 +70,15 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
         else getRandomQuoteFromDb
     yield nextQuote
 
-  /** Retrieve all the quotes from the Postgres Database
-    * @param offset
-    *   offset value, default to 0
-    * @param limit
-    *   limit value, default to 10
-    * @return
-    *   list of InspirationalQuote
-    */
+  /**
+   * Retrieve all the quotes from the Postgres Database
+   * @param offset
+   *   offset value, default to 0
+   * @param limit
+   *   limit value, default to 10
+   * @return
+   *   list of InspirationalQuote
+   */
   def runGetAllQuotes(
     offset: Int,
     limit: Int
@@ -85,24 +88,26 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       response  <- runQueryTxa(getAllQuotes(tableName, offset, limit))
     yield response
 
-  /** Get single or multiple random quote
-    * @param rows
-    *   default o value 0
-    * @return
-    *   List of Random quote/s
-    */
+  /**
+   * Get single or multiple random quote
+   * @param rows
+   *   default o value 0
+   * @return
+   *   List of Random quote/s
+   */
   def runRandomQuote(rows: Int): Task[List[InspirationalQuote]] =
     for
       tableName <- getQuoteTable
       response  <- runQueryTxa(getRandomQuote(tableName, rows))
     yield response.toList
 
-  /** Get a quote by its UUID
-    * @param uuid
-    *   selected uuid
-    * @return
-    *   Selected quote
-    */
+  /**
+   * Get a quote by its UUID
+   * @param uuid
+   *   selected uuid
+   * @return
+   *   Selected quote
+   */
   def runSelectQuote(uuid: UUID): Task[InspirationalQuote] =
     for
       tableName <- getQuoteTable
@@ -134,12 +139,13 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       favQuotes    <- runQueryTxa(getAllFavQuotes(quoteTable, userFavTable, userId, historyQuotes))
     yield favQuotes
 
-  /** Get a Quote by its genre
-    * @param genre
-    *   to be selected from any quote
-    * @return
-    *   Random 5 quotes from the selected genre
-    */
+  /**
+   * Get a Quote by its genre
+   * @param genre
+   *   to be selected from any quote
+   * @return
+   *   Random 5 quotes from the selected genre
+   */
   def runSelectGenreQuote(
     genre: String
   ): Task[List[InspirationalQuote]] =
@@ -148,13 +154,14 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       response  <- runQueryTxa(getQuoteByGenre(tableName, genre))
     yield response.toList
 
-  /** Full text search using the Postgres TS vector, more in this article:
-    * https://leandronsp.com/a-powerful-full-text-search-in-postgresql-in-less-than-20-lines
-    * @param searchInput
-    *   user's searched text parameter
-    * @return
-    *   list of matched quotes
-    */
+  /**
+   * Full text search using the Postgres TS vector, more in this article:
+   * https://leandronsp.com/a-powerful-full-text-search-in-postgresql-in-less-than-20-lines
+   * @param searchInput
+   *   user's searched text parameter
+   * @return
+   *   list of matched quotes
+   */
   def runSearchQuote(
     searchInput: String
   ): Task[List[InspirationalQuote]] =
@@ -164,12 +171,13 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       response  <- runQueryTxa(getQuoteBySearchedText(tableName, tsQueryInput))
     yield response
 
-  /** Auto-completed logic on selecting the genre that is present int he any quotes
-    * @param term
-    *   User's input term should be max of three characters
-    * @return
-    *   List of matched genre to show the auto-suggestion while user is typing
-    */
+  /**
+   * Auto-completed logic on selecting the genre that is present int he any quotes
+   * @param term
+   *   User's input term should be max of three characters
+   * @return
+   *   List of matched genre to show the auto-suggestion while user is typing
+   */
   def runSelectGenreTitles(term: String): Task[List[String]] =
     for
       tableName <- getQuoteTable
@@ -182,10 +190,11 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
     for response <- runUpdateTxa(insertAuthor(authorTable, authorDetail))
     yield response
 
-  /** Get all the distinct authors from the Postgres table
-    * @return
-    *   Authors
-    */
+  /**
+   * Get all the distinct authors from the Postgres table
+   * @return
+   *   Authors
+   */
   def runGetAndUploadAuthorDetails(): ZIO[WebClient, Throwable, Long] =
     for
       authorTable    <- getAuthorTable

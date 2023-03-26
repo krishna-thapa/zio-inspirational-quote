@@ -12,6 +12,7 @@ CREATE TABLE user_details_table
     password        varchar(255) NOT NULL,
     created_date    date         NOT NULL,
     is_admin        boolean          default true,
+    is_notification boolean          default true,
     profile_picture bytea
 );
 
@@ -28,4 +29,4 @@ CREATE TABLE user_fav_quotes
 -- Admin account in the database with "admin" as encrypted password
 INSERT INTO user_details_table
 VALUES (gen_random_uuid(), 'admin', 'admin', 'admin@com',
-        '$2a$05$qURyvfv6eJtoroIDL48ExuAeOGxN705UcTgrHYyrrDjBLm5UrBDgO', '2020-10-15', true, null);
+        '$2a$05$qURyvfv6eJtoroIDL48ExuAeOGxN705UcTgrHYyrrDjBLm5UrBDgO', '2020-10-15', true, false, null);

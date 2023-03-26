@@ -81,4 +81,4 @@ LRANGE cache-quoteOfTheDay 0 -1
 - [ ] Start writing some test cases and add integration test using test containers
 - [ ] See how the email notification can be achieved using publisher and subscriber pattern with scheduler as cron job
 - [ ] Use of the opaque type of Scala 3
-- [ ] Add email system for the password recovery
+- [ ] Add email system for the registration confirmation and password recovery

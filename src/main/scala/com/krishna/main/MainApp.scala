@@ -1,18 +1,15 @@
 package com.krishna.main
 
-import zio.http.*
-import zio.logging.backend.SLF4J
-import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
-
 import com.krishna.config.*
 import com.krishna.database.DatabaseMigrator
 import com.krishna.database.quotes.QuoteDbService
 import com.krishna.database.user.UserDbService
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.http.ConfigHttp
-import com.krishna.service.EmailService
-import com.krishna.util.QuoteOfTheDayScheduler
 import com.krishna.wikiHttp.WikiHttpService
+import zio.http.*
+import zio.logging.backend.SLF4J
+import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
 object MainApp extends ZIOAppDefault:
 
@@ -21,7 +18,7 @@ object MainApp extends ZIOAppDefault:
 
   val program =
     for
-      _    <- ZIO.logInfo("Running ZIO inspirational quote API project!!")
+      _    <- ZIO.logInfo("Running ZIO inspirational quote API project!")
       port <- DatabaseMigrator.migrate <*> Server.install(ConfigHttp.combinedHttps)
       _    <- ZIO.logInfo(s"Starting server on http://localhost:$port")
       // _    <- QuoteOfTheDayScheduler.getQuoteOfTheDay

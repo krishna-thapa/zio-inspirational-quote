@@ -58,7 +58,7 @@ package object config:
 
   object Configuration:
 
-    private def getEnvironmentConfig[T: Tag](
+    def getEnvironmentConfig[T: Tag](
       configPath: String
     )(using Descriptor[T]): Layer[ReadError[String], T] =
       ZLayer {

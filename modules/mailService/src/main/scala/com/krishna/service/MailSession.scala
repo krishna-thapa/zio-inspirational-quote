@@ -18,7 +18,7 @@ object MailSession:
     mailer.creds.map { c =>
       new Authenticator:
         override def getPasswordAuthentication: PasswordAuthentication =
-          new PasswordAuthentication(c.username, c.password)
+          new PasswordAuthentication(c.userEmail.value, c.password)
     }
 
   private def getMimeMessage(session: Session): ZIO[Any, Throwable, MimeMessage] =

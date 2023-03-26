@@ -18,12 +18,13 @@ import com.krishna.wikiHttp.WebClient
 
 object CsvQuoteService:
 
-  /** Convert each line from the CSV file to class object of InspirationalQuote
-    * @param line
-    *   String that represent each line in the CSV data store
-    * @return
-    *   InspirationalQuote that represents the Quote record
-    */
+  /**
+   * Convert each line from the CSV file to class object of InspirationalQuote
+   * @param line
+   *   String that represent each line in the CSV data store
+   * @return
+   *   InspirationalQuote that represents the Quote record
+   */
   private def toInspirationQuote(
     line: String
   ): IO[Throwable, InspirationalQuote] =
@@ -49,21 +50,24 @@ object CsvQuoteService:
       storedDate = LocalDate.now()
     )
 
-  /** Collect all the Quotes as a Case class value
-    */
+  /**
+   * Collect all the Quotes as a Case class value
+   */
   val collectQuotes: ZSink[Any, Nothing, InspirationalQuote, Nothing, Chunk[InspirationalQuote]] =
     ZSink.collectAll
 
-  /** Create a Stream of String lines from the selected CSV file
-    */
+  /**
+   * Create a Stream of String lines from the selected CSV file
+   */
   val csvStream: String => ZStream[Any, IOException, String] = csvPath =>
     ZStream
       .fromResource(csvPath)
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
 
-  /** Validate the number of rows that the user wants to get from the CSV file. It will be from the
-    * record 0 and the default value is 20
-    */
+  /**
+   * Validate the number of rows that the user wants to get from the CSV file. It will be from the
+   * record 0 and the default value is 20
+   */
   val validateRows: Option[Int] => UIO[RuntimeFlags] = rows =>
     ZIO
       .fromOption(rows)
@@ -74,12 +78,13 @@ object CsvQuoteService:
           )
       )
 
-  /** Read the quotes from the CSV file and return the Class objects
-    * @param rows
-    *   Number of records to be return, each record represent the a row in CSV file
-    * @return
-    *   Chunk of InspirationalQuote that represents the Quote roq in CSV file
-    */
+  /**
+   * Read the quotes from the CSV file and return the Class objects
+   * @param rows
+   *   Number of records to be return, each record represent the a row in CSV file
+   * @return
+   *   Chunk of InspirationalQuote that represents the Quote roq in CSV file
+   */
   def getQuotesFromCsv(
     rows: Option[Int] = None
   ): Task[Chunk[InspirationalQuote]] =
@@ -94,8 +99,9 @@ object CsvQuoteService:
       _ <- ZIO.logInfo(s"Finishing retrieving total quote records of size: ${result.size}.")
     yield result
 
-  /** Pipeline to insert a quote to Database Postgres
-    */
+  /**
+   * Pipeline to insert a quote to Database Postgres
+   */
   private def toInspirationQuoteAndInsertToDb(
     line: String
   ): ZIO[QuoteRepo, Throwable, Unit] =
@@ -104,16 +110,18 @@ object CsvQuoteService:
       _     <- QuoteRepo.runMigrateQuote(quote)
     yield ()
 
-  /** Collect all total Quotes count that is migrated to Database
-    */
+  /**
+   * Collect all total Quotes count that is migrated to Database
+   */
 
   val collectQuotesQuotes: ZSink[Any, Nothing, Any, Nothing, Long] =
     ZSink.count
 
-  /** Reads the quotes from the CSV file and store to the Postgres Database
-    * @return
-    *   Total amount of records stored in the Database
-    */
+  /**
+   * Reads the quotes from the CSV file and store to the Postgres Database
+   * @return
+   *   Total amount of records stored in the Database
+   */
   def migrateQuotesToDb(): ZIO[QuoteRepo, Throwable, Long] =
     for
       _           <- QuoteRepo.runTruncateTable()

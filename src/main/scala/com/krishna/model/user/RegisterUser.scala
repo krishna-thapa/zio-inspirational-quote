@@ -8,7 +8,8 @@ case class RegisterUser(
   firstName: String,
   lastName: String,
   email: String,
-  password: String
+  password: String,
+  isNotification: Boolean = true
 ) extends Email
   with UserDetail
 

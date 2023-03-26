@@ -14,7 +14,8 @@ case class UserInfo(
   email: String,
   password: String,
   createdDate: LocalDate,
-  isAdmin: Boolean = false
+  isAdmin: Boolean = false,
+  isNotification: Boolean = true
 ) extends Email
   with UserDetail
 
@@ -31,5 +32,6 @@ object UserInfo:
       form.lastName,
       form.email,
       form.password,
-      LocalDate.now()
+      LocalDate.now(),
+      isNotification = form.isNotification
     )

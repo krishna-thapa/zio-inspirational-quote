@@ -34,6 +34,8 @@ object UserServiceSpec extends ZIOSpecDefault:
 
     override def deletePicture(email: String): Task[Int] = ???
 
+    override def listAllUserEmails: Task[List[String]] = ???
+
   object MockedUserRepo:
     val layer: ULayer[MockedUserRepo] = ZLayer.succeed(MockedUserRepo())
 

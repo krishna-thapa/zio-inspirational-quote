@@ -5,11 +5,12 @@ import zio.http.model.Method
 
 import com.krishna.http.VerboseLog
 
-/** An http app that:
-  *   - Accepts a `Request` and returns a `Response`
-  *   - Does not fail
-  *   - Does not use the environment
-  */
+/**
+ * An http app that:
+ *   - Accepts a `Request` and returns a `Response`
+ *   - Does not fail
+ *   - Does not use the environment
+ */
 object HomePage:
 
   def apply(): Http[Any, Throwable, Request, Response] =

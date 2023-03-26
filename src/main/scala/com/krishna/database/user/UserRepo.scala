@@ -29,6 +29,8 @@ trait UserRepo:
 
   def deletePicture(email: String): Task[Int]
 
+  def listAllUserEmails: Task[List[String]]
+
 object UserRepo:
 
   def isAccountExist(email: String): ZIO[UserRepo, Throwable, Option[UserInfo]] =
@@ -48,6 +50,9 @@ object UserRepo:
 
   def users: ZIO[UserRepo, Throwable, List[UserInfo]] =
     ZIO.serviceWithZIO[UserRepo](_.listAllUser)
+
+  def allUserEmails(): ZIO[UserRepo, Throwable, List[String]] =
+    ZIO.serviceWithZIO[UserRepo](_.listAllUserEmails)
 
   def toggleAdminRole(email: String): ZIO[UserRepo, Throwable, Int] =
     ZIO.serviceWithZIO[UserRepo](_.toggleAdminRole(email))

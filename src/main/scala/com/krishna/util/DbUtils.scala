@@ -6,8 +6,9 @@ import com.krishna.config.{ Configuration, DatabaseConfig, RedisConfig, Tables, 
 
 object DbUtils:
 
-  /** Validates the table name that is coming from the config file
-    */
+  /**
+   * Validates the table name that is coming from the config file
+   */
   private val validateDbTable: Task[Tables] = {
     for
       getDbConfig <- com.krishna.config.databaseConfig

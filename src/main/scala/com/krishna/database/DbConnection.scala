@@ -23,9 +23,10 @@ object DbConnection:
         ._1
     }
 
-  /** Create a connection pool with Postgres Database client. Use of `zio.interop.catz` to Convert a
-    * cats Resource into a scoped ZIO.
-    */
+  /**
+   * Create a connection pool with Postgres Database client. Use of `zio.interop.catz` to Convert a
+   * cats Resource into a scoped ZIO.
+   */
   lazy val transactor: ZIO[DatabaseConfig with Scope, Throwable, HikariTransactor[Task]] =
     for
       _           <- ZIO.logInfo("Getting Database connection pool!")

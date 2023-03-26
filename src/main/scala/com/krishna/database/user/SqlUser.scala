@@ -18,7 +18,7 @@ object SqlUser:
 
   lazy val insertUser: (String, UserInfo) => doobie.Update0 = (tableName, user) =>
     (fr"INSERT INTO" ++ Fragment.const(tableName) ++
-      fr"VALUES (${user.userId}, ${user.firstName}, ${user.lastName}, ${user.email}, ${user.password}, ${user.createdDate}, ${user.isAdmin})").update
+      fr"VALUES (${user.userId}, ${user.firstName}, ${user.lastName}, ${user.email}, ${user.password}, ${user.createdDate}, ${user.isAdmin}, ${user.isNotification})").update
 
   lazy val updateUser: (String, RegisterUser) => doobie.Update0 = (tableName, user) =>
     (fr"UPDATE" ++ Fragment.const(
@@ -28,6 +28,12 @@ object SqlUser:
   lazy val getAllUsers: String => doobie.Query0[UserInfo] = tableName =>
     (fr"SELECT * FROM" ++ Fragment.const(tableName))
       .query[UserInfo]
+
+  lazy val getAllUserEmails: String => doobie.Query0[String] = tableName =>
+    (fr"SELECT email FROM" ++ Fragment.const(
+      tableName
+    ) ++ fr"WHERE NOT is_admin AND is_notification")
+      .query[String]
 
   lazy val getUser: (String, String) => doobie.ConnectionIO[UserInfo] = (tableName, email) =>
     (fr"SELECT * FROM" ++ Fragment.const(tableName) ++ fr"WHERE email=$email")

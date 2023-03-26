@@ -51,6 +51,12 @@ case class UserDbService() extends UserRepo:
       response  <- runQueryTxa(getAllUsers(tableName))
     yield response.sortBy(_.firstName)
 
+  override def listAllUserEmails: Task[List[String]] =
+    for
+      tableName <- getUserTable
+      response  <- runQueryTxa(getAllUserEmails(tableName))
+    yield response.sorted
+
   override def toggleAdminRole(email: String): Task[Int] =
     for
       tableName <- getUserTable
