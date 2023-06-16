@@ -35,10 +35,21 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - "./swagger/openapi.json:/openapi.json"
+      - "./swagger:/swagger"
     environment:
-      SWAGGER_JSON: /openapi.json
+      SWAGGER_JSON: /swagger/openapi.json
       BASE_URL: /swagger
+
+  #  redoc-ui:
+  #    image: redocly/redoc
+  #    container_name: redoc-ui
+  #    #restart: unless-stopped
+  #    ports:
+  #      - "18080:80"
+  #    volumes:
+  #      - "./swagger/openapi.json:/usr/share/nginx/html/openapi.json"
+  #    environment:
+  #      SPEC_URL: /openapi.json
 
   # pgadmin:
   #   image: dpage/pgadmin4

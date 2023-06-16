@@ -1,0 +1,64 @@
+{
+  "/user/register": {
+    "post": {
+      "tags": [
+        "Public Auth endpoints"
+      ],
+      "description": "Get quote of the day. It will be same quote for 24 hours.\n",
+      "operationId": "runQuoteOfTheDayQuote",
+      "responses": {
+        "200": {
+          "description": "Quote of the day response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+   "/user/login": {
+    "post": {
+      "tags": [
+        "Public Auth endpoints"
+      ],
+      "description": "Get quote of the day. It will be same quote for 24 hours.\n",
+      "operationId": "runQuoteOfTheDayQuote",
+      "responses": {
+        "200": {
+          "description": "Quote of the day response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

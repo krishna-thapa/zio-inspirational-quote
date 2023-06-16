@@ -22,16 +22,18 @@
   "paths": {
     "/quote/quoteOfTheDay": {
       "get": {
+        "tags": [
+          "Public Quote endpoints"
+        ],
         "description": "Get quote of the day. It will be same quote for 24 hours.\n",
         "operationId": "runQuoteOfTheDayQuote",
-        "parameters": [],
         "responses": {
           "200": {
             "description": "Quote of the day response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InspirationalQuote"
+                  "$ref": "./components/quote.json#/schemas/InspirationalQuote"
                 }
               }
             }
@@ -41,7 +43,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "./components/error.json#/schemas/Error"
                 }
               }
             }
@@ -51,9 +53,25 @@
     },
     "/quote/random": {
       "get": {
+        "tags": [
+          "Public Quote endpoints"
+        ],
         "description": "Retrieve a random quote from the database. You can pass the number of quotes that you want to retrieve.",
         "operationId": "runRandomQuote",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "rows",
+            "in": "query",
+            "description": "Number of rows to be retrieved from the database randomly.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "maximum": 10,
+              "minimum": 1
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Random quotes from the database",
@@ -62,7 +80,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/InspirationalQuote"
+                    "$ref": "./components/quote.json#/schemas/InspirationalQuote"
                   }
                 }
               }
@@ -73,7 +91,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "./components/error.json#/schemas/Error"
                 }
               }
             }
@@ -81,34 +99,37 @@
         }
       }
     },
-    "/pets/{id}": {
+    "/quote/search/{text}": {
       "get": {
-        "description": "Returns a user based on a single ID, if the user does not have access to the pet",
-        "operationId": "find pet by id",
+        "tags": [
+          "Public Quote endpoints"
+        ],
+        "description": "Do the full text search using the searched text in the Postgres database.",
+        "operationId": "runSearchQuote",
         "parameters": [
           {
-            "name": "id",
+            "name": "text",
             "in": "path",
-            "description": "ID of pet to fetch",
+            "description": "Searched text from the user's input",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "description": "Can be a single word or words",
+              "default": "love",
+              "minLength": 3
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "pet response",
+            "description": "Matched list of the quotes",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InspirationalQuote"
-                },
-                "example": {
-                  "id": 1,
-                  "name": "doggie",
-                  "tag": "dog"
+                  "type": "array",
+                  "items": {
+                    "$ref": "./components/quote.json#/schemas/InspirationalQuote"
+                  }
                 }
               }
             }
@@ -118,108 +139,122 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "./components/error.json#/schemas/Error"
                 }
               }
             }
           }
         }
-      },
-      "delete": {
-        "description": "deletes a single pet based on the ID supplied",
-        "operationId": "deletePet",
+      }
+    },
+    "/quote/genre-title/{text}": {
+      "get": {
+        "tags": [
+          "Public Quote endpoints"
+        ],
+        "description": "Auto-complete the genre list as user input the letter in the textbox.",
+        "operationId": "runSelectGenreTitles",
         "parameters": [
           {
-            "name": "id",
+            "name": "text",
             "in": "path",
-            "description": "ID of pet to delete",
+            "description": "Searched genre auto-complete text from the user's input",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "description": "Start with the single letter",
+              "default": "lo",
+              "minLength": 1
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "pet deleted"
+          "200": {
+            "description": "Matched list of the genres",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           },
           "default": {
             "description": "unexpected error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "./components/error.json#/schemas/Error"
                 }
               }
             }
           }
         }
       }
-    }
-  },
-  "components": {
-    "schemas": {
-      "InspirationalQuote": {
-        "required": [
-          "serialId",
-          "quote",
-          "storedDate"
+    },
+    "/quote/genre/{genre}": {
+      "get": {
+        "tags": [
+          "Public Quote endpoints"
         ],
-        "properties": {
-          "serialId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "quote": {
-            "$ref": "#/components/schemas/Quote"
-          },
-          "author": {
-            "type": "string"
-          },
-          "relatedInfo": {
-            "type": "string"
-          },
-          "genre": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-              "type": "string"
+        "description": "Select maximum of 5 quotes with the user's input genre title.",
+        "operationId": "runSelectGenreQuote",
+        "parameters": [
+          {
+            "name": "genre",
+            "in": "path",
+            "description": "Quotes with the selected genre from the user's input",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Genre will be selected from the auto-complete API endpoint",
+              "enum": [
+                "love",
+                "age",
+                "sad",
+                "romance"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of quotes with the selected genre.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./components/quote.json#/schemas/InspirationalQuote"
+                  }
+                }
+              }
             }
           },
-          "storedDate": {
-            "type": "string",
-            "format": "date",
-            "description": "Stored date in database",
-            "example": "2023-06-13"
-          }
-        }
-      },
-      "Quote": {
-        "required": [
-          "quote"
-        ],
-        "properties": {
-          "quote": {
-            "type": "string"
-          }
-        }
-      },
-      "Error": {
-        "required": [
-          "code",
-          "message"
-        ],
-        "properties": {
-          "code": {
-            "type": "integer",
-            "format": "int32"
+          "500": {
+            "description": "Error while running runSelectGenreQuote, with Internal Server issue."
           },
-          "message": {
-            "type": "string"
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./components/error.json#/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
+    },
+    "/user/register": {
+      "$ref": "./paths/public-auth.json#/~1user~1register"
+    },
+    "/user/login": {
+      "$ref": "./paths/public-auth.json#/~1user~1login"
     }
   }
 }

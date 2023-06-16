@@ -1,0 +1,64 @@
+{
+  "schemas": {
+    "InspirationalQuote": {
+      "required": [
+        "serialId",
+        "quote",
+        "storedDate"
+      ],
+      "properties": {
+        "serialId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "quote": {
+          "$ref": "#/schemas/Quote"
+        },
+        "author": {
+          "type": "string"
+        },
+        "relatedInfo": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "storedDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Stored date in database",
+          "example": "2023-06-13"
+        }
+      }
+    },
+    "Quote": {
+      "required": [
+        "quote"
+      ],
+      "properties": {
+        "quote": {
+          "type": "string"
+        }
+      }
+    },
+    "Error": {
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

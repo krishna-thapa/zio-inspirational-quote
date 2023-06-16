@@ -1,15 +1,14 @@
 package com.krishna.http.api.general
 
-import zio.ZIO
-import zio.http.Middleware.cors
-import zio.http.*
-import zio.http.middleware.Cors.CorsConfig
-import zio.http.model.Method
-import zio.http.model.headers.values.Origin
-
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
 import com.krishna.model.user.JwtUser
+import zio.ZIO
+import zio.http.*
+import zio.http.Middleware.cors
+import zio.http.middleware.Cors.CorsConfig
+import zio.http.model.Method
+import zio.http.model.headers.values.Origin
 
 object PublicQuoteHttp:
 
@@ -31,7 +30,11 @@ object PublicQuoteHttp:
 
       case req @ Method.GET -> !! / "quote" / "random" =>
         val rows: Int    = ConfigHttp.getQueryParameter(req, ("rows", 1))
-        val maxRows: Int = if rows >= 10 then 10 else rows
+        val maxRows: Int = rows match
+          case row if row >= 10 => 10
+          case row if row <= 0  => 1
+          case _         => rows
+
         ZIO.logInfo(s"Getting $maxRows random quote from the Postgres database!") *>
           (for
             quotes <- QuoteRepo.runRandomQuote(maxRows)
