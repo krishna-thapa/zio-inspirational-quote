@@ -1,5 +1,13 @@
 package com.krishna.database.quotes
 
+import java.util.UUID
+
+import scala.concurrent.duration.DurationInt
+
+import zio.*
+import zio.json.*
+import zio.stream.{ UStream, ZSink, ZStream }
+
 import com.krishna.config
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
@@ -9,12 +17,6 @@ import com.krishna.util.DbUtils.*
 import com.krishna.util.SqlCommon.*
 import com.krishna.util.{ DateConversion, RedisClient }
 import com.krishna.wikiHttp.WebClient
-import zio.*
-import zio.json.*
-import zio.stream.{ UStream, ZSink, ZStream }
-
-import java.util.UUID
-import scala.concurrent.duration.DurationInt
 
 case class QuoteDbService() extends QuoteRepo with RedisClient:
 
@@ -51,8 +53,9 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       for
         _           <- ZIO.logInfo("Retrieving a random quote of the day from the Postgres DB!")
         randomQuote <- runRandomQuote(1)
-        quote = randomQuote.head // runRandomQuote will always have at least one record, exception is handle already
-        _         <- ZIO.logInfo(
+        quote =
+          randomQuote.head // runRandomQuote will always have at least one record, exception is handle already
+        _ <- ZIO.logInfo(
           s"Checking if the retrieved quote id: ${quote.serialId} from DB is present in list cached list!"
         )
         isPresent <- isPresentInCachedQuoteIds(quote.serialId)

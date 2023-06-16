@@ -1,10 +1,11 @@
 package com.krishna.database
 
-import com.krishna.config.{ DatabaseConfig, databaseConfig }
 import doobie.ExecutionContexts
 import doobie.hikari.HikariTransactor
 import zio.*
 import zio.interop.catz.*
+
+import com.krishna.config.{ DatabaseConfig, databaseConfig }
 
 object DbConnection:
 

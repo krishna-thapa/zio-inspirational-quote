@@ -1,14 +1,15 @@
 package com.krishna.http.api.general
 
-import com.krishna.database.quotes.QuoteRepo
-import com.krishna.http.ConfigHttp
-import com.krishna.model.user.JwtUser
 import zio.ZIO
-import zio.http.*
 import zio.http.Middleware.cors
+import zio.http.*
 import zio.http.middleware.Cors.CorsConfig
 import zio.http.model.Method
 import zio.http.model.headers.values.Origin
+
+import com.krishna.database.quotes.QuoteRepo
+import com.krishna.http.ConfigHttp
+import com.krishna.model.user.JwtUser
 
 object PublicQuoteHttp:
 

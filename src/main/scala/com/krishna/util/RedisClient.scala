@@ -1,15 +1,17 @@
 package com.krishna.util
 
+import java.util.UUID
+
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{ ExecutionContext, Future }
+
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import com.krishna.config.RedisConfig
 import dev.profunktor.redis4cats.effect.Log.NoOp.*
 import dev.profunktor.redis4cats.{ Redis, RedisCommands }
 import zio.{ Task, ZIO }
 
-import java.util.UUID
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{ ExecutionContext, Future }
+import com.krishna.config.RedisConfig
 
 trait RedisClient:
 
