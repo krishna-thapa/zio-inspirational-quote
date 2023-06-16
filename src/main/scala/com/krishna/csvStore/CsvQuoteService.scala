@@ -65,20 +65,6 @@ object CsvQuoteService:
       .via(ZPipeline.utf8Decode >>> ZPipeline.splitLines)
 
   /**
-   * Validate the number of rows that the user wants to get from the CSV file. It will be from the
-   * record 0 and the default value is 20
-   */
-  val validateRows: Option[Int] => UIO[RuntimeFlags] = rows =>
-    ZIO
-      .fromOption(rows)
-      .orElse(
-        ZIO.logError(s"Invalid rows input $rows, selecting default value of 20") *> ZIO
-          .succeed(
-            20
-          )
-      )
-
-  /**
    * Read the quotes from the CSV file and return the Class objects
    * @param rows
    *   Number of records to be return, each record represent the a row in CSV file
@@ -86,13 +72,13 @@ object CsvQuoteService:
    *   Chunk of InspirationalQuote that represents the Quote roq in CSV file
    */
   def getQuotesFromCsv(
-    rows: Option[Int] = None
+    rows: Int
   ): Task[Chunk[InspirationalQuote]] =
     for
       quoteConfig <- CsvUtil.quoteConfig
-      getRows     <- validateRows(rows)
       result      <- csvStream(quoteConfig.csvPath)
-        .take(getRows)
+        .take(rows + 1)
+        .drop(1)
         .mapZIOPar(quoteConfig.batchSize)(toInspirationQuote)
         .run(collectQuotes)
         .tapError(ex => ZIO.logError(s"Error while $ex"))

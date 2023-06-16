@@ -30,4 +30,4 @@ object HomePage:
       case Method.GET -> !! => Response.text("Home page!!")
 
       case Method.GET -> !! / "ping" => Response.text("Http response with pong!!")
-    } @@ VerboseLog.log
+    } // @@ VerboseLog.log

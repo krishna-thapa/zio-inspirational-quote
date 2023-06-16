@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   postgres:
@@ -26,6 +26,19 @@ services:
       - "redis-data:/data:rw"
     command: >
       bash -c "redis-server --appendonly yes"
+
+  # https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/installation.md
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./swagger/openapi.json:/openapi.json"
+    environment:
+      SWAGGER_JSON: /openapi.json
+      BASE_URL: /swagger
 
   # pgadmin:
   #   image: dpage/pgadmin4

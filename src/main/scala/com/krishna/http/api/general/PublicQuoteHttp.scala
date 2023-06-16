@@ -1,14 +1,23 @@
 package com.krishna.http.api.general
 
-import zio.ZIO
-import zio.http.*
-import zio.http.model.Method
-
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
 import com.krishna.model.user.JwtUser
+import zio.ZIO
+import zio.http.*
+import zio.http.Middleware.cors
+import zio.http.middleware.Cors.CorsConfig
+import zio.http.model.Method
+import zio.http.model.headers.values.Origin
 
 object PublicQuoteHttp:
+
+  // Create CORS configuration
+  val config: CorsConfig =
+    CorsConfig(
+      allowedOrigins = s => s.contains("localhost:8080"),
+      allowedMethods = Some(Set(Method.GET))
+    )
 
   def apply(): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
@@ -25,7 +34,7 @@ object PublicQuoteHttp:
         ZIO.logInfo(s"Getting $maxRows random quote from the Postgres database!") *>
           (for
             quotes <- QuoteRepo.runRandomQuote(maxRows)
-            _      <- ZIO.logInfo(s"Success on getting random quote of size $maxRows")
+            _      <- ZIO.logInfo(s"Success on getting random quote of size ${quotes.size}")
           yield ConfigHttp.convertToJson(quotes))
 
       case Method.GET -> !! / "quote" / "search" / searchInput =>
@@ -52,4 +61,4 @@ object PublicQuoteHttp:
               s"Success on getting genre titles starting $term, size: ${genres.size}"
             )
           yield ConfigHttp.convertToJson(genres))
-    }
+    } @@ cors(config)

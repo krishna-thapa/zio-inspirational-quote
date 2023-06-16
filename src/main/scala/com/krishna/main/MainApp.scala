@@ -1,5 +1,9 @@
 package com.krishna.main
 
+import zio.*
+import zio.http.*
+import zio.logging.backend.SLF4J
+
 import com.krishna.config.*
 import com.krishna.database.DatabaseMigrator
 import com.krishna.database.quotes.QuoteDbService
@@ -7,9 +11,6 @@ import com.krishna.database.user.UserDbService
 import com.krishna.errorHandle.ErrorHandle
 import com.krishna.http.ConfigHttp
 import com.krishna.wikiHttp.WikiHttpService
-import zio.http.*
-import zio.logging.backend.SLF4J
-import zio.{ ExitCode, ZIO, ZIOAppDefault, * }
 
 object MainApp extends ZIOAppDefault:
 

@@ -1,13 +1,5 @@
 package com.krishna.database.quotes
 
-import java.util.UUID
-
-import scala.concurrent.duration.DurationInt
-
-import zio.*
-import zio.json.*
-import zio.stream.{ UStream, ZSink, ZStream }
-
 import com.krishna.config
 import com.krishna.config.DatabaseConfig
 import com.krishna.database.quotes.SqlQuote.*
@@ -17,6 +9,12 @@ import com.krishna.util.DbUtils.*
 import com.krishna.util.SqlCommon.*
 import com.krishna.util.{ DateConversion, RedisClient }
 import com.krishna.wikiHttp.WebClient
+import zio.*
+import zio.json.*
+import zio.stream.{ UStream, ZSink, ZStream }
+
+import java.util.UUID
+import scala.concurrent.duration.DurationInt
 
 case class QuoteDbService() extends QuoteRepo with RedisClient:
 
@@ -51,13 +49,27 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
   def runQuoteOfTheDayQuote(): Task[InspirationalQuote] =
     lazy val getRandomQuoteFromDb: ZIO[Any, Throwable, InspirationalQuote] =
       for
-        _           <- ZIO.logInfo("Retrieving the quote of the day from the Postgres DB!")
+        _           <- ZIO.logInfo("Retrieving a random quote of the day from the Postgres DB!")
         randomQuote <- runRandomQuote(1)
-        _           <- setCachedQuote(randomQuote.head.toJson)
-      yield randomQuote.head
+        quote = randomQuote.head // runRandomQuote will always have at least one record, exception is handle already
+        _         <- ZIO.logInfo(
+          s"Checking if the retrieved quote id: ${quote.serialId} from DB is present in list cached list!"
+        )
+        isPresent <- isPresentInCachedQuoteIds(quote.serialId)
+        _         <-
+          if isPresent then
+            ZIO.logInfo(
+              s"Quote with id: ${quote.serialId} is already present in the cached ids list, getting a new one!"
+            ) *> runQuoteOfTheDayQuote()
+          else
+            ZIO.logInfo(
+              s"Storing id: ${quote.serialId} in the cached quote ids list!"
+            ) *> setCachedQuoteIds(quote.serialId)
+        _         <- setCachedQuote(quote.toJson)
+      yield quote
 
     for
-      _           <- ZIO.logInfo("Checking if the quote of the day is already defined")
+      _ <- ZIO.logInfo("Checking if the quote of the day is already defined and stored in cache")
       optionQuote <- getCachedQuote
       nextQuote   <-
         if optionQuote.isDefined then
@@ -89,16 +101,19 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
     yield response
 
   /**
-   * Get single or multiple random quote
+   * Get single or multiple random quotes
+   * use of different Postgres Select query depending on the input rows for efficient query call
    * @param rows
-   *   default o value 0
+   *   default to value 1, maximum with the value of 10
    * @return
    *   List of Random quote/s
    */
   def runRandomQuote(rows: Int): Task[List[InspirationalQuote]] =
     for
       tableName <- getQuoteTable
-      response  <- runQueryTxa(getRandomQuote(tableName, rows))
+      response  <-
+        if rows == 1 then runQueryTxa(getOneRandomQuote(tableName))
+        else runQueryTxa(getRandomQuotes(tableName, rows))
     yield response.toList
 
   /**
@@ -114,6 +129,13 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
       response  <- runQueryTxa(getQuoteById(tableName, uuid))
     yield response
 
+  /**
+   * Insert the favourite quote to the database with user id, if the quote is already exist then
+   * toggle the boolean tag for the quote id.
+   * @param userId Id that represents the User from the user details table
+   * @param quoteId Id that represent the quote
+   * @return Response from the Update query in the table
+   */
   def runUpdateFavQuote(
     userId: UUID,
     quoteId: String
@@ -132,6 +154,12 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
             runUpdateTxa(alterFavQuoteRow(userFavTable, isFavRowExist.get.id))
     yield response
 
+  /**
+   * Get all the favourite quotes from the table for a user
+   * @param userId Id that represents the User from the user details table
+   * @param historyQuotes Weather to include all the quotes that the user had marked as favorites in past
+   * @return List of the quotes
+   */
   def runGetAllFavQuotes(userId: UUID, historyQuotes: Boolean): Task[List[InspirationalQuote]] =
     for
       quoteTable   <- getQuoteTable
@@ -172,7 +200,7 @@ case class QuoteDbService() extends QuoteRepo with RedisClient:
     yield response
 
   /**
-   * Auto-completed logic on selecting the genre that is present int he any quotes
+   * Auto-completed logic on selecting the genre that is present in any quotes
    * @param term
    *   User's input term should be max of three characters
    * @return

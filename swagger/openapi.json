@@ -1,0 +1,225 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "Inspirational quote service",
+    "description": "Backend service written in Scala and ZIO for the Inspirational Quote service. Using the OpenAPI 3.0 specification",
+    "contact": {
+      "name": "krishna-thapa",
+      "email": "krishna.nature91@gmail.com",
+      "url": "https://github.com/krishna-thapa"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:9000/"
+    }
+  ],
+  "paths": {
+    "/quote/quoteOfTheDay": {
+      "get": {
+        "description": "Get quote of the day. It will be same quote for 24 hours.\n",
+        "operationId": "runQuoteOfTheDayQuote",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Quote of the day response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspirationalQuote"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quote/random": {
+      "get": {
+        "description": "Retrieve a random quote from the database. You can pass the number of quotes that you want to retrieve.",
+        "operationId": "runRandomQuote",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Random quotes from the database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InspirationalQuote"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{id}": {
+      "get": {
+        "description": "Returns a user based on a single ID, if the user does not have access to the pet",
+        "operationId": "find pet by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of pet to fetch",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "pet response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspirationalQuote"
+                },
+                "example": {
+                  "id": 1,
+                  "name": "doggie",
+                  "tag": "dog"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "deletes a single pet based on the ID supplied",
+        "operationId": "deletePet",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of pet to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "pet deleted"
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InspirationalQuote": {
+        "required": [
+          "serialId",
+          "quote",
+          "storedDate"
+        ],
+        "properties": {
+          "serialId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quote": {
+            "$ref": "#/components/schemas/Quote"
+          },
+          "author": {
+            "type": "string"
+          },
+          "relatedInfo": {
+            "type": "string"
+          },
+          "genre": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "storedDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Stored date in database",
+            "example": "2023-06-13"
+          }
+        }
+      },
+      "Quote": {
+        "required": [
+          "quote"
+        ],
+        "properties": {
+          "quote": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

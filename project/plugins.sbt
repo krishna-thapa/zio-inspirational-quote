@@ -1,12 +1,12 @@
 // https://scalameta.org/scalafmt/
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.0")
 
 // https://scalacenter.github.io/scalafix/
 // https://github.com/liancheng/scalafix-organize-imports
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.10.4")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.11.0")
 
 // https://github.com/spray/sbt-revolver
-addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
+addSbtPlugin("io.spray" % "sbt-revolver" % "0.10.0")
 
 // https://www.baeldung.com/scala/sbt-dependency-tree
 // sbt dependencyBrowseGraph

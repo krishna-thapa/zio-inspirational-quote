@@ -1,11 +1,10 @@
 package com.krishna.database
 
+import com.krishna.config.{ DatabaseConfig, databaseConfig }
 import doobie.ExecutionContexts
 import doobie.hikari.HikariTransactor
 import zio.*
 import zio.interop.catz.*
-
-import com.krishna.config.{ DatabaseConfig, databaseConfig }
 
 object DbConnection:
 
@@ -29,7 +28,7 @@ object DbConnection:
    */
   lazy val transactor: ZIO[DatabaseConfig with Scope, Throwable, HikariTransactor[Task]] =
     for
-      _           <- ZIO.logInfo("Getting Database connection pool!")
+      // _           <- ZIO.logInfo("Getting Database connection pool!")
       getDbConfig <- com.krishna.config.databaseConfig
       dbConfig    <- DatabaseConfig.validateConfig(getDbConfig)
       ce          <- ExecutionContexts.fixedThreadPool[Task](10).toScopedZIO

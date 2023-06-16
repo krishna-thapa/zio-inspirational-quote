@@ -1,6 +1,6 @@
-val zioVersion = "2.0.10"
-val zioLogger  = "2.1.11"
-val zioJson    = "0.4.2"
+val zioVersion = "2.0.13"
+val zioLogger  = "2.1.12"
+val zioJson    = "0.5.0"
 
 ThisBuild / organization := "com.krishna"
 ThisBuild / version      := "0.0.1"
@@ -45,10 +45,10 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-http" % "0.0.3",
 
       // https://github.com/profunktor/redis4cats
-      "dev.profunktor" %% "redis4cats-effects" % "1.4.0",
+      "dev.profunktor" %% "redis4cats-effects" % "1.4.1",
 
       // https://zio.github.io/zio-logging/
-      "ch.qos.logback" % "logback-classic"   % "1.4.6",
+      "ch.qos.logback" % "logback-classic"   % "1.4.7",
       "dev.zio"       %% "zio-logging"       % zioLogger,
       "dev.zio"       %% "zio-logging-slf4j" % zioLogger
     ) ++
@@ -83,7 +83,7 @@ val doobieDependencies: Seq[ModuleID] = Seq(
   "org.tpolecat" %% "doobie-core"      % doobieJdbc,
   "org.tpolecat" %% "doobie-postgres"  % doobieJdbc,
   "org.tpolecat" %% "doobie-hikari"    % doobieJdbc,
-  "dev.zio"      %% "zio-interop-cats" % "23.0.0.0"
+  "dev.zio"      %% "zio-interop-cats" % "23.0.03"
 )
 
 val zioTesting: Seq[ModuleID] = Seq(

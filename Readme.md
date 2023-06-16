@@ -2,7 +2,7 @@
 
 ## Versions used
 - Scala: 3.2.2
-- sbt: 1.8.1
+- sbt: 1.9.0
 - JDK: JDK 11
 
 ## References
@@ -52,6 +52,7 @@ DEL cache-quoteOfTheDay
 // Get all the stored values inside the list
 LRANGE cache-random-quote 0 -1
 LRANGE cache-quoteOfTheDay 0 -1
+LRANGE cached_ids 0 -1
 ```
 
 ## Use of Doobie for the JDBC

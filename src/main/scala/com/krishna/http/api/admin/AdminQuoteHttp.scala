@@ -18,10 +18,10 @@ object AdminQuoteHttp:
   ): Http[QuoteRepo with WebClient, Throwable, Request, Response] =
     Http.collectZIO[Request] {
 
-      case Method.GET -> !! / "admin" / "csv-quotes" / rows =>
-        val getRows: Option[Int] = rows.toIntOption
+      case req @ Method.GET -> !! / "admin" / "csv-quotes" =>
+        val getRows: Int = ConfigHttp.getQueryParameter(req, ("rows", 20))
         ZIO.logInfo(
-          s"Retrieving total $rows quotes from the CSV file data, not from Postgres DB!"
+          s"Retrieving total $getRows quotes from the CSV file data, not from Postgres DB!"
         ) *>
           CsvQuoteService
             .getQuotesFromCsv(rows = getRows)

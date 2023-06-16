@@ -11,7 +11,13 @@ package object config:
 
   final case class WikiConfig(apiUrl: String)
   final case class QuoteConfig(csvPath: String, batchSize: Int)
-  final case class RedisConfig(hostname: String, database: Int)
+
+  final case class RedisConfig(
+    hostname: String,
+    database: Int,
+    maxCacheQuoteIds: Int,
+    cachedQuoteIdsKey: String
+  )
 
   final case class Tables(
     quotesTable: String,
