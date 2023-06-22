@@ -1,15 +1,18 @@
 package com.krishna.http.api.general
 
 import zio.*
+import zio.http.Middleware.cors
 import zio.http.*
+import zio.http.middleware.Cors.CorsConfig
 import zio.http.model.{ Headers, HttpError, Method, Status }
 import zio.json.*
 
 import com.krishna.database.user.{ UserRepo, UserService }
 import com.krishna.errorHandle.ErrorHandle
+import com.krishna.http.api.CorsConfigQuote
 import com.krishna.model.user.{ LoginForm, RegisterUser }
 
-object PublicAuthHttp:
+object PublicAuthHttp extends CorsConfigQuote:
 
   private val logResponse: (Status, String) => UIO[Unit] = (status, httpService) =>
     if status != Status.Ok then ZIO.logError(s"Http response error on service called: $httpService")
@@ -35,4 +38,4 @@ object PublicAuthHttp:
               .catchAll(ErrorHandle.responseError("registerUser", _))
             _        <- logResponse(response.status, "user register")
           yield response
-      }
+      } @@ cors(config)

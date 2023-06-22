@@ -1,0 +1,44 @@
+{
+  "/admin/users": {
+    "get": {
+      "tags": [
+        "Admin Access endpoints"
+      ],
+      "description": "Get all the users with detail that are stored in the database.\n",
+      "operationId": "getAllUserInfo",
+      "security:": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "List of the stored user details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "../components/user.json#/schemas/UserDetail"
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User is not allowed."
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

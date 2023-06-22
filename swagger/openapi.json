@@ -255,6 +255,35 @@
     },
     "/user/login": {
       "$ref": "./paths/public-auth.json#/~1user~1login"
+    },
+    "/admin/users": {
+      "$ref": "./paths/admin-access.json#/~1admin~1users"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "name": "X-ACCESS-TOKEN",
+        "in": "header",
+        "description": "Enter the token with the `Bearer: `",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "InspirationalQuote": {
+        "$ref": "./components/quote.json#/schemas/InspirationalQuote"
+      },
+      "UserRegister": {
+        "$ref": "./components/user.json#/schemas/UserRegister"
+      },
+      "LoginForm": {
+        "$ref": "./components/user.json#/schemas/LoginForm"
+      },
+      "UserDetail": {
+        "$ref": "./components/user.json#/schemas/UserDetail"
+      }
     }
   }
 }

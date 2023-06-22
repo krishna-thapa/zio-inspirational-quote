@@ -1,0 +1,81 @@
+{
+  "schemas": {
+    "UserRegister": {
+      "required": [
+        "firstName",
+        "lastName",
+        "email",
+        "password"
+      ],
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password",
+          "minLength": 3
+        }
+      }
+    },
+    "LoginForm": {
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password",
+          "minLength": 3
+        }
+      }
+    },
+    "UserDetail": {
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password",
+          "minLength": 3
+        },
+        "createdDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Stored date in database",
+          "example": "2023-06-13"
+        },
+        "isAdmin": {
+          "type": "boolean"
+        },
+        "isNotification": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

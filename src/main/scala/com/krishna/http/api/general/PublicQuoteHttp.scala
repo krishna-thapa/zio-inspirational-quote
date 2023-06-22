@@ -9,16 +9,11 @@ import zio.http.model.headers.values.Origin
 
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.http.api.CorsConfigQuote
+import com.krishna.http.api.general.PublicAuthHttp.config
 import com.krishna.model.user.JwtUser
 
-object PublicQuoteHttp:
-
-  // Create CORS configuration
-  val config: CorsConfig =
-    CorsConfig(
-      allowedOrigins = s => s.contains("localhost:8080"),
-      allowedMethods = Some(Set(Method.GET))
-    )
+object PublicQuoteHttp extends CorsConfigQuote:
 
   def apply(): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {

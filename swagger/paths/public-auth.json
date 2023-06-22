@@ -4,46 +4,89 @@
       "tags": [
         "Public Auth endpoints"
       ],
-      "description": "Get quote of the day. It will be same quote for 24 hours.\n",
-      "operationId": "runQuoteOfTheDayQuote",
+      "description": "User registration for the new user. It will create a new account in the database.\n",
+      "operationId": "registerUser",
+      "requestBody": {
+        "description": "User registration form.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/user.json#/schemas/UserRegister"
+            }
+          }
+        }
+      },
       "responses": {
         "200": {
-          "description": "Quote of the day response",
-          "content": {
-            "application/json": {
+          "description": "Success response if the user is registered in the database.",
+          "headers": {
+            "X-ACCESS-TOKEN": {
               "schema": {
-                "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+                "type": "string"
+              },
+              "description": "JWT token once the user is authorized from the back-end."
+            }
+          },
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "inserting a user record success!!"
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../components/error.json#/schemas/Error"
+                }
               }
             }
           }
         },
-        "default": {
-          "description": "unexpected error",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../components/error.json#/schemas/Error"
-              }
-            }
-          }
+        "409": {
+          "description": "Account already present for the given email."
         }
       }
     }
   },
-   "/user/login": {
+  "/user/login": {
     "post": {
       "tags": [
         "Public Auth endpoints"
       ],
-      "description": "Get quote of the day. It will be same quote for 24 hours.\n",
-      "operationId": "runQuoteOfTheDayQuote",
+      "description": "Login form for the user.\n",
+      "operationId": "loginResponse",
+      "requestBody": {
+        "description": "User log-in form.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/user.json#/schemas/LoginForm"
+            }
+          }
+        }
+      },
       "responses": {
         "200": {
-          "description": "Quote of the day response",
-          "content": {
-            "application/json": {
+          "description": "Success if the user is successfully logged in.",
+          "headers": {
+            "X-ACCESS-TOKEN": {
               "schema": {
-                "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+                "type": "string"
+              },
+              "description": "JWT token once the user is authorized from the back-end."
+            }
+          },
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "Login success!!"
               }
             }
           }
