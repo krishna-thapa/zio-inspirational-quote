@@ -64,7 +64,12 @@ LRANGE cached_ids 0 -1
 - [Javax email in ZIO](https://github.com/funcit/zio-email)
 - [GitHub action with Scala native packager](https://stackoverflow.com/questions/64666502/sbt-native-packager-push-to-github-actions-repository)
 
-
+## Use of Swagger, Open API V3 and Prism to mock API testing
+- [Swagger mock server using prism](https://zenn-dev.translate.goog/yousaku/scraps/c924a99708ba10?_x_tr_sl=ja&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=sc&_x_tr_hist=true)
+- Running [Swagger UI](https://github.com/swagger-api/swagger-ui) as Docker container
+- Once the docker container is up, go to http://localhost:8080/swagger/#/
+- API Mock Servers and Contract Testing using [Prism](https://docs.stoplight.io/docs/prism/674b27b261c3c-prism-overview)
+- Running the Prism mock as Docker container 
 
 ## Run the project as Docker container
 - To publish it locally: `sbt docker:publishLocal`

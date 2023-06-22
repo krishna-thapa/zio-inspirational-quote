@@ -21,234 +21,19 @@
   ],
   "paths": {
     "/quote/quoteOfTheDay": {
-      "get": {
-        "tags": [
-          "Public Quote endpoints"
-        ],
-        "description": "Get quote of the day. It will be same quote for 24 hours.\n",
-        "operationId": "runQuoteOfTheDayQuote",
-        "responses": {
-          "200": {
-            "description": "Quote of the day response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./components/quote.json#/schemas/InspirationalQuote"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./components/error.json#/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$ref": "./paths/public-access.json#/~1quote~1quoteOfTheDay"
     },
     "/quote/random": {
-      "get": {
-        "tags": [
-          "Public Quote endpoints"
-        ],
-        "description": "Retrieve a random quote from the database. You can pass the number of quotes that you want to retrieve.",
-        "operationId": "runRandomQuote",
-        "parameters": [
-          {
-            "name": "rows",
-            "in": "query",
-            "description": "Number of rows to be retrieved from the database randomly.",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "maximum": 10,
-              "minimum": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Random quotes from the database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "./components/quote.json#/schemas/InspirationalQuote"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./components/error.json#/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$ref": "./paths/public-access.json#/~1quote~1random"
     },
     "/quote/search/{text}": {
-      "get": {
-        "tags": [
-          "Public Quote endpoints"
-        ],
-        "description": "Do the full text search using the searched text in the Postgres database.",
-        "operationId": "runSearchQuote",
-        "parameters": [
-          {
-            "name": "text",
-            "in": "path",
-            "description": "Searched text from the user's input",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Can be a single word or words",
-              "default": "love",
-              "minLength": 3
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Matched list of the quotes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "./components/quote.json#/schemas/InspirationalQuote"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./components/error.json#/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$ref": "./paths/public-access.json#/~1quote~1search~1{text}"
     },
     "/quote/genre-title/{text}": {
-      "get": {
-        "tags": [
-          "Public Quote endpoints"
-        ],
-        "description": "Auto-complete the genre list as user input the letter in the textbox.",
-        "operationId": "runSelectGenreTitles",
-        "parameters": [
-          {
-            "name": "text",
-            "in": "path",
-            "description": "Searched genre auto-complete text from the user's input",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Start with the single letter",
-              "default": "lo",
-              "minLength": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Matched list of the genres",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./components/error.json#/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$ref": "./paths/public-access.json#/~1quote~1genre-title~1{text}"
     },
     "/quote/genre/{genre}": {
-      "get": {
-        "tags": [
-          "Public Quote endpoints"
-        ],
-        "description": "Select maximum of 5 quotes with the user's input genre title.",
-        "operationId": "runSelectGenreQuote",
-        "parameters": [
-          {
-            "name": "genre",
-            "in": "path",
-            "description": "Quotes with the selected genre from the user's input",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Genre will be selected from the auto-complete API endpoint",
-              "enum": [
-                "love",
-                "age",
-                "sad",
-                "romance"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of quotes with the selected genre.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "./components/quote.json#/schemas/InspirationalQuote"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error while running runSelectGenreQuote, with Internal Server issue."
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./components/error.json#/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$ref": "./paths/public-access.json#/~1quote~1genre~1{genre}"
     },
     "/user/register": {
       "$ref": "./paths/public-auth.json#/~1user~1register"
@@ -263,10 +48,10 @@
   "components": {
     "securitySchemes": {
       "bearerAuth": {
-        "type": "http",
+        "type": "apiKey",
         "name": "X-ACCESS-TOKEN",
         "in": "header",
-        "description": "Enter the token with the `Bearer: `",
+        "description": "Enter the JWT token",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
