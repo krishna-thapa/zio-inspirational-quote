@@ -17,8 +17,6 @@ trait RedisClient:
 
   val redisConfig: Task[RedisConfig]
 
-  // private val cachedQuoteIdsKey: String = "cached_quote_ids"
-
   private val contentDate: String = DateConversion.getCurrentDate
 
   def getCachedQuote: ZIO[Any, Throwable, Option[String]] =

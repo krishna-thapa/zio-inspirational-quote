@@ -21,19 +21,19 @@
   ],
   "paths": {
     "/quote/quoteOfTheDay": {
-      "$ref": "./paths/public-access.json#/~1quote~1quoteOfTheDay"
+      "$ref": "./paths/public-quote.json#/~1quote~1quoteOfTheDay"
     },
     "/quote/random": {
-      "$ref": "./paths/public-access.json#/~1quote~1random"
+      "$ref": "./paths/public-quote.json#/~1quote~1random"
     },
     "/quote/search/{text}": {
-      "$ref": "./paths/public-access.json#/~1quote~1search~1{text}"
+      "$ref": "./paths/public-quote.json#/~1quote~1search~1{text}"
     },
     "/quote/genre-title/{text}": {
-      "$ref": "./paths/public-access.json#/~1quote~1genre-title~1{text}"
+      "$ref": "./paths/public-quote.json#/~1quote~1genre-title~1{text}"
     },
     "/quote/genre/{genre}": {
-      "$ref": "./paths/public-access.json#/~1quote~1genre~1{genre}"
+      "$ref": "./paths/public-quote.json#/~1quote~1genre~1{genre}"
     },
     "/user/register": {
       "$ref": "./paths/public-auth.json#/~1user~1register"
@@ -42,7 +42,37 @@
       "$ref": "./paths/public-auth.json#/~1user~1login"
     },
     "/admin/users": {
-      "$ref": "./paths/admin-access.json#/~1admin~1users"
+      "$ref": "./paths/admin-auth.json#/~1admin~1users"
+    },
+    "/admin/user/toggle-to-admin/{email}": {
+      "$ref": "./paths/admin-auth.json#/~1admin~1user~1toggle-to-admin~1{email}"
+    },
+    "/admin/user/{email}": {
+      "$ref": "./paths/admin-auth.json#/~1admin~1user~1{email}"
+    },
+    "/admin/migrate": {
+      "$ref": "./paths/admin-quote.json#/~1admin~1migrate"
+    },
+    "/admin/authors": {
+      "$ref": "./paths/admin-quote.json#/~1admin~1authors"
+    },
+    "/admin/db-quotes": {
+      "$ref": "./paths/admin-quote.json#/~1admin~1db-quotes"
+    },
+    "/admin/csv-quotes": {
+      "$ref": "./paths/admin-quote.json#/~1admin~1csv-quotes"
+    },
+    "/quote/fav/{csvId}": {
+      "$ref": "./paths/user-quote.json#/~1quote~1fav~1{csvId}"
+    },
+    "/quote/fav/all": {
+      "$ref": "./paths/user-quote.json#/~1quote~1fav~1all"
+    },
+    "/quote/{uuid}": {
+      "$ref": "./paths/user-quote.json#/~1quote~1{uuid}"
+    },
+    "/quote/author/{authorName}": {
+      "$ref": "./paths/user-quote.json#/~1quote~1author~1{authorName}"
     }
   },
   "components": {
@@ -68,6 +98,9 @@
       },
       "UserDetail": {
         "$ref": "./components/user.json#/schemas/UserDetail"
+      },
+       "AuthorDetail": {
+        "$ref": "./components/author.json#/schemas/AuthorDetail"
       }
     }
   }

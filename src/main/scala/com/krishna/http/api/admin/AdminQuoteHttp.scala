@@ -1,17 +1,20 @@
 package com.krishna.http.api.admin
 
 import zio.ZIO
+import zio.http.Middleware.cors
 import zio.http.*
 import zio.http.model.Method
 
 import com.krishna.csvStore.CsvQuoteService
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.http.api.CorsConfigQuote
+import com.krishna.http.api.admin.AdminAuthHttp.config
 import com.krishna.model.InspirationalQuote
 import com.krishna.model.user.JwtUser
 import com.krishna.wikiHttp.WebClient
 
-object AdminQuoteHttp:
+object AdminQuoteHttp extends CorsConfigQuote:
 
   def apply(
     claim: JwtUser
@@ -53,4 +56,4 @@ object AdminQuoteHttp:
             _               <- ZIO.logInfo(s"Success on uploading total authors: $authorsInserted")
           yield Response.text(s"Success on uploading total $authorsInserted authors to database."))
 
-    }
+    } @@ cors(config)

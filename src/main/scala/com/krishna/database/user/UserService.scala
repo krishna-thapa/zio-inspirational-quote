@@ -1,5 +1,9 @@
 package com.krishna.database.user
 
+import java.nio.charset.StandardCharsets
+
+import scala.util.Try
+
 import zio.http.*
 import zio.http.model.{ Headers, Status }
 import zio.stream.ZStream
@@ -238,7 +242,10 @@ object UserService:
     email: String,
     responseFun: String => ZIO[UserRepo, Throwable, Response]
   ): ZIO[UserRepo, Throwable, Response] =
-    if email.nonEmpty && Email.validEmail(email) then responseFun(email)
+    val decodeEmail: Try[String] = Try(
+      java.net.URLDecoder.decode(email, StandardCharsets.UTF_8.name)
+    )
+    if decodeEmail.isSuccess && Email.validEmail(decodeEmail.get) then responseFun(decodeEmail.get)
     else
       val errorMsg: String =
         s"Invalid pattern of the email address: $email."

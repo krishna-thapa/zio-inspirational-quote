@@ -1,0 +1,39 @@
+{
+  "/user/info": {
+    "get": {
+      "tags": [
+        "User Auth endpoints"
+      ],
+      "description": "Retrieved all the user information.\n",
+      "operationId": "getUserInfo",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success response once the quote is marked as favourite",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "toggle to/from Admin role success!!"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

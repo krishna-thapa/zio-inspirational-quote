@@ -1,5 +1,6 @@
 package com.krishna.http.api.user
 
+import zio.http.Middleware.cors
 import zio.http.*
 import zio.http.model.{ Method, Status }
 import zio.{ UIO, ZIO }
@@ -7,9 +8,11 @@ import zio.{ UIO, ZIO }
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.database.user.UserRepo
 import com.krishna.http.ConfigHttp
+import com.krishna.http.api.CorsConfigQuote
+import com.krishna.http.api.admin.AdminQuoteHttp.config
 import com.krishna.model.user.JwtUser
 
-object UserQuoteHttp:
+object UserQuoteHttp extends CorsConfigQuote:
 
   // CSVId should start with "CSV" prefix and digit should be greater than 100
   private lazy val csvIdPattern = "CSV(?!(?:\\d{1,2}|100)$)[0-9]\\d+$".r
@@ -80,4 +83,4 @@ object UserQuoteHttp:
             .catchAll {
               case e: Exception => internalServerError(e)
             }
-    }
+    } @@ cors(config)

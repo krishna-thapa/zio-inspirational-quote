@@ -67,6 +67,10 @@
           "application/json": {
             "schema": {
               "$ref": "../components/user.json#/schemas/LoginForm"
+            },
+            "example": {
+              "email": "admin@com",
+              "password": "admin"
             }
           }
         }

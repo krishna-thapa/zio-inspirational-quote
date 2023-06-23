@@ -9,5 +9,5 @@ trait CorsConfigQuote:
   val config: CorsConfig =
     CorsConfig(
       allowedOrigins = s => s.contains("localhost:8080"),
-      allowedMethods = Some(Set(Method.GET))
+      allowedMethods = Some(Set(Method.GET, Method.POST, Method.DELETE, Method.PUT))
     )

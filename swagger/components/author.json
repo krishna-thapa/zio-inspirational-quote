@@ -1,0 +1,26 @@
+{
+  "schemas": {
+    "AuthorDetail": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "alias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imageUrl": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

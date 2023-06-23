@@ -1,0 +1,202 @@
+{
+  "/admin/migrate": {
+    "get": {
+      "tags": [
+        "Admin Quote endpoints"
+      ],
+      "description": "Migrate all the quotes from the CSV stored file to the Postgres Database.\n",
+      "operationId": "migrateQuotesToDb",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success response once the quotes have been successfully migrate to the Database",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "Success on migrating total n* quotes to database."
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User is not allowed."
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/admin/authors": {
+    "get": {
+      "tags": [
+        "Admin Quote endpoints"
+      ],
+      "description": "Retrieve all the authors details from the Wiki Media API and stored in the new Postgres table.\n",
+      "operationId": "runGetAndUploadAuthorDetails",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success response once the authors have been successfully retrieved to the Database",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "Success on uploading total n* authors to database."
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User is not allowed."
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/admin/db-quotes": {
+    "get": {
+      "tags": [
+        "Admin Quote endpoints"
+      ],
+      "description": "Retrieve the quotes from the Postgres database with the given offset and limit values.\n",
+      "operationId": "runGetAllQuotes",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "offset",
+          "in": "query",
+          "description": "Offset value for the pagination of the query result.",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "default": 0
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "description": "Limit value for the pagination of the query result.",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "List of the quotes from the Postgres database.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User is not allowed."
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/admin/csv-quotes": {
+    "get": {
+      "tags": [
+        "Admin Quote endpoints"
+      ],
+      "description": "Retrieve the quotes from the CSV file with the given number of rows.\n",
+      "operationId": "getQuotesFromCsv",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "rows",
+          "in": "query",
+          "description": "Number of rows to be retrieved from the CSV file randomly.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "default": 1,
+            "maximum": 10
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "List of the quotes from the CSV file.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User is not allowed."
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

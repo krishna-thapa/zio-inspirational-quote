@@ -1,0 +1,185 @@
+{
+  "/quote/fav/{csvId}": {
+    "post": {
+      "tags": [
+        "User Quote endpoints"
+      ],
+      "description": "Store the quote as favourite quote in the Postgres database table.\n",
+      "operationId": "runUpdateFavQuote",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "csvId",
+          "in": "path",
+          "description": "A unique CSV Id that represents a quote from the Postgres Database.",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "description": "Valid CSV Id of the quote."
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success response once the quote is marked as favourite",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "updating fav quote success!!"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/quote/fav/all": {
+    "get": {
+      "tags": [
+        "User Quote endpoints"
+      ],
+      "description": "Retrieved all the favourite quotes from the Postgres database table.\n",
+      "operationId": "runGetAllFavQuotes",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "List of all the quotes that are marked as favourite",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+                }
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/quote/{uuid}": {
+    "get": {
+      "tags": [
+        "User Quote endpoints"
+      ],
+      "description": "Retrieved the matched quote with the given UUID from the Postgres Database table.\n",
+      "operationId": "runSelectQuote",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "uuid",
+          "in": "path",
+          "description": "UUID of the quote that is stored in the Postgres Database table.",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success response once the quote is marked as favourite",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/quote.json#/schemas/InspirationalQuote"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/quote/author/{authorName}": {
+    "get": {
+      "tags": [
+        "User Quote endpoints"
+      ],
+      "description": "Retrieved the author details with the given author name from the quote.\n",
+      "operationId": "runGetAuthorDetail",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "authorName",
+          "in": "path",
+          "description": "The name of the author.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success response on the Author details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/author.json#/schemas/AuthorDetail"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "unexpected error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/error.json#/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
