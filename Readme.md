@@ -80,9 +80,9 @@ LRANGE cached_ids 0 -1
 - [x] Add the Author details to the postgres table
 - [x] Add the favorite quote API endpoints for the users
 - [x] Use of the fs2/ZIO Stream for reading the quotes from the postgres as stream
-- [ ] Add the Swagger API management tool
+- [x] Add the Swagger API management tool
 - [x] Add the Postgres full text search and new API endpoint for it
-- [ ] Add the Redis for the cache management and to handle the uniqueness on the random quotes
+- [x] Add the Redis for the cache management and to handle the uniqueness on the random quotes
 - [ ] Dockerized the whole app and deploy the image to the GitHub docker hub
 - [ ] Start writing some test cases and add integration test using test containers
 - [ ] See how the email notification can be achieved using publisher and subscriber pattern with scheduler as cron job

@@ -3,11 +3,12 @@ package com.krishna.auth
 import java.time.Clock
 
 import pdi.jwt.{ Jwt, JwtAlgorithm, JwtClaim }
-import zio.ZIO
+import zio.http.*
 import zio.http.model.Status
-import zio.http.{ Http, HttpApp, Request }
 import zio.json.*
+import zio.{ IO, ZIO }
 
+import com.krishna.errorHandle.ErrorHandle
 import com.krishna.model.user.JwtUser
 
 object JwtService:
@@ -33,21 +34,14 @@ object JwtService:
   def isUserAdmin(token: String): Option[JwtUser] =
     isUserValid(token).filter(_.isAdmin)
 
-  // Takes in a Failing HttpApp and a Succeed HttpApp which are called based on Authentication success or failure
-  // For each request tries to read the `X-ACCESS-TOKEN` header
-  // Validates JWT Claim
-  def authenticateUser[R, E](
-    success: JwtUser => HttpApp[R, E],
-    isAdmin: Boolean = false
-  ): HttpApp[R, E] =
-    val fail: HttpApp[Any, Nothing] =
-      Http.text("User not allowed!").setStatus(Status.Unauthorized)
-
-    Http
-      .fromFunction[Request] {
-        _.headers
-          .get("X-ACCESS-TOKEN")
-          .flatMap(token => if isAdmin then isUserAdmin(token) else isUserValid(token))
-          .fold[HttpApp[R, E]](fail)(success)
-      }
-      .flatten
+  /**
+   * Authorize the user by validating the JWT token from the header of the request
+   * @param req HTTP Request
+   * @param isAdmin Boolean flag to validate if the user of logging in as Admin role or not
+   * @return Option of the user details
+   */
+  def authenticate(req: Request, isAdmin: Boolean = false): Option[JwtUser] =
+    req
+      .headers
+      .get("X-ACCESS-TOKEN")
+      .flatMap(token => if isAdmin then isUserAdmin(token) else isUserValid(token))

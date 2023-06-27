@@ -2,7 +2,6 @@ package com.krishna.wikiHttp
 
 import zio.*
 import zio.http.Client
-import zio.http.service.{ ChannelFactory, EventLoopGroup }
 
 import com.krishna.model.AuthorDetail
 import com.krishna.wikiHttp.JsonRes.JsonBody
@@ -21,7 +20,7 @@ case class WikiHttpService() extends WebClient:
         jsonBody <- response.body.asString
       yield JsonBody(jsonBody)
 
-    program.provide(Client.default, Scope.default)
+    program.provide(Client.default)
 
   override def getAuthorDetail(
     author: String

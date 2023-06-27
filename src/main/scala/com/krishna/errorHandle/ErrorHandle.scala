@@ -29,6 +29,12 @@ object ErrorHandle:
     ) *>
       ZIO.succeed(Response.text(errorMsg).setStatus(Status.InternalServerError))
 
+  val responseAuthError: UIO[Response] =
+    ZIO.logError(
+      "Failed while authorizing the user, User not allowed!"
+    ) *>
+      ZIO.succeed(Response.text("User not allowed!").setStatus(Status.Unauthorized))
+
   def responseError(service: String, exception: Throwable): UIO[Response] =
     exception match
       case ex: PSQLException =>

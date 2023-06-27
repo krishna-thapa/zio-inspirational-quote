@@ -42,7 +42,7 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-json" % zioJson,
 
       // https://zio.github.io/zio-http/
-      "dev.zio" %% "zio-http" % "0.0.3",
+      "dev.zio" %% "zio-http" % "0.0.5",
 
       // https://github.com/profunktor/redis4cats
       "dev.profunktor" %% "redis4cats-effects" % "1.4.1",

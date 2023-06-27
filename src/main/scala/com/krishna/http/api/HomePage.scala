@@ -3,8 +3,6 @@ package com.krishna.http.api
 import zio.http.*
 import zio.http.model.Method
 
-import com.krishna.http.VerboseLog
-
 /**
  * An http app that:
  *   - Accepts a `Request` and returns a `Response`
@@ -30,4 +28,4 @@ object HomePage:
       case Method.GET -> !! => Response.text("Home page!!")
 
       case Method.GET -> !! / "ping" => Response.text("Http response with pong!!")
-    } // @@ VerboseLog.log
+    }

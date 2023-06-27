@@ -20,14 +20,13 @@ object MainApp extends ZIOAppDefault:
   val program =
     for
       _    <- ZIO.logInfo("Running ZIO inspirational quote API project!")
-      port <- DatabaseMigrator.migrate <*> Server.install(ConfigHttp.combinedHttps)
+      port <- DatabaseMigrator.migrate <*> Server.install(
+        ConfigHttp.httpsWithMiddlewares.withDefaultErrorResponse
+      )
       _    <- ZIO.logInfo(s"Starting server on http://localhost:$port")
       // _    <- QuoteOfTheDayScheduler.getQuoteOfTheDay
       _    <- ZIO.never
     yield ()
-
-//  private val environmentLayers =
-//    List(configLayer, Server.live, Configuration.layer, QuoteDbService.layer)
 
   override val run: ZIO[Environment & ZIOAppArgs, Any, Any] =
     program

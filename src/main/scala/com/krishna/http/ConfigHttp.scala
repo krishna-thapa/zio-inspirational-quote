@@ -1,10 +1,12 @@
 package com.krishna.http
 
 import pdi.jwt.JwtClaim
-import zio.http.ServerConfig.LeakDetectionLevel
-import zio.http.{ Server, * }
+import zio.*
+import zio.http.HttpAppMiddleware.cors
+import zio.http.*
+import zio.http.middleware.Cors.CorsConfig
+import zio.http.model.{ Headers, Method, Status }
 import zio.json.{ EncoderOps, JsonEncoder }
-import zio.{ ULayer, ZIO }
 
 import com.krishna.auth.JwtService
 import com.krishna.database.quotes.QuoteRepo
@@ -22,23 +24,21 @@ object ConfigHttp:
 
   private type AllRepo = QuoteRepo with UserRepo with WebClient
 
-  private val jwtUserHttps: JwtUser => Http[AllRepo, Throwable, Request, Response] = claim =>
-    UserQuoteHttp.apply(claim) ++ UserAuthHttp(claim)
+  private val combinedHttps: HttpApp[AllRepo, Throwable] =
+    HomePage() ++
+      PublicAuthHttp.apply() ++ PublicQuoteHttp.apply() ++
+      UserQuoteHttp.apply() ++ UserAuthHttp.apply() ++
+      AdminAuthHttp.apply() ++ AdminQuoteHttp.apply()
 
-  private val jwtAdminHttps: JwtUser => Http[AllRepo, Throwable, Request, Response] = claim =>
-    AdminAuthHttp(claim) ++ AdminQuoteHttp.apply(claim)
-
-  val combinedHttps: Http[AllRepo, Throwable, Request, Response] =
-    HomePage() ++ PublicAuthHttp() ++ PublicQuoteHttp() ++
-      JwtService.authenticateUser(jwtUserHttps) ++
-      JwtService.authenticateUser(jwtAdminHttps, isAdmin = true)
+  val httpsWithMiddlewares =
+    combinedHttps @@ MiddlewareConfig.middlewares @@ cors(MiddlewareConfig.configs)
 
   val config: ServerConfig = ServerConfig
     .default
     .port(port)
     // To upload and download the image, have to increase the request size
     .objectAggregator(2097152)
-    .leakDetection(LeakDetectionLevel.PARANOID)
+    // .leakDetection(LeakDetectionLevel.PARANOID)
     .maxThreads(5)
 
   val configLayer: ULayer[ServerConfig] = ServerConfig.live(config)

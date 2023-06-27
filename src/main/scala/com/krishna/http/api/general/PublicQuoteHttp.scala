@@ -1,19 +1,15 @@
 package com.krishna.http.api.general
 
 import zio.ZIO
-import zio.http.Middleware.cors
 import zio.http.*
-import zio.http.middleware.Cors.CorsConfig
 import zio.http.model.Method
 import zio.http.model.headers.values.Origin
 
 import com.krishna.database.quotes.QuoteRepo
 import com.krishna.http.ConfigHttp
-import com.krishna.http.api.CorsConfigQuote
-import com.krishna.http.api.general.PublicAuthHttp.config
 import com.krishna.model.user.JwtUser
 
-object PublicQuoteHttp extends CorsConfigQuote:
+object PublicQuoteHttp:
 
   def apply(): Http[QuoteRepo, Throwable, Request, Response] =
     Http.collectZIO[Request] {
@@ -61,4 +57,4 @@ object PublicQuoteHttp extends CorsConfigQuote:
               s"Success on getting genre titles starting $term, size: ${genres.size}"
             )
           yield ConfigHttp.convertToJson(genres))
-    } @@ cors(config)
+    }
