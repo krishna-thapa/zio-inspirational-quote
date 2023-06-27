@@ -9,7 +9,7 @@ import zio.http.{ HttpAppMiddleware, RequestHandlerMiddleware }
 import zio.{ Clock, durationInt }
 
 object MiddlewareConfig:
-  
+
   // Added the CORS config to allow the Swagger UI to access the API via Open API Spec
   val configs: CorsConfig =
     CorsConfig(
